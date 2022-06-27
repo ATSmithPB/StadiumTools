@@ -3,7 +3,7 @@
 namespace StadiumTools
 {
     /// <summary>
-    /// Stores a collection of unit conversion coeffecients to handle various modeling unit spaces
+    /// This object stores a collection of unit conversion coeffecients to handle various modeling unit spaces
     /// </summary>
     public struct UnitHandler
     {
@@ -14,17 +14,61 @@ namespace StadiumTools
         public const double feet = 3.28084;
         public const double yard = 1.09361;
     }
-    
+
+    /// <summary>
+    /// A point in 2D space (h,v)
+    /// </summary>
+    public struct Pt2d
+    {
+        /// <summary>
+        /// Horizontal distance from origin
+        /// </summary>
+        public double H { get; set; }
+        /// <summary>
+        /// Vertical distance from origin
+        /// </summary>
+        public double V { get; set; }
+    }
+
+    /// <summary>
+    /// A vector in 2D space (h,v)
+    /// </summary>
+    public struct Vec2d
+    {
+        /// <summary>
+        /// Horizontal component of vector.
+        /// </summary>
+        public double H { get; set; }
+        /// <summary>
+        /// Vertical component of vector.
+        /// </summary>
+        public double V { get; set; }
+        /// <summary>
+        /// Length of vector
+        /// </summary>
+        public double L { get; set; }
+    }
+
+    /// <summary>
+    /// A point in 3D space (x, y, z)
+    /// </summary>
+    public struct Pt3d
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+    }
+
     /// <summary>
     /// This object contains the properties of a Spectator. 
     /// </summary>
-    internal class Spectator2D
+    internal class Spectator
     {
         //Properties
         /// <summary>
         /// a tuple represneting the 2d (h(x), v(y)) coordinates of the spectator relative to the P.O.F (Point of focus)
         /// </summary>
-        public (double H, double V) loc2D { get; set; } = (0.0, 0.0);
+        public Pt2d pof { get; set; }
         /// <summary>
         /// a tuple representing the 2d (h(x), v(y)) components and Length of a spectators sightline to the P.O.F
         /// </summary>
@@ -42,7 +86,7 @@ namespace StadiumTools
         /// <summary>
         /// Initializes a new Spectator2D
         /// </summary>
-        public Spectator2D()
+        public Spectator()
         {
             Initialize();
         }
@@ -58,19 +102,15 @@ namespace StadiumTools
     }
 
     /// <summary>
-    /// This object represents a 2D single seating tier.
+    /// This object contains the data of a single seating tier.
     /// </summary>
-    internal class Tier2D
+    internal class Tier
     {
         //Properties
         /// <summary>
         /// Model unit space of the tier (mm, m, in, ft) 
         /// </summary>
         public double unit;
-        /// <summary>
-        /// 2d coordinate representing the point-of-focus of the seating tier
-        /// </summary>
-        public (double h, double v) pof { get; set; }
         /// <summary>
         /// Horizontal offset of Tier Start from Point of Focus (P.O.F)
         /// </summary>
@@ -141,7 +181,7 @@ namespace StadiumTools
         public double superEyeV { get; set; }
        
         //Constructors
-        public Tier2D()
+        public Tier()
         {
             Initialize();
         }
@@ -153,7 +193,6 @@ namespace StadiumTools
         public void Initialize()
         {
             this.unit = UnitHandler.m;
-            this.pof = (0.0, 0.0);
             this.startH = 2.0 * unit;
             this.startV = 5 * unit;
             this.cValue = 0.10 * unit;
@@ -172,5 +211,19 @@ namespace StadiumTools
             this.superEyeH = 0.8 * unit;
             this.superEyeV = 2.5 * unit;
         }
+    }
+
+
+    internal class Tier2d
+    {
+        /// <summary>
+        /// Tier to inherit geometric properties from
+        /// </summary>
+        public Tier tier { get; set; }
+        /// <summary>
+        /// 2d coordinate representing the point-of-focus of the seating tier
+        /// </summary>
+        public (double h, double v) pof { get; set; }
+        public List<()>
     }
 }
