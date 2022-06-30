@@ -245,8 +245,8 @@ namespace StadiumTools
         {
             this.Unit = UnitHandler.m;
             this.RefPt = RefPtType.ByPOF;
-            this.StartH = 2.0 * Unit;
-            this.StartV = 5 * Unit;
+            this.StartH = 5.0 * Unit;
+            this.StartV = 1.0 * Unit;
             this.Cvalue = 0.10 * Unit;
             this.EyeH = 0.8 * Unit;
             this.EyeV = 1.2 * Unit;
