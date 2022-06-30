@@ -18,5 +18,8 @@
       <HintPath>C:\Program Files\Rhino 7\System\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="StadiumTools">
+      <HintPath>..\StadiumTools\bin\Debug\StadiumTools.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

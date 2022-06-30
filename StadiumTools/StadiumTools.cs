@@ -87,9 +87,21 @@ namespace StadiumTools
     {
         //Properties
         /// <summary>
-        /// a point representing the location of the spectator in 2d space relative to the P.O.F
+        /// the index of the spectator's tier within a section
         /// </summary>
-        public Pt2d loc2d { get; set; }
+        public int tierNum { get; set; }
+        /// <summary>
+        /// the index of the spectators row within a tier
+        /// </summary>
+        public int rowNum { get; set; }
+        /// <summary>
+        /// a point representing the location of the spectator seated in 2d space relative to the P.O.F
+        /// </summary>
+        public Pt2d seatedLoc2d { get; set; }
+        /// <summary>
+        /// a point representing the location of spectator standing in 2d space relative to the P.O.F
+        /// </summary>
+        public Pt2d standingLoc2d { get; set; }
         /// <summary>
         /// a point represneting the location of the P.O.F (Point of focus)
         /// </summary>
@@ -116,6 +128,18 @@ namespace StadiumTools
             Initialize();
         }
 
+        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d Spt, Pt2d pof, Vec2d sLine)
+        {
+            this.tierNum = tierN;
+            this.rowNum = rowN;
+            this.seatedLoc2d = pt;
+            this.standingLoc2d = Spt;
+            this.pof = pof;
+            this.sightLine = sLine;
+            this.hasSightLine = false;
+            this.cVal = 0.0;
+        }
+
         //Methods
 
         /// <summary>
@@ -123,7 +147,8 @@ namespace StadiumTools
         /// </summary>
         public void Initialize()
         {
-            this.loc2d = new Pt2d();
+            this.seatedLoc2d = new Pt2d();
+            this.standingLoc2d = new Pt2d();
             this.pof = new Pt2d();
             this.sightLine = new Vec2d();
             this.hasSightLine = false;
@@ -192,6 +217,10 @@ namespace StadiumTools
         /// </summary>
         public int RowCount { get; set; }
         /// <summary>
+        /// Width of row (distance from riser to riser)
+        /// </summary>
+        public double RowWidth { get; set; }
+        /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
         public bool VomHas { get; set; }
@@ -227,6 +256,10 @@ namespace StadiumTools
         /// Vertical offset of spectator eyes from floor of super riser
         /// </summary>
         public double SuperEyeV { get; set; }
+        /// <summary>
+        /// Optional value to round riser increments
+        /// </summary>
+        public double RoundTo { get; set; }
 
         //Constructors
         /// <summary>
@@ -245,14 +278,15 @@ namespace StadiumTools
         {
             this.Unit = UnitHandler.m;
             this.RefPt = RefPtType.ByPOF;
-            this.StartH = 2.0 * Unit;
-            this.StartV = 5 * Unit;
+            this.StartH = 5.0 * Unit;
+            this.StartV = 1.0 * Unit;
             this.Cvalue = 0.10 * Unit;
             this.EyeH = 0.8 * Unit;
             this.EyeV = 1.2 * Unit;
             this.SEyeH = 0.8 * Unit;
             this.SEyeV = 2.5 * Unit;
             this.RowCount = 20;
+            this.RowWidth = 0.9;
             this.VomHas = true;
             this.VomStart = 5;
             this.VomHeight = 5;
@@ -262,6 +296,7 @@ namespace StadiumTools
             this.SuperChamfer = 0.01 * Unit;
             this.SuperEyeH = 0.8 * Unit;
             this.SuperEyeV = 2.5 * Unit;
+            this.RoundTo = 0.001 * Unit;
         }
     }
 

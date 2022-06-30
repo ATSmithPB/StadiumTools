@@ -67,7 +67,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
     bool success = false;
 
-    List<Pt2d> tier1Pts = GetTierPts(tier1, out success);
+    List<Pt2d> tier1Pts = GetSectionPts(section1, out success);
     Point2d[] t1Pts = Pt2dToPoint2d(tier1Pts);
 
     //Outputs
@@ -83,17 +83,53 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// <param name="t"></param>
   /// <param name="success"></param>
   /// <returns></returns>
-  public List<Pt2d> GetTierPts(Tier t, out bool success)
+  public List<Pt2d> GetSectionPts(Section s, out bool success)
   {
-    List<Pt2d> pts = new List<Pt2d>();
-
-    if (t.RefPt == Tier.RefPtType.ByPOF)
+    List<Pt2d> sectionPts = new List<Pt2d>();
+    List<Spectator> spectators = new List<Spectator>();
+    //Ensure first tier uses POF as reference point
+    if (s.Tiers[0].RefPt != Tier.RefPtType.ByPOF)
     {
-      pts.Add(new Pt2d(t.StartH, t.StartV));
+      s.Tiers[0].RefPt = Tier.RefPtType.ByPOF;
+    }
+
+    //Set current Reference point to equal the POF
+    Pt2d refPt = s.POF;
+
+    for (int t = 0; t < s.Tiers.Length; t++)
+    {
+
+      //Get optional Fascia Point for current tier
+      if (s.Tiers[t].FasciaH != 0.0)
+      {
+        sectionPts.Add(new Pt2d(refPt.H + s.Tiers[t].StartH, ((refPt.V + s.Tiers[t].StartV) - s.Tiers[t].FasciaH)));
+      }
+
+      //Get first point for current tier
+      Pt2d prevPt = new Pt2d(refPt.H + s.Tiers[t].StartH, refPt.V + s.Tiers[t].StartV);
+      sectionPts.Add(prevPt);
+
+      //Get point for each row in rowcount
+      for (int r = 0; r < s.Tiers[t].RowCount; r++)
+      {
+        //Get rear riser bottom point for current row and add to list
+        Pt2d currentPt = new Pt2d();
+        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth * r + 1);
+        currentPt.V = prevPt.V;
+        sectionPts.Add(currentPt);
+
+        //Get spectator eye point for current row and add to list
+        Pt2d specPt = new Pt2d(prevPt.H + s.Tiers[t].EyeH, prevPt.V + s.Tiers[t].EyeV);
+        
+        Spectator spectator = new Spectator(t ,r + 1, specPt, s.POF, sLine)
+
+        //Get rear riser bottom point for current row and add to list
+
+      }
     }
 
     success = true;
-    return pts;
+    return sectionPts;
     
   }
 
