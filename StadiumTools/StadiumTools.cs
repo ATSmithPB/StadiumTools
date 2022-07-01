@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using static System.Math;
 
 namespace StadiumTools
 {
@@ -60,11 +61,29 @@ namespace StadiumTools
         public double L { get; set; }
 
         //Constructors
+        /// <summary>
+        /// Construct a 2d vector from its components
+        /// </summary>
+        /// <param name="h"></param>
+        /// <param name="v"></param>
+        /// <param name="l"></param>
         public Vec2d(double h, double v, double l)
         {
             this.H = h;
             this.V = v;
             this.L = l;
+        }
+
+        /// <summary>
+        /// Construct a 2d vector from two Pt2d point objects
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        public Vec2d(Pt2d start, Pt2d end)
+        {
+            this.H = end.H - start.H;
+            this.V = end.V - start.V;
+            this.L = Sqrt((end.H - start.H) * (end.H - start.H) + (end.V - start.V) * (end.V - start.V));
         }
 
         //Methods
@@ -97,27 +116,31 @@ namespace StadiumTools
         /// <summary>
         /// a point representing the location of the spectator seated in 2d space relative to the P.O.F
         /// </summary>
-        public Pt2d seatedLoc2d { get; set; }
+        public Pt2d Loc2d { get; set; }
         /// <summary>
         /// a point representing the location of spectator standing in 2d space relative to the P.O.F
         /// </summary>
-        public Pt2d standingLoc2d { get; set; }
+        public Pt2d Loc2dStanding { get; set; }
         /// <summary>
         /// a point represneting the location of the P.O.F (Point of focus)
         /// </summary>
         public Pt2d pof { get; set; }
         /// <summary>
-        /// a tuple representing the 2d (h(x), v(y)) components and Length of a spectators sightline to the P.O.F
+        /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a seated spectator's sightline to the P.O.F
         /// </summary>
         public Vec2d sightLine { get; set; }
         /// <summary>
+        /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a standing spectator's sightline to the P.O.F
+        /// </summary>
+        public Vec2d sightLineStanding { get; set; }
+        /// <summary>
         /// True if the spectator has an unobstructed sightline to the P.O.F
         /// </summary>
-        public bool hasSightLine { get; set; }
+        public bool hasSightLine { get; set; } = false;
         /// <summary>
         /// The C-Value of the spectator
         /// </summary>
-        public double cVal { get; set; }
+        public double cVal { get; set; } = 0.0;
 
         //Constructors 
         /// <summary>
@@ -128,16 +151,25 @@ namespace StadiumTools
             Initialize();
         }
 
-        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d Spt, Pt2d pof, Vec2d sLine)
+        /// <summary>
+        /// construct a Spectator from a collection of values
+        /// </summary>
+        /// <param name="tierN"></param>
+        /// <param name="rowN"></param>
+        /// <param name="pt"></param>
+        /// <param name="ptSt"></param>
+        /// <param name="pof"></param>
+        /// <param name="sLine"></param>
+        /// <param name="sLineSt"></param>
+        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt)
         {
             this.tierNum = tierN;
             this.rowNum = rowN;
-            this.seatedLoc2d = pt;
-            this.standingLoc2d = Spt;
+            this.Loc2d = pt;
+            this.Loc2dStanding = ptSt;
             this.pof = pof;
             this.sightLine = sLine;
-            this.hasSightLine = false;
-            this.cVal = 0.0;
+            this.sightLineStanding = sLineSt;
         }
 
         //Methods
@@ -147,12 +179,10 @@ namespace StadiumTools
         /// </summary>
         public void Initialize()
         {
-            this.seatedLoc2d = new Pt2d();
-            this.standingLoc2d = new Pt2d();
+            this.Loc2d = new Pt2d();
+            this.Loc2dStanding = new Pt2d();
             this.pof = new Pt2d();
             this.sightLine = new Vec2d();
-            this.hasSightLine = false;
-            this.cVal = 0.0;
         }
     }
 
@@ -217,9 +247,9 @@ namespace StadiumTools
         /// </summary>
         public int RowCount { get; set; }
         /// <summary>
-        /// Width of row (distance from riser to riser)
+        /// Width(s) of row (distance from riser to riser)
         /// </summary>
-        public double RowWidth { get; set; }
+        public List<double> RowWidth { get; set; }
         /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
@@ -286,7 +316,12 @@ namespace StadiumTools
             this.SEyeH = 0.8 * Unit;
             this.SEyeV = 2.5 * Unit;
             this.RowCount = 20;
-            this.RowWidth = 0.9;
+            
+            for (int i = 0; i < this.RowCount; i++)
+            {
+                this.RowWidth[i] = 0.8;
+            }
+            
             this.VomHas = true;
             this.VomStart = 5;
             this.VomHeight = 5;

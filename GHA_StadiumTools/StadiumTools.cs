@@ -192,6 +192,10 @@ namespace StadiumTools
         /// </summary>
         public int RowCount { get; set; }
         /// <summary>
+        /// Width of row (distance from riser to riser)
+        /// </summary>
+        public double RowWidth { get; set; }
+        /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
         public bool VomHas { get; set; }
@@ -227,7 +231,11 @@ namespace StadiumTools
         /// Vertical offset of spectator eyes from floor of super riser
         /// </summary>
         public double SuperEyeV { get; set; }
-       
+        /// <summary>
+        /// Optional value to round riser increments
+        /// </summary>
+        public double RoundTo { get; set; }
+
         //Constructors
         /// <summary>
         /// Initializes a new default Tier
@@ -253,6 +261,7 @@ namespace StadiumTools
             this.SEyeH = 0.8 * Unit;
             this.SEyeV = 2.5 * Unit;
             this.RowCount = 20;
+            this.RowWidth = 0.9;
             this.VomHas = true;
             this.VomStart = 5;
             this.VomHeight = 5;
@@ -262,6 +271,7 @@ namespace StadiumTools
             this.SuperChamfer = 0.01 * Unit;
             this.SuperEyeH = 0.8 * Unit;
             this.SuperEyeV = 2.5 * Unit;
+            this.RoundTo = 0.001 * Unit;
         }
     }
 

@@ -60,6 +60,9 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier tier3 = new Tier();
     tier1.StartH = 5.0;
     tier1.StartV = 1.0;
+    tier1.RowWidth = 0.8;
+    tier2.RowWidth = 0.8;
+    tier3.RowWidth = 0.8;
 
     Tier[] tiers = new Tier[3] {tier1, tier2, tier3};
 
@@ -114,17 +117,23 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       {
         //Get rear riser bottom point for current row and add to list
         Pt2d currentPt = new Pt2d();
-        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth * r + 1);
+        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth);
         currentPt.V = prevPt.V;
         sectionPts.Add(currentPt);
 
-        //Get spectator eye point for current row and add to list
+        //Generate a spectator for current row and add to list
         Pt2d specPt = new Pt2d(prevPt.H + s.Tiers[t].EyeH, prevPt.V + s.Tiers[t].EyeV);
-        
-        Spectator spectator = new Spectator(t ,r + 1, specPt, s.POF, sLine)
+        Pt2d specPtSt = new Pt2d(prevPt.H + s.Tiers[t].SEyeH, prevPt.V + s.Tiers[t].SEyeV);
+        Vec2d sLine = new Vec2d(specPt, s.Tiers[t].POF);
+        Vec2d sLineSt = new Vec2d(specPtSt, s.Tiers[t].POF);
+        Spectator spectator = new Spectator(t, r, specPt, specPtSt, s.POF, sLine, sLineSt);
 
-        //Get rear riser bottom point for current row and add to list
+        //Get rear riser top point for current row and add to list
+        currentPt.V += 0.37;
+        sectionPts.Add(currentPt);
 
+        //reset prevPt for next row iteration
+        prevPt = currentPt;
       }
     }
 
@@ -148,6 +157,23 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     }
 
     return rcPts;
+  }
+
+  /// <summary>
+  /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
+  /// </summary>
+  /// <param name="vecs"></param>
+  /// <returns></returns>
+  public Vector2d[] Vec2dToVector2d(List<Vec2d> vecs)
+  {
+    Vector2d[] rcVecs = new Vector2d[vecs.Count];
+
+    for (int i = 0; i < vecs.Count; i++)
+    {
+      rcVecs[i] = new Vector2d(vecs[i].H, vecs[i].V);
+    }
+
+    return rcVecs;
   }
   #endregion
 }
