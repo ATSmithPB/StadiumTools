@@ -58,23 +58,18 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
     Tier tier3 = new Tier();
-    tier1.StartH = 5.0;
-    tier1.StartV = 1.0;
-    tier1.RowWidth = 0.8;
-    tier2.RowWidth = 0.8;
-    tier3.RowWidth = 0.8;
 
     Tier[] tiers = new Tier[3] {tier1, tier2, tier3};
 
     Section section1 = new Section(tiers);
 
-    bool success = false;
+    bool success = true;
 
-    List<Pt2d> tier1Pts = GetSectionPts(section1, out success);
-    Point2d[] t1Pts = Pt2dToPoint2d(tier1Pts);
+    Pt2d[][] tier1Pts = GetSectionPts(section1);
+    //Point2d[] t1Pts = Pt2dToPoint2d(tier1Pts);
 
     //Outputs
-    pline = t1Pts;
+    //pline = t1Pts;
     s = success;
   }
   #endregion
@@ -86,40 +81,51 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// <param name="t"></param>
   /// <param name="success"></param>
   /// <returns></returns>
-  public List<Pt2d> GetSectionPts(Section s, out bool success)
+  public Pt2d[][] GetSectionPts(Section s)
   {
-    List<Pt2d> sectionPts = new List<Pt2d>();
-    List<Spectator> spectators = new List<Spectator>();
-    //Ensure first tier uses POF as reference point
-    if (s.Tiers[0].RefPt != Tier.RefPtType.ByPOF)
-    {
-      s.Tiers[0].RefPt = Tier.RefPtType.ByPOF;
-    }
+    //Initialize jagged array to store section points
+    int tierCount = s.Tiers.Length;
+    Pt2d[][] sectionPoints = new Pt2d[tierCount][];
 
     //Set current Reference point to equal the POF
-    Pt2d refPt = s.POF;
+    Pt2d curRefPt = s.POF;
 
     for (int t = 0; t < s.Tiers.Length; t++)
     {
-
-      //Get optional Fascia Point for current tier
+      //Calculate point count for Tier t to initialize sub-array
+      int tierPtCount = ((s.Tiers[t].RowCount * 2) - 1);
       if (s.Tiers[t].FasciaH != 0.0)
       {
-        sectionPts.Add(new Pt2d(refPt.H + s.Tiers[t].StartH, ((refPt.V + s.Tiers[t].StartV) - s.Tiers[t].FasciaH)));
+        tierPtCount += 1;
+      }
+      if (s.Tiers[t].SuperCurb != 0.0)
+      {
+        tierPtCount += 1;
       }
 
-      //Get first point for current tier
-      Pt2d prevPt = new Pt2d(refPt.H + s.Tiers[t].StartH, refPt.V + s.Tiers[t].StartV);
-      sectionPts.Add(prevPt);
+      sectionPoints[t] = new Pt2d[tierPtCount];
+      int p = 0;
+      //Add optional Fascia Point for current tier to point array
+      if (s.Tiers[t].FasciaH != 0.0)
+      {
+        sectionPoints[t][p] = (new Pt2d(curRefPt.H + s.Tiers[t].StartH, ((curRefPt.V + s.Tiers[t].StartV) - s.Tiers[t].FasciaH)));
+        p++;
+      }
 
-      //Get point for each row in rowcount
+      //Add first row, first Point for current tier to point array
+      Pt2d prevPt = new Pt2d(curRefPt.H + s.Tiers[t].StartH, curRefPt.V + s.Tiers[t].StartV);
+      sectionPoints[t][p] = prevPt;
+      p++;
+
+      //Add riser points for each row in rowcount to point array
       for (int r = 0; r < s.Tiers[t].RowCount; r++)
       {
         //Get rear riser bottom point for current row and add to list
         Pt2d currentPt = new Pt2d();
-        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth);
+        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth[r]);
         currentPt.V = prevPt.V;
-        sectionPts.Add(currentPt);
+        sectionPoints[t][p] = currentPt;
+        p++;
 
         //Generate a spectator for current row and add to list
         Pt2d specPt = new Pt2d(prevPt.H + s.Tiers[t].EyeH, prevPt.V + s.Tiers[t].EyeV);
@@ -130,20 +136,25 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
         //Get rear riser top point for current row and add to list
         currentPt.V += 0.37;
-        sectionPts.Add(currentPt);
+        sectionPoints[t][p] = currentPt;
+        p++;
 
         //reset prevPt for next row iteration
         prevPt = currentPt;
       }
+
+      //Add final tier point to tier
+      prevPt.H += (s.Tiers[t].RowWidth[s.Tiers[t].RowCount]);
+      sectionPoints[t][s.Tiers[t].RowCount] = prevPt;
+      p++;
     }
 
-    success = true;
-    return sectionPts;
-    
+    return sectionPoints;
+
   }
 
   /// <summary>
-  /// Casts a list of Pt2d objects to an array of RhinoCommon Point2d 
+  /// Casts a list of Pt2d objects to an array of RhinoCommon Point2d
   /// </summary>
   /// <param name="pts"></param>
   /// <returns></returns>
@@ -156,6 +167,21 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       rcPts[i] = new Point2d(pts[i].H, pts[i].V);
     }
 
+    return rcPts;
+  }
+
+  public DataTree<Point2d> Pt2dToPoint2d(Pt2d[][] pts)
+  {
+    DataTree<Point2d> rcPts = new DataTree<Point2d>();
+    for (int i = 0; i < pts.Length; i++)
+    {
+      for (int j = 0; j < pts.Length; j++)
+      {
+        GH_Path path = new GH_Path(i, j);
+        Point2d item = new Point2d(pts[i][j].H, pts[i][j].V);
+        rcPts.Add(item, path);
+      }
+    }
     return rcPts;
   }
 
