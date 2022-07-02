@@ -58,6 +58,9 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
     Tier tier3 = new Tier();
+    tier1.SuperCurb = 0.0;
+    tier2.SuperCurb = 0.0;
+    tier3.SuperCurb = 0.0;
 
     Tier[] tiers = new Tier[3] {tier1, tier2, tier3};
 
@@ -66,10 +69,10 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     bool success = true;
 
     Pt2d[][] tier1Pts = GetSectionPts(section1);
-    //Point2d[] t1Pts = Pt2dToPoint2d(tier1Pts);
+    DataTree<Point2d> t1Pts = Pt2dToPoint2d(tier1Pts);
 
     //Outputs
-    //pline = t1Pts;
+    pline = t1Pts;
     s = success;
   }
   #endregion
@@ -81,24 +84,24 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// <param name="t"></param>
   /// <param name="success"></param>
   /// <returns></returns>
-  public Pt2d[][] GetSectionPts(Section s)
+  public Pt2d[][] GetSectionPts(Section section)
   {
     //Initialize jagged array to store section points
-    int tierCount = s.Tiers.Length;
+    int tierCount = section.Tiers.Length;
     Pt2d[][] sectionPoints = new Pt2d[tierCount][];
 
     //Set current Reference point to equal the POF
-    Pt2d curRefPt = s.POF;
+    Pt2d curRefPt = section.POF;
 
-    for (int t = 0; t < s.Tiers.Length; t++)
+    for (int t = 0; t < section.Tiers.Length; t++)
     {
       //Calculate point count for Tier t to initialize sub-array
-      int tierPtCount = ((s.Tiers[t].RowCount * 2) - 1);
-      if (s.Tiers[t].FasciaH != 0.0)
+      int tierPtCount = ((section.Tiers[t].RowCount * 2));
+      if (section.Tiers[t].FasciaH != 0.0)
       {
         tierPtCount += 1;
       }
-      if (s.Tiers[t].SuperCurb != 0.0)
+      if (section.Tiers[t].SuperCurb != 0.0)
       {
         tierPtCount += 1;
       }
@@ -106,33 +109,33 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       sectionPoints[t] = new Pt2d[tierPtCount];
       int p = 0;
       //Add optional Fascia Point for current tier to point array
-      if (s.Tiers[t].FasciaH != 0.0)
+      if (section.Tiers[t].FasciaH != 0.0)
       {
-        sectionPoints[t][p] = (new Pt2d(curRefPt.H + s.Tiers[t].StartH, ((curRefPt.V + s.Tiers[t].StartV) - s.Tiers[t].FasciaH)));
+        sectionPoints[t][p] = (new Pt2d(curRefPt.H + section.Tiers[t].StartH, ((curRefPt.V + section.Tiers[t].StartV) - section.Tiers[t].FasciaH)));
         p++;
       }
 
       //Add first row, first Point for current tier to point array
-      Pt2d prevPt = new Pt2d(curRefPt.H + s.Tiers[t].StartH, curRefPt.V + s.Tiers[t].StartV);
+      Pt2d prevPt = new Pt2d(curRefPt.H + section.Tiers[t].StartH, curRefPt.V + section.Tiers[t].StartV);
       sectionPoints[t][p] = prevPt;
       p++;
 
       //Add riser points for each row in rowcount to point array
-      for (int r = 0; r < s.Tiers[t].RowCount; r++)
+      for (int r = 0; r < (section.Tiers[t].RowCount - 1); r++)
       {
         //Get rear riser bottom point for current row and add to list
         Pt2d currentPt = new Pt2d();
-        currentPt.H = prevPt.H + (s.Tiers[t].RowWidth[r]);
+        currentPt.H = prevPt.H + (section.Tiers[t].RowWidth[r]);
         currentPt.V = prevPt.V;
         sectionPoints[t][p] = currentPt;
         p++;
 
         //Generate a spectator for current row and add to list
-        Pt2d specPt = new Pt2d(prevPt.H + s.Tiers[t].EyeH, prevPt.V + s.Tiers[t].EyeV);
-        Pt2d specPtSt = new Pt2d(prevPt.H + s.Tiers[t].SEyeH, prevPt.V + s.Tiers[t].SEyeV);
-        Vec2d sLine = new Vec2d(specPt, s.Tiers[t].POF);
-        Vec2d sLineSt = new Vec2d(specPtSt, s.Tiers[t].POF);
-        Spectator spectator = new Spectator(t, r, specPt, specPtSt, s.POF, sLine, sLineSt);
+        Pt2d specPt = new Pt2d(prevPt.H + section.Tiers[t].EyeH, prevPt.V + section.Tiers[t].EyeV);
+        Pt2d specPtSt = new Pt2d(prevPt.H + section.Tiers[t].SEyeH, prevPt.V + section.Tiers[t].SEyeV);
+        Vec2d sLine = new Vec2d(specPt, section.Tiers[t].POF);
+        Vec2d sLineSt = new Vec2d(specPtSt, section.Tiers[t].POF);
+        Spectator spectator = new Spectator(t, r, specPt, specPtSt, section.POF, sLine, sLineSt);
 
         //Get rear riser top point for current row and add to list
         currentPt.V += 0.37;
@@ -144,9 +147,9 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       }
 
       //Add final tier point to tier
-      prevPt.H += (s.Tiers[t].RowWidth[s.Tiers[t].RowCount]);
-      sectionPoints[t][s.Tiers[t].RowCount] = prevPt;
-      p++;
+      prevPt.H += (section.Tiers[t].RowWidth[section.Tiers[t].RowCount - 1]);
+      sectionPoints[t][p] = prevPt;
+      //p++;
     }
 
     return sectionPoints;
@@ -154,10 +157,10 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   }
 
   /// <summary>
-  /// Casts a list of Pt2d objects to an array of RhinoCommon Point2d
+  /// Casts a list of Pt2d objects into an array of RhinoCommon Point2d
   /// </summary>
   /// <param name="pts"></param>
-  /// <returns></returns>
+  /// <returns>Point2d[]</returns>
   public Point2d[] Pt2dToPoint2d(List<Pt2d> pts)
   {
     Point2d[] rcPts = new Point2d[pts.Count];
@@ -170,14 +173,19 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     return rcPts;
   }
 
+  /// <summary>
+  /// Casts a jagged array of Pt2d objects into a data tree of RhinoCommon Point2d
+  /// </summary>
+  /// <param name="pts"></param>
+  /// <returns>DataTree<Point2d></Point2d></returns>
   public DataTree<Point2d> Pt2dToPoint2d(Pt2d[][] pts)
   {
     DataTree<Point2d> rcPts = new DataTree<Point2d>();
     for (int i = 0; i < pts.Length; i++)
     {
-      for (int j = 0; j < pts.Length; j++)
+      for (int j = 0; j < pts[i].Length; j++)
       {
-        GH_Path path = new GH_Path(i, j);
+        GH_Path path = new GH_Path(i);
         Point2d item = new Point2d(pts[i][j].H, pts[i][j].V);
         rcPts.Add(item, path);
       }
@@ -189,7 +197,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
   /// </summary>
   /// <param name="vecs"></param>
-  /// <returns></returns>
+  /// <returns>Vector2d[]</returns>
   public Vector2d[] Vec2dToVector2d(List<Vec2d> vecs)
   {
     Vector2d[] rcVecs = new Vector2d[vecs.Count];
