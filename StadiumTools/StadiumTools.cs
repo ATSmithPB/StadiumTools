@@ -273,11 +273,11 @@ namespace StadiumTools
         /// <summary>
         /// Start row for inserting super riser
         /// </summary>
-        public int SuperStart { get; set; }
+        public int SuperRow { get; set; }
         /// <summary>
-        /// Optional chamfer distance for nose of super riser
+        /// Optional curb distance before super riser 
         /// </summary>
-        public double SuperChamfer { get; set; }
+        public double SuperCurb { get; set; }
         /// <summary>
         /// Horizontal offset of spectator eyes from nose of super riser 
         /// </summary>
@@ -290,6 +290,10 @@ namespace StadiumTools
         /// Optional value to round riser increments
         /// </summary>
         public double RoundTo { get; set; }
+        /// <summary>
+        /// An ordered list of Spectators in the tier
+        /// </summary>
+        public Spectator[] Spectators { get; set; }
 
         //Constructors
         /// <summary>
@@ -316,19 +320,23 @@ namespace StadiumTools
             this.SEyeH = 0.8 * Unit;
             this.SEyeV = 2.5 * Unit;
             this.RowCount = 20;
-            
+
+            // Initialize all row widths to default value
+            List<double> rowWidths = new List<double>();
+            double defaultRW = 0.8;
             for (int i = 0; i < this.RowCount; i++)
-            {
-                this.RowWidth[i] = 0.8;
+            {   
+                rowWidths.Add(defaultRW);
             }
-            
+
+            this.RowWidth = rowWidths;
             this.VomHas = true;
             this.VomStart = 5;
             this.VomHeight = 5;
             this.FasciaH = 1.0 * Unit;
             this.HasSuper = true;
-            this.SuperStart = 15;
-            this.SuperChamfer = 0.01 * Unit;
+            this.SuperRow = 15;
+            this.SuperCurb = 0.01 * Unit;
             this.SuperEyeH = 0.8 * Unit;
             this.SuperEyeV = 2.5 * Unit;
             this.RoundTo = 0.001 * Unit;
@@ -360,6 +368,18 @@ namespace StadiumTools
             Tier[] tiers = tierList.ToArray();
             this.Tiers = tiers;
             this.POF = new Pt2d(0.0, 0.0);
+
+            //Force first tier to get reference point from Point of Focus
+            if (tiers[0].RefPt != Tier.RefPtType.ByPOF)
+            {
+                tiers[0].RefPt = Tier.RefPtType.ByPOF;
+            }
+
+            //Apply the section POF to all contained tiers 
+            foreach (Tier t in tiers)
+            {
+                t.POF = this.POF;
+            }
         }
 
         /// <summary>
