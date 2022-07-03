@@ -11,7 +11,7 @@ namespace StadiumTools
         /// <summary>
         /// Available methods to generate a reference point for a tier
         /// </summary>
-        public enum RefPtType
+        public enum ReferencePtType
         {
             ByPOF,
             ByEndOfPrevTier
@@ -19,9 +19,13 @@ namespace StadiumTools
 
         //Properties
         /// <summary>
-        /// Method for determining the reference point of the tier
+        /// The method for determining the reference point of the tier
         /// </summary>
-        public RefPtType RefPt { get; set; }
+        public ReferencePtType RefPtType { get; set; }
+        /// <summary>
+        /// Index of tier within it's section
+        /// </summary>
+        public int SectionIndex { get; set; }
         /// <summary>
         /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
         /// </summary>
@@ -110,6 +114,10 @@ namespace StadiumTools
         /// An ordered list of Spectators in the tier
         /// </summary>
         public Spectator[] Spectators { get; set; }
+        /// <summary>
+        /// Pt2d that represents the final point of the tier (Hmax, Vmax)
+        /// </summary>
+        public Pt2d endPt { get; set; }
 
         //Constructors
         /// <summary>
@@ -127,7 +135,7 @@ namespace StadiumTools
         public void Initialize()
         {
             this.Unit = UnitHandler.m;
-            this.RefPt = RefPtType.ByPOF;
+            this.RefPtType = ReferencePtType.ByPOF;
             this.StartH = 5.0 * Unit;
             this.StartV = 1.0 * Unit;
             this.Cvalue = 0.10 * Unit;

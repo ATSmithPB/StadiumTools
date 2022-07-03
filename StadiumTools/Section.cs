@@ -29,9 +29,9 @@ namespace StadiumTools
             this.POF = new Pt2d(0.0, 0.0);
 
             //Force first tier to get reference point from Point of Focus
-            if (tiers[0].RefPt != Tier.RefPtType.ByPOF)
+            if (tiers[0].RefPtType != Tier.ReferencePtType.ByPOF)
             {
-                tiers[0].RefPt = Tier.RefPtType.ByPOF;
+                tiers[0].RefPtType = Tier.ReferencePtType.ByPOF;
             }
 
             //Apply the section POF to all contained tiers 
@@ -49,6 +49,11 @@ namespace StadiumTools
         {
             this.Tiers = tiers;
             this.POF = new Pt2d(0.0, 0.0);
+
+            for (int i = 0; i < tiers.Length; i++)
+            {
+                tiers[i].SectionIndex = i;
+            }
         }
 
         /// <summary>
