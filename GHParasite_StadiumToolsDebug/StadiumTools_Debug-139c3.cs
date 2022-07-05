@@ -71,13 +71,13 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     tier2.StartV = 4.0;
     tier3.StartV = 4.0;
 
-    Tier[] tiers = new Tier[3] {tier1, tier2, tier3};
+    Tier[] tiers = new Tier[3] { tier1, tier2, tier3 };
 
     Section section1 = new Section(tiers);
 
     bool success = true;
 
-    Pt2d[][] tier1Pts = GetSectionPts(section1);
+    Pt2d[][] tier1Pts = CalcSectionPts(section1);
     DataTree<Point2d> t1Pts = Pt2dToPoint2d(tier1Pts);
 
     //Outputs
@@ -93,92 +93,93 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// <param name="t"></param>
   /// <param name="success"></param>
   /// <returns></returns>
-  public Pt2d[][] GetSectionPts(Section section)
+  public void CalcSectionPts(Section section)
   {
-    //Initialize jagged array to store section points
-    int tierCount = section.Tiers.Length;
-    Pt2d[][] sectionPoints = new Pt2d[tierCount][];
-
-    //Set Tier Reference point
-    for (int i = 0; i < section.Tiers.Length; i++)
+    for (int t = 0; t < section.Tiers.Length; t++)
     {
-      sectionPoints[i] = GetTierPoints(section, section.Tiers[i]);
+      CalcTierPoints(section, section.Tiers[t]);
     }
-
-    return sectionPoints;
   }
 
-  public Pt2d[] GetTierPoints(Section section, Tier tier)
+  /// <summary>
+  /// Returns an array of Pt2d objects for a given tier within a section
+  /// </summary>
+  /// <param name="section"></param>
+  /// <param name="tier"></param>
+  /// <returns>Pt2d[]</returns>
+  public void CalcTierPoints(Section section, Tier tier)
   {
-    //Tier points increment
-    int p = 0;
-    
     //Set Reference Point
     Pt2d RefPt = tier.POF;
     if (tier.RefPtType == Tier.ReferencePtType.ByEndOfPrevTier)
     {
-      RefPt = section.Tiers[tier.SectionIndex - 1].endPt;
+      RefPt = section.Tiers[tier.SectionIndex - 1].Points2d[section.Tiers[tier.SectionIndex - 1].Points2dCount - 1];
     }
 
-    //Calculate point count Tier to initialize sub-array
-    int tierPtCount = ((tier.RowCount * 2));
-    if (tier.FasciaH != 0.0)
-    {
-      tierPtCount += 1;
-    }
-    if (tier.SuperCurb != 0.0)
-    {
-      tierPtCount += 1;
-    }
+    CalcRowPoints(tier);
 
-    Pt2d[] tierPts = new Pt2d[tierPtCount];
+  }
+
+  /// <summary>
+  /// Calculates B and C points for a tier iterativly.
+  /// </summary>
+  /// <param name="tier"></param>
+  public void CalcRowPoints(Tier tier)
+  {
+    //Tier points increment
+    int p = 0;
+
     //Add optional Fascia Point to point array
     if (tier.FasciaH != 0.0)
     {
-      tierPts[p] = (new Pt2d(RefPt.H + tier.StartH, ((RefPt.V + tier.StartV) - tier.FasciaH)));
+      tier.Points2d[p] = (new Pt2d(tier.RefPt.H + tier.StartH, ((tier.RefPt.V + tier.StartV) - tier.FasciaH)));
       p++;
     }
 
-    //Add first row, first Point to point array
-    Pt2d prevPt = new Pt2d(RefPt.H + tier.StartH, RefPt.V + tier.StartV);
-    tierPts[p] = prevPt;
+    //Add first row, first Point (PtA) to point array
+    Pt2d prevPt = new Pt2d(tier.RefPt.H + tier.StartH, tier.RefPt.V + tier.StartV);
+    tier.Points2d[p] = prevPt;
     p++;
 
     //Add riser points for each row in rowcount to point array
-    for (int r = 0; r < (tier.RowCount - 1); r++)
+    for (int row = 0; row < (tier.RowCount - 1); row++)
     {
-      //Get rear riser bottom point for current row and add to list
+      //Get rear riser bottom point (PtB) for current row and add to list
       Pt2d currentPt = new Pt2d();
-      currentPt.H = prevPt.H + (tier.RowWidth[r]);
+      currentPt.H = prevPt.H + (tier.RowWidth[row]);
       currentPt.V = prevPt.V;
-      tierPts[p] = currentPt;
+      tier.Points2d[p] = currentPt;
       p++;
 
       //Generate a spectator for current row and add to list
-      Pt2d specPt = new Pt2d(prevPt.H + tier.EyeH, prevPt.V + tier.EyeV);
-      Pt2d specPtSt = new Pt2d(prevPt.H + tier.SEyeH, prevPt.V + tier.SEyeV);
-      Vec2d sLine = new Vec2d(specPt, tier.POF);
-      Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
-      Spectator spectator = new Spectator(tier.SectionIndex, r, specPt, specPtSt, section.POF, sLine, sLineSt);
+      CalcRowSpectator(tier, prevPt, row);
 
-      //Get rear riser top point for current row and add to list
+      //Get rear riser top point (PtC) for current row and add to list
       currentPt.V += 0.37;
-      tierPts[p] = currentPt;
+      tier.Points2d[p] = currentPt;
       p++;
 
-      //reset prevPt for next row iteration
       prevPt = currentPt;
     }
 
     //Add final tier point to tier
     prevPt.H += (tier.RowWidth[tier.RowCount - 1]);
-    tierPts[p] = prevPt;
-    tier.endPt = prevPt;
-
-    return tierPts;
+    tier.Points2d[p] = prevPt;
   }
-  
 
+  /// <summary>
+  /// Creates and adds a row's spectator to the tier. PtB argument should be rear riser point.
+  /// </summary>
+  /// <param name="tier"></param>
+  /// <param name="pt"></param>
+  public void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
+  {
+    Pt2d specPt = new Pt2d(ptB.H + tier.EyeH, ptB.V + tier.EyeV);
+    Pt2d specPtSt = new Pt2d(ptB.H + tier.SEyeH, ptB.V + tier.SEyeV);
+    Vec2d sLine = new Vec2d(specPt, tier.POF);
+    Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
+    Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
+  }
 
   /// <summary>
   /// Casts a list of Pt2d objects into an array of RhinoCommon Point2d
