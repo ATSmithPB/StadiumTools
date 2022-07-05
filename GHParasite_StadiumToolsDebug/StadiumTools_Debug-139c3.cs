@@ -75,127 +75,30 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
     Section section1 = new Section(tiers);
 
-    bool success = true;
-
-    Pt2d[][] tier1Pts = CalcSectionPts(section1);
-    DataTree<Point2d> t1Pts = Pt2dToPoint2d(tier1Pts);
+    Pt2d[][]section1Pts = Section.GetSectionPts(section1);
+    DataTree<Point2d> t1Pts = Pt2dToPoint2d(section1Pts);
 
     //Outputs
     pline = t1Pts;
-    s = success;
   }
   #endregion
   #region Additional
 
   /// <summary>
-  /// Returns a list of 2d points that define a seating tier
+  /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
   /// </summary>
-  /// <param name="t"></param>
-  /// <param name="success"></param>
-  /// <returns></returns>
-  public void CalcSectionPts(Section section)
+  /// <param name="vecs"></param>
+  /// <returns>Vector2d[]</returns>
+  public Vector2d[] Vec2dToVector2d(List<Vec2d> vecs)
   {
-    for (int t = 0; t < section.Tiers.Length; t++)
-    {
-      CalcTierPoints(section, section.Tiers[t]);
-    }
-  }
+    Vector2d[] rcVecs = new Vector2d[vecs.Count];
 
-  /// <summary>
-  /// Returns an array of Pt2d objects for a given tier within a section
-  /// </summary>
-  /// <param name="section"></param>
-  /// <param name="tier"></param>
-  /// <returns>Pt2d[]</returns>
-  public void CalcTierPoints(Section section, Tier tier)
-  {
-    //Set Reference Point
-    Pt2d RefPt = tier.POF;
-    if (tier.RefPtType == Tier.ReferencePtType.ByEndOfPrevTier)
+    for (int i = 0; i < vecs.Count; i++)
     {
-      RefPt = section.Tiers[tier.SectionIndex - 1].Points2d[section.Tiers[tier.SectionIndex - 1].Points2dCount - 1];
+      rcVecs[i] = new Vector2d(vecs[i].H, vecs[i].V);
     }
 
-    CalcRowPoints(tier);
-
-  }
-
-  /// <summary>
-  /// Calculates B and C points for a tier iterativly.
-  /// </summary>
-  /// <param name="tier"></param>
-  public void CalcRowPoints(Tier tier)
-  {
-    //Tier points increment
-    int p = 0;
-
-    //Add optional Fascia Point to point array
-    if (tier.FasciaH != 0.0)
-    {
-      tier.Points2d[p] = (new Pt2d(tier.RefPt.H + tier.StartH, ((tier.RefPt.V + tier.StartV) - tier.FasciaH)));
-      p++;
-    }
-
-    //Add first row, first Point (PtA) to point array
-    Pt2d prevPt = new Pt2d(tier.RefPt.H + tier.StartH, tier.RefPt.V + tier.StartV);
-    tier.Points2d[p] = prevPt;
-    p++;
-
-    //Add riser points for each row in rowcount to point array
-    for (int row = 0; row < (tier.RowCount - 1); row++)
-    {
-      //Get rear riser bottom point (PtB) for current row and add to list
-      Pt2d currentPt = new Pt2d();
-      currentPt.H = prevPt.H + (tier.RowWidth[row]);
-      currentPt.V = prevPt.V;
-      tier.Points2d[p] = currentPt;
-      p++;
-
-      //Generate a spectator for current row and add to list
-      CalcRowSpectator(tier, prevPt, row);
-
-      //Get rear riser top point (PtC) for current row and add to list
-      currentPt.V += 0.37;
-      tier.Points2d[p] = currentPt;
-      p++;
-
-      prevPt = currentPt;
-    }
-
-    //Add final tier point to tier
-    prevPt.H += (tier.RowWidth[tier.RowCount - 1]);
-    tier.Points2d[p] = prevPt;
-  }
-
-  /// <summary>
-  /// Creates and adds a row's spectator to the tier. PtB argument should be rear riser point.
-  /// </summary>
-  /// <param name="tier"></param>
-  /// <param name="pt"></param>
-  public void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
-  {
-    Pt2d specPt = new Pt2d(ptB.H + tier.EyeH, ptB.V + tier.EyeV);
-    Pt2d specPtSt = new Pt2d(ptB.H + tier.SEyeH, ptB.V + tier.SEyeV);
-    Vec2d sLine = new Vec2d(specPt, tier.POF);
-    Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
-    Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
-  }
-
-  /// <summary>
-  /// Casts a list of Pt2d objects into an array of RhinoCommon Point2d
-  /// </summary>
-  /// <param name="pts"></param>
-  /// <returns>Point2d[]</returns>
-  public Point2d[] Pt2dToPoint2d(List<Pt2d> pts)
-  {
-    Point2d[] rcPts = new Point2d[pts.Count];
-
-    for (int i = 0; i < pts.Count; i++)
-    {
-      rcPts[i] = new Point2d(pts[i].H, pts[i].V);
-    }
-
-    return rcPts;
+    return rcVecs;
   }
 
   /// <summary>
@@ -218,21 +121,9 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     return rcPts;
   }
 
-  /// <summary>
-  /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
-  /// </summary>
-  /// <param name="vecs"></param>
-  /// <returns>Vector2d[]</returns>
-  public Vector2d[] Vec2dToVector2d(List<Vec2d> vecs)
-  {
-    Vector2d[] rcVecs = new Vector2d[vecs.Count];
 
-    for (int i = 0; i < vecs.Count; i++)
-    {
-      rcVecs[i] = new Vector2d(vecs[i].H, vecs[i].V);
-    }
 
-    return rcVecs;
-  }
+
+
   #endregion
 }
