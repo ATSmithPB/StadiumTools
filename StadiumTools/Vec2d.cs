@@ -48,6 +48,17 @@ namespace StadiumTools
             this.L = Sqrt((end.H - start.H) * (end.H - start.H) + (end.V - start.V) * (end.V - start.V));
         }
 
+        /// <summary>
+        /// Construct a 2d vector from a Spectator object
+        /// </summary>
+        /// <param name="spec"></param>
+        public Vec2d(Spectator spec)
+        {
+            this.H = spec.POF.H - spec.Loc2d.H;
+            this.V = spec.POF.V - spec.Loc2d.V;
+            this.L = Sqrt((spec.POF.H - spec.Loc2d.H) * (spec.POF.H - spec.Loc2d.H) + (spec.POF.V - spec.Loc2d.V) * (spec.POF.V - spec.Loc2d.V));
+        }
+
         //Methods
     }
 }

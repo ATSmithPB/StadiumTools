@@ -53,7 +53,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(ref object pline, ref object s)
+  private void RunScript(ref object pline, ref object spec, ref object vecOut)
   {
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
@@ -71,13 +71,15 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
     Pt2d[][] section1Pts = Section.GetSectionPts(section1);
     DataTree<Point2d> t1Pts = Pt2dToPoint2d(section1Pts);
-    //Vec2d[][] section1Vecs = Section.GetSectionSightlines(section1);
-    //DataTree<Vector2d> t1Vecs = Vec2dToVector2d(section1Vecs);
-
+    Vec2d[][] section1Vecs = Section.GetSightlines(section1);
+    DataTree<Vector2d> t1Vecs = Vec2dToVector2d(section1Vecs);
+    Pt2d[][] section1Specs = Section.GetSpectatorPts(section1);
+    DataTree<Point2d> specPts = Pt2dToPoint2d(section1Specs);
 
     //Outputs
     pline = t1Pts;
-    s = section1.Tiers[0].Spectators.Length;
+    spec = specPts;
+    vecOut = t1Vecs;
   }
   #endregion
   #region Additional

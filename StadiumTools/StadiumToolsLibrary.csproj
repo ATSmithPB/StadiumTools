@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO_Grasshopper.cs" />
     <Compile Include="Pt2d.cs" />
     <Compile Include="Pt3d.cs" />
     <Compile Include="Section.cs" />

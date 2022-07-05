@@ -23,19 +23,27 @@ namespace StadiumTools
         /// </summary>
         public ReferencePtType RefPtType { get; set; }
         /// <summary>
-        /// Index of tier within it's section
+        /// Reference Point of tier relative to StartH and StartV
+        /// </summary>
+        public Pt2d RefPt { get; set; }
+        /// <summary>
+        /// Index of the tier within a section
         /// </summary>
         public int SectionIndex { get; set; }
+        /// <summary>
+        /// Index of the tier within the plan
+        /// </summary>
+        public int PlanIndex { get; set; }
         /// <summary>
         /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
         /// </summary>
         public double Unit;
         /// <summary>
-        /// Point of focus for the spectators of this tier 
+        /// Point of focus for all spectators in this tier 
         /// </summary>
         public Pt2d POF { get; set; }
         /// <summary>
-        /// Horizontal offset of Tier Start from reference point
+        /// Horizontal offset of tier start from reference point
         /// </summary>
         public double StartH { get; set; }
         /// <summary>
@@ -43,27 +51,27 @@ namespace StadiumTools
         /// </summary>
         public double StartV { get; set; }
         /// <summary>
-        /// Maximum allowable c-value for spectators in this tier.
+        /// Minimum allowable c-value for spectators in this tier.
         /// </summary>
         public double Cvalue { get; set; }
         /// <summary>
-        /// Horizontal offset of seated spectator eyes from riser nose 
+        /// Horizontal offset of seated spectator eyes from row start 
         /// </summary>
         public double EyeH { get; set; }
         /// <summary>
-        /// Vertical offset of seated spectator eyes from floor
+        /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
         public double EyeV { get; set; }
         /// <summary>
-        /// Horizontal offset of standing spectator eyes from riser nose 
+        /// Horizontal offset of standing spectator eyes from row start
         /// </summary>
         public double SEyeH { get; set; }
         /// <summary>
-        /// Vertical offset of seated spectator eyes from floor
+        /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
         public double SEyeV { get; set; }
         /// <summary>
-        /// Number of rows in this tier not including super risers
+        /// Number of rows in this tier (super riser == row)
         /// </summary>
         public int RowCount { get; set; }
         /// <summary>
@@ -79,7 +87,7 @@ namespace StadiumTools
         /// </summary>
         public int VomStart { get; set; }
         /// <summary>
-        /// Height of vomitory in rows 
+        /// Height of vomitory (in rows)
         /// </summary>
         public int VomHeight { get; set; }
         /// <summary>
@@ -115,9 +123,14 @@ namespace StadiumTools
         /// </summary>
         public Spectator[] Spectators { get; set; }
         /// <summary>
-        /// Pt2d that represents the final point of the tier (Hmax, Vmax)
+        /// Number of Pt2d objects this tier describes
         /// </summary>
-        public Pt2d endPt { get; set; }
+        public int Points2dCount { get; set; }
+        /// <summary>
+        /// Pt2d objects that represents the top outline geometry of the tier
+        /// </summary>
+        public Pt2d[] Points2d { get; set; }
+       
 
         //Constructors
         /// <summary>
@@ -160,11 +173,34 @@ namespace StadiumTools
             this.FasciaH = 1.0 * Unit;
             this.HasSuper = true;
             this.SuperRow = 15;
-            this.SuperCurb = 0.01 * Unit;
+            this.SuperCurb = 0.0 * Unit;
             this.SuperEyeH = 0.8 * Unit;
             this.SuperEyeV = 2.5 * Unit;
             this.RoundTo = 0.001 * Unit;
+            this.Points2dCount = GetTierPtCount(this);
+            this.Points2d = new Pt2d[this.Points2dCount];
+            this.Spectators = new Spectator[this.RowCount];
         }
+
+        /// <summary>
+        /// Calculates the geometric point count for a Tier
+        /// </summary>
+        /// <param name="tier"></param>
+        private static int GetTierPtCount(Tier tier)
+        {
+            int tierPtCount = (tier.RowCount * 2);
+            if (tier.FasciaH != 0.0)
+            {
+                tierPtCount += 1;
+            }
+            if (tier.SuperCurb != 0.0)
+            {
+                tierPtCount += 1;
+            }
+
+            return tierPtCount;   
+        }
+
     }
 
 }

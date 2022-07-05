@@ -24,6 +24,16 @@ namespace StadiumTools
             this.V = v;
         }
 
+        /// <summary>
+        /// Construct a 2d point from a Spectator object
+        /// </summary>
+        /// <param name="spec"></param>
+        public Pt2d(Spectator spec)
+        {
+            this.H = spec.Loc2d.H;
+            this.V = spec.Loc2d.V;
+        }
+
         //Methods
     }
 }

@@ -12,11 +12,11 @@ namespace StadiumTools
         /// <summary>
         /// the index of the spectator's tier within a section
         /// </summary>
-        public int tierNum { get; set; }
+        public int TierNum { get; set; }
         /// <summary>
         /// the index of the spectators row within a tier
         /// </summary>
-        public int rowNum { get; set; }
+        public int RowNum { get; set; }
         /// <summary>
         /// a point representing the location of the spectator seated in 2d space relative to the P.O.F
         /// </summary>
@@ -28,11 +28,11 @@ namespace StadiumTools
         /// <summary>
         /// a point represneting the location of the P.O.F (Point of focus)
         /// </summary>
-        public Pt2d pof { get; set; }
+        public Pt2d POF { get; set; }
         /// <summary>
         /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a seated spectator's sightline to the P.O.F
         /// </summary>
-        public Vec2d sightLine { get; set; }
+        public Vec2d SightLine { get; set; }
         /// <summary>
         /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a standing spectator's sightline to the P.O.F
         /// </summary>
@@ -40,11 +40,11 @@ namespace StadiumTools
         /// <summary>
         /// True if the spectator has an unobstructed sightline to the P.O.F
         /// </summary>
-        public bool hasSightLine { get; set; } = false;
+        public bool HasSightLine { get; set; } = false;
         /// <summary>
         /// The C-Value of the spectator
         /// </summary>
-        public double cVal { get; set; } = 0.0;
+        public double CVal { get; set; } = 0.0;
 
         //Constructors 
         /// <summary>
@@ -67,12 +67,12 @@ namespace StadiumTools
         /// <param name="sLineSt"></param>
         public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt)
         {
-            this.tierNum = tierN;
-            this.rowNum = rowN;
+            this.TierNum = tierN;
+            this.RowNum = rowN;
             this.Loc2d = pt;
             this.Loc2dStanding = ptSt;
-            this.pof = pof;
-            this.sightLine = sLine;
+            this.POF = pof;
+            this.SightLine = sLine;
             this.sightLineStanding = sLineSt;
         }
 
@@ -85,8 +85,8 @@ namespace StadiumTools
         {
             this.Loc2d = new Pt2d();
             this.Loc2dStanding = new Pt2d();
-            this.pof = new Pt2d();
-            this.sightLine = new Vec2d();
+            this.POF = new Pt2d();
+            this.SightLine = new Vec2d();
         }
     }
 }
