@@ -58,16 +58,10 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
     Tier tier3 = new Tier();
-    tier1.SuperCurb = 0.0;
-    tier2.SuperCurb = 0.0;
-    tier3.SuperCurb = 0.0;
-    tier1.FasciaH = 1.0;
-    tier2.FasciaH = 1.0;
-    tier3.FasciaH = 1.0;
     tier2.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
     tier3.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
     tier2.StartH = -2.0;
-    tier3.StartH = -2.0;
+    tier3.StartH = -3.0;
     tier2.StartV = 4.0;
     tier3.StartV = 4.0;
 
@@ -75,11 +69,15 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
     Section section1 = new Section(tiers);
 
-    Pt2d[][]section1Pts = Section.GetSectionPts(section1);
+    Pt2d[][] section1Pts = Section.GetSectionPts(section1);
     DataTree<Point2d> t1Pts = Pt2dToPoint2d(section1Pts);
+    //Vec2d[][] section1Vecs = Section.GetSectionSightlines(section1);
+    //DataTree<Vector2d> t1Vecs = Vec2dToVector2d(section1Vecs);
+
 
     //Outputs
     pline = t1Pts;
+    s = section1.Tiers[0].Spectators.Length;
   }
   #endregion
   #region Additional
@@ -89,11 +87,11 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// </summary>
   /// <param name="vecs"></param>
   /// <returns>Vector2d[]</returns>
-  public Vector2d[] Vec2dToVector2d(List<Vec2d> vecs)
+  public Vector2d[] Vec2dToVector2d(Vec2d[] vecs)
   {
-    Vector2d[] rcVecs = new Vector2d[vecs.Count];
+    Vector2d[] rcVecs = new Vector2d[vecs.Length];
 
-    for (int i = 0; i < vecs.Count; i++)
+    for (int i = 0; i < vecs.Length; i++)
     {
       rcVecs[i] = new Vector2d(vecs[i].H, vecs[i].V);
     }
@@ -101,6 +99,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     return rcVecs;
   }
 
+ 
   /// <summary>
   /// Casts a jagged array of Pt2d objects into a data tree of RhinoCommon Point2d
   /// </summary>
@@ -121,9 +120,24 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     return rcPts;
   }
 
-
-
-
-
+  /// <summary>
+  /// Casts a jagged array of Vec2d objects into a data tree of RhinoCommon Vector2d
+  /// </summary>
+  /// <param name="pts"></param>
+  /// <returns>DataTree<Point2d></Point2d></returns>
+  public DataTree<Vector2d> Vec2dToVector2d(Vec2d[][] vecs)
+  {
+    DataTree<Vector2d> rcVecs = new DataTree<Vector2d>();
+    for (int i = 0; i < vecs.Length; i++)
+    {
+      for (int j = 0; j < vecs[i].Length; j++)
+      {
+        GH_Path path = new GH_Path(i);
+        Vector2d item = new Vector2d(vecs[i][j].H, vecs[i][j].V);
+        rcVecs.Add(item, path);
+      }
+    }
+    return rcVecs;
+  }
   #endregion
 }
