@@ -152,10 +152,10 @@ namespace StadiumTools
             this.StartH = 5.0 * Unit;
             this.StartV = 1.0 * Unit;
             this.Cvalue = 0.10 * Unit;
-            this.EyeH = 0.8 * Unit;
-            this.EyeV = 1.2 * Unit;
-            this.SEyeH = 0.8 * Unit;
-            this.SEyeV = 2.5 * Unit;
+            this.EyeH = 0.4 * Unit;
+            this.EyeV = 0.9 * Unit;
+            this.SEyeH = 0.6 * Unit;
+            this.SEyeV = 1.7 * Unit;
             this.RowCount = 20;
 
             // Initialize all row widths to default value

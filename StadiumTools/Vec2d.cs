@@ -22,7 +22,21 @@ namespace StadiumTools
         /// </summary>
         public double L { get; set; }
 
-        //Constructors
+        //Constructor
+
+        /// <summary>
+        /// Construct a Vec2d from another Vec2d
+        /// </summary>
+        /// <param name="h"></param>
+        /// <param name="v"></param>
+        /// <param name="l"></param>
+        public Vec2d(Vec2d v)
+        {
+            this.H = v.H;
+            this.V = v.V;
+            this.L = v.L;
+        }
+
         /// <summary>
         /// Construct a 2d vector from its components
         /// </summary>
@@ -60,5 +74,8 @@ namespace StadiumTools
         }
 
         //Methods
+
+     
+
     }
 }

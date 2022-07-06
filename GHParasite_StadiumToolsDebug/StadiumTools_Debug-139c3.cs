@@ -53,7 +53,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(ref object pline, ref object spec, ref object vecOut)
+  private void RunScript(ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
   {
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
@@ -68,18 +68,29 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier[] tiers = new Tier[3] { tier1, tier2, tier3 };
 
     Section section1 = new Section(tiers);
-
-    Pt2d[][] section1Pts = Section.GetSectionPts(section1);
-    DataTree<Point2d> t1Pts = Pt2dToPoint2d(section1Pts);
-    Vec2d[][] section1Vecs = Section.GetSightlines(section1);
-    DataTree<Vector2d> t1Vecs = Vec2dToVector2d(section1Vecs);
-    Pt2d[][] section1Specs = Section.GetSpectatorPts(section1);
+    //Section Points
+    Pt2d[][] section1Pt2d = Section.GetSectionPts(section1);
+    DataTree<Point2d> section1Pts = Pt2dToPoint2d(section1Pt2d);
+    //Section Spectators Seated
+    Pt2d[][] section1Specs = Section.GetSpectatorPts(section1, false);
     DataTree<Point2d> specPts = Pt2dToPoint2d(section1Specs);
+    //Section Sightlines Seated
+    Vec2d[][] section1Vec2d = Section.GetSightlines(section1, false);
+    DataTree<Vector2d> sightLines = Vec2dToVector2d(section1Vec2d);
+    //Section Spectators Standing
+    Pt2d[][] section1SpecsSt = Section.GetSpectatorPts(section1, true);
+    DataTree<Point2d> specPtsSt = Pt2dToPoint2d(section1SpecsSt);
+    //Section Sightlines Standing
+    Vec2d[][] section1Vecs2dSt = Section.GetSightlines(section1, true);
+    DataTree<Vector2d> sightLinesSt = Vec2dToVector2d(section1Vecs2dSt);
 
     //Outputs
-    pline = t1Pts;
-    spec = specPts;
-    vecOut = t1Vecs;
+    sectionPoints = section1Pts;
+    specPoints = specPts;
+    specSightLines = sightLines;
+    specPointsStanding = specPtsSt;
+    specSightLinesStanding = sightLinesSt;
+    A = true;
   }
   #endregion
   #region Additional

@@ -36,11 +36,15 @@ namespace StadiumTools
         /// <summary>
         /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a standing spectator's sightline to the P.O.F
         /// </summary>
-        public Vec2d sightLineStanding { get; set; }
+        public Vec2d SightLineStanding { get; set; }
         /// <summary>
         /// True if the spectator has an unobstructed sightline to the P.O.F
         /// </summary>
         public bool HasSightLine { get; set; } = false;
+        /// <summary>
+        /// True if the spectator has an unobstructed sightline to the P.O.F
+        /// </summary>
+        public bool HasSightLineStanding { get; set; } = false;
         /// <summary>
         /// The C-Value of the spectator
         /// </summary>
@@ -73,7 +77,7 @@ namespace StadiumTools
             this.Loc2dStanding = ptSt;
             this.POF = pof;
             this.SightLine = sLine;
-            this.sightLineStanding = sLineSt;
+            this.SightLineStanding = sLineSt;
         }
 
         //Methods

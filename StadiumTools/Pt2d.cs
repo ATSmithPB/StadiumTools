@@ -18,21 +18,27 @@ namespace StadiumTools
         public double V { get; set; }
 
         //Constructors
+        /// <summary>
+        /// Construct a Pt2d from an existing Pt2d object
+        /// </summary>
+        /// <param name="pt"></param>
+        public Pt2d(Pt2d pt)
+        {
+            this.H = pt.H;
+            this.V = pt.V;
+        }
+
+        /// <summary>
+        /// Construct a Pt2d from its component coordinates
+        /// </summary>
+        /// <param name="h"></param>
+        /// <param name="v"></param>
         public Pt2d(double h, double v)
         {
             this.H = h;
             this.V = v;
         }
 
-        /// <summary>
-        /// Construct a 2d point from a Spectator object
-        /// </summary>
-        /// <param name="spec"></param>
-        public Pt2d(Spectator spec)
-        {
-            this.H = spec.Loc2d.H;
-            this.V = spec.Loc2d.V;
-        }
 
         //Methods
     }

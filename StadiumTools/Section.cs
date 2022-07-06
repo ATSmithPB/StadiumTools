@@ -95,19 +95,37 @@ namespace StadiumTools
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static Pt2d[][] GetSpectatorPts(Section section)
+        public static Pt2d[][] GetSpectatorPts(Section section, bool standing)
         {
             Pt2d[][] specPts = new Pt2d[section.Tiers.Length][];
-            for (int i = 0; i < section.Tiers.Length; i++)
+
+            if (standing)
             {
-                Pt2d[] thisTierSpecPts = new Pt2d[section.Tiers[i].RowCount];
-                for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                for (int i = 0; i < section.Tiers.Length; i++)
                 {
-                    Pt2d specPt = new Pt2d(section.Tiers[i].Spectators[j]);
-                    thisTierSpecPts[j] = specPt;
+                    Pt2d[] thisTierSpecPts = new Pt2d[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        Pt2d specPt = section.Tiers[i].Spectators[j].Loc2dStanding;
+                        thisTierSpecPts[j] = specPt;
+                    }
+                    specPts[i] = thisTierSpecPts;
                 }
-                specPts[i] = thisTierSpecPts;
             }
+            else
+            {
+                for (int i = 0; i < section.Tiers.Length; i++)
+                {
+                    Pt2d[] thisTierSpecPts = new Pt2d[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        Pt2d specPt = section.Tiers[i].Spectators[j].Loc2d;
+                        thisTierSpecPts[j] = specPt;
+                    }
+                    specPts[i] = thisTierSpecPts;
+                }
+            }
+
             return specPts;
         }
 
@@ -116,21 +134,37 @@ namespace StadiumTools
         /// </summary>
         /// <param name="section"></param>
         /// <returns>Vec2d[][]</returns>
-        public static Vec2d[][] GetSightlines(Section section)
+        public static Vec2d[][] GetSightlines(Section section, bool standing)
         {
             Vec2d[][] sightLines = new Vec2d[section.Tiers.Length][];
-            for (int i = 0; i < section.Tiers.Length; i++)
+            
+            if (standing)
             {
-                Vec2d[] thisTierSightLines = new Vec2d[section.Tiers[i].RowCount];
-                for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                for (int i = 0; i < section.Tiers.Length; i++)
                 {
-                    Vec2d sightLine = new Vec2d(section.Tiers[i].Spectators[j]);
-                    thisTierSightLines[j] = sightLine;
+                    Vec2d[] thisTierSightLines = new Vec2d[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        Vec2d sightLine = section.Tiers[i].Spectators[j].SightLineStanding;
+                        thisTierSightLines[j] = sightLine;
+                    }
+                    sightLines[i] = thisTierSightLines;
                 }
-                sightLines[i] = thisTierSightLines;
+            }
+            else
+            {
+                for (int i = 0; i < section.Tiers.Length; i++)
+                {
+                    Vec2d[] thisTierSightLines = new Vec2d[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        Vec2d sightLine = section.Tiers[i].Spectators[j].SightLine;
+                        thisTierSightLines[j] = sightLine;
+                    }
+                    sightLines[i] = thisTierSightLines;
+                }
             }
             return sightLines;
-
         }
 
         /// <summary>
@@ -195,7 +229,7 @@ namespace StadiumTools
                 p++;
 
                 //Instance a spectator for current row
-                CalcRowSpectator(tier, prevPt, row);
+                CalcRowSpectator(tier, currentPt, row);
 
                 //Calc rear riser top point (PtC) for current row and add to list
                 currentPt.V += 0.37;
@@ -212,14 +246,14 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Creates and adds a row's spectator to the tier. PtB argument should be rear riser point.
+        /// Creates and adds a row's spectator to the tier. PtB argument should be rear lower riser point.
         /// </summary>
         /// <param name="tier"></param>
         /// <param name="pt"></param>
         private static void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
         {
-            Pt2d specPt = new Pt2d(ptB.H + tier.EyeH, ptB.V + tier.EyeV);
-            Pt2d specPtSt = new Pt2d(ptB.H + tier.SEyeH, ptB.V + tier.SEyeV);
+            Pt2d specPt = new Pt2d(ptB.H - tier.EyeH, ptB.V + tier.EyeV);
+            Pt2d specPtSt = new Pt2d(ptB.H - tier.SEyeH, ptB.V + tier.SEyeV);
             Vec2d sLine = new Vec2d(specPt, tier.POF);
             Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
             Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
