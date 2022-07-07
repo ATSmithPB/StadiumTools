@@ -4,7 +4,7 @@ using static System.Math;
 namespace StadiumTools
 {
     /// <summary>
-    /// Represents a vector in 2D space (h,v)
+    /// Represents a vector in 2D space (X,Y)
     /// </summary>
     public struct Vec2d
     {
@@ -12,11 +12,11 @@ namespace StadiumTools
         /// <summary>
         /// Horizontal component of vector.
         /// </summary>
-        public double H { get; set; }
+        public double X { get; set; }
         /// <summary>
         /// Vertical component of vector.
         /// </summary>
-        public double V { get; set; }
+        public double Y { get; set; }
         /// <summary>
         /// Length of vector
         /// </summary>
@@ -27,13 +27,13 @@ namespace StadiumTools
         /// <summary>
         /// Construct a Vec2d from another Vec2d
         /// </summary>
-        /// <param name="h"></param>
-        /// <param name="v"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         /// <param name="l"></param>
         public Vec2d(Vec2d v)
         {
-            this.H = v.H;
-            this.V = v.V;
+            this.X = v.X;
+            this.Y = v.Y;
             this.L = v.L;
         }
 
@@ -43,10 +43,10 @@ namespace StadiumTools
         /// <param name="h"></param>
         /// <param name="v"></param>
         /// <param name="l"></param>
-        public Vec2d(double h, double v, double l)
+        public Vec2d(double x, double y, double l)
         {
-            this.H = h;
-            this.V = v;
+            this.X = x;
+            this.Y = y;
             this.L = l;
         }
 
@@ -57,9 +57,9 @@ namespace StadiumTools
         /// <param name="end"></param>
         public Vec2d(Pt2d start, Pt2d end)
         {
-            this.H = end.H - start.H;
-            this.V = end.V - start.V;
-            this.L = Sqrt((end.H - start.H) * (end.H - start.H) + (end.V - start.V) * (end.V - start.V));
+            this.X = end.X - start.X;
+            this.Y = end.Y - start.Y;
+            this.L = Sqrt((end.X - start.X) * (end.X - start.X) + (end.Y - start.Y) * (end.Y - start.Y));
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace StadiumTools
         /// <param name="spec"></param>
         public Vec2d(Spectator spec)
         {
-            this.H = spec.POF.H - spec.Loc2d.H;
-            this.V = spec.POF.V - spec.Loc2d.V;
-            this.L = Sqrt((spec.POF.H - spec.Loc2d.H) * (spec.POF.H - spec.Loc2d.H) + (spec.POF.V - spec.Loc2d.V) * (spec.POF.V - spec.Loc2d.V));
+            this.X = spec.POF.Y - spec.Loc2d.Y;
+            this.Y = spec.POF.Y - spec.Loc2d.Y;
+            this.L = Sqrt((spec.POF.X - spec.Loc2d.X) * (spec.POF.X - spec.Loc2d.X) + (spec.POF.Y - spec.Loc2d.Y) * (spec.POF.Y - spec.Loc2d.Y));
         }
 
         //Methods

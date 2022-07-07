@@ -3,7 +3,7 @@
 namespace StadiumTools
 {
     /// <summary>
-    /// Represents a point in 2D space (h,v)
+    /// Represents a point in 2D space (x,y)
     /// </summary>
     public struct Pt2d
     {
@@ -11,11 +11,11 @@ namespace StadiumTools
         /// <summary>
         /// Horizontal distance from origin
         /// </summary>
-        public double H { get; set; }
+        public double X { get; set; }
         /// <summary>
         /// Vertical distance from origin
         /// </summary>
-        public double V { get; set; }
+        public double Y { get; set; }
 
         //Constructors
         /// <summary>
@@ -24,19 +24,19 @@ namespace StadiumTools
         /// <param name="pt"></param>
         public Pt2d(Pt2d pt)
         {
-            this.H = pt.H;
-            this.V = pt.V;
+            this.X = pt.X;
+            this.Y = pt.Y;
         }
 
         /// <summary>
         /// Construct a Pt2d from its component coordinates
         /// </summary>
-        /// <param name="h"></param>
-        /// <param name="v"></param>
-        public Pt2d(double h, double v)
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public Pt2d(double x, double y)
         {
-            this.H = h;
-            this.V = v;
+            this.X = x;
+            this.Y = y;
         }
 
 

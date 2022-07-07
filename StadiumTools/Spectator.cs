@@ -10,43 +10,43 @@ namespace StadiumTools
     {
         //Properties
         /// <summary>
-        /// the index of the spectator's tier within a section
+        /// the index of the spectator's tier within their section
         /// </summary>
         public int TierNum { get; set; }
         /// <summary>
-        /// the index of the spectators row within a tier
+        /// the index of the spectators row within their tier
         /// </summary>
         public int RowNum { get; set; }
         /// <summary>
-        /// a point representing the location of the spectator seated in 2d space relative to the P.O.F
+        /// Pt2d representing the location of the spectator eyes relative to the P.O.F
         /// </summary>
         public Pt2d Loc2d { get; set; }
         /// <summary>
-        /// a point representing the location of spectator standing in 2d space relative to the P.O.F
+        /// Pt2d representing the location of the STANDING spectator eyes relative to the P.O.F
         /// </summary>
         public Pt2d Loc2dStanding { get; set; }
         /// <summary>
-        /// a point represneting the location of the P.O.F (Point of focus)
+        /// Pt2d representing the location of the P.O.F (Point of focus). Inherited from section.
         /// </summary>
         public Pt2d POF { get; set; }
         /// <summary>
-        /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a seated spectator's sightline to the P.O.F
+        /// Vec2d representing the 2d X,Y components and Length of a seated spectator's sightline to the P.O.F
         /// </summary>
         public Vec2d SightLine { get; set; }
         /// <summary>
-        /// a Vec2d representing the 2d (h(x), v(y)) components and Length of a standing spectator's sightline to the P.O.F
+        /// Vec2d representing the 2d X,Y components and Length of a standing spectator's sightline to the P.O.F
         /// </summary>
         public Vec2d SightLineStanding { get; set; }
         /// <summary>
-        /// True if the spectator has an unobstructed sightline to the P.O.F
+        /// True if the spectator has an unobstructed, seated sightline to the P.O.F
         /// </summary>
         public bool HasSightLine { get; set; } = false;
         /// <summary>
-        /// True if the spectator has an unobstructed sightline to the P.O.F
+        /// True if the spectator has an unobstructed, STANDING sightline to the P.O.F
         /// </summary>
         public bool HasSightLineStanding { get; set; } = false;
         /// <summary>
-        /// The C-Value of the spectator
+        /// The C-Value of the spectator. Calculated upon creation of Section object.
         /// </summary>
         public double CVal { get; set; } = 0.0;
 

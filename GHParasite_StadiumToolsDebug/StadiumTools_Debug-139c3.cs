@@ -60,11 +60,11 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     Tier tier3 = new Tier();
     tier2.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
     tier3.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
-    tier1.StartH = x;
-    tier2.StartH = -2.0;
-    tier3.StartH = -3.0;
-    tier2.StartV = 4.0;
-    tier3.StartV = 4.0;
+    tier1.StartX = x;
+    tier2.StartX = -2.0;
+    tier3.StartX = -3.0;
+    tier2.StartY = 4.0;
+    tier3.StartY = 4.0;
 
     Tier[] tiers = new Tier[3] { tier1, tier2, tier3 };
 
@@ -107,7 +107,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
 
     for (int i = 0; i < vecs.Length; i++)
     {
-      rcVecs[i] = new Vector2d(vecs[i].H, vecs[i].V);
+      rcVecs[i] = new Vector2d(vecs[i].X, vecs[i].Y);
     }
 
     return rcVecs;
@@ -127,7 +127,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       for (int j = 0; j < pts[i].Length; j++)
       {
         GH_Path path = new GH_Path(i);
-        Point2d item = new Point2d(pts[i][j].H, pts[i][j].V);
+        Point2d item = new Point2d(pts[i][j].X, pts[i][j].Y);
         rcPts.Add(item, path);
       }
     }
@@ -147,7 +147,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       for (int j = 0; j < vecs[i].Length; j++)
       {
         GH_Path path = new GH_Path(i);
-        Vector2d item = new Vector2d(vecs[i][j].H, vecs[i][j].V);
+        Vector2d item = new Vector2d(vecs[i][j].X, vecs[i][j].Y);
         rcVecs.Add(item, path);
       }
     }

@@ -23,7 +23,7 @@ namespace StadiumTools
         /// </summary>
         public ReferencePtType RefPtType { get; set; }
         /// <summary>
-        /// Reference Point of tier relative to StartH and StartV
+        /// Reference Point of tier relative to StartX and StartY
         /// </summary>
         public Pt2d RefPt { get; set; }
         /// <summary>
@@ -45,31 +45,31 @@ namespace StadiumTools
         /// <summary>
         /// Horizontal offset of tier start from reference point
         /// </summary>
-        public double StartH { get; set; }
+        public double StartX { get; set; }
         /// <summary>
         /// Vertical offset of tier start from reference point
         /// </summary>
-        public double StartV { get; set; }
+        public double StartY { get; set; }
         /// <summary>
         /// Minimum allowable c-value for spectators in this tier.
         /// </summary>
-        public double Cvalue { get; set; }
+        public double MinimumC { get; set; }
         /// <summary>
         /// Horizontal offset of seated spectator eyes from row start 
         /// </summary>
-        public double EyeH { get; set; }
+        public double EyeX { get; set; }
         /// <summary>
         /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
-        public double EyeV { get; set; }
+        public double EyeY { get; set; }
         /// <summary>
         /// Horizontal offset of standing spectator eyes from row start
         /// </summary>
-        public double SEyeH { get; set; }
+        public double SEyeX { get; set; }
         /// <summary>
         /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
-        public double SEyeV { get; set; }
+        public double SEyeY { get; set; }
         /// <summary>
         /// Number of rows in this tier (super riser == row)
         /// </summary>
@@ -99,9 +99,13 @@ namespace StadiumTools
         /// </summary>
         public bool HasSuper { get; set; }
         /// <summary>
-        /// Start row for inserting super riser
+        /// Row number for inserting super riser
         /// </summary>
         public int SuperRow { get; set; }
+        /// <summary>
+        /// Width of super riser row
+        /// </summary>
+        public double SuperWidth { get; set; }
         /// <summary>
         /// Optional curb distance before super riser 
         /// </summary>
@@ -109,17 +113,25 @@ namespace StadiumTools
         /// <summary>
         /// Horizontal offset of spectator eyes from nose of super riser 
         /// </summary>
-        public double SuperEyeH { get; set; }
+        public double SuperEyeX { get; set; }
         /// <summary>
         /// Vertical offset of spectator eyes from floor of super riser
         /// </summary>
-        public double SuperEyeV { get; set; }
+        public double SuperEyeY { get; set; }
         /// <summary>
-        /// Optional value to round riser increments
+        /// Horizontal offset of STANDING spectator eyes from nose of super riser 
+        /// </summary>
+        public double SuperSEyeX { get; set; }
+        /// <summary>
+        /// Vertical offset of STANDING spectator eyes from floor of super riser
+        /// </summary>
+        public double SuperSEyeY { get; set; }
+        /// <summary>
+        /// Increment size to round riser heights to
         /// </summary>
         public double RoundTo { get; set; }
         /// <summary>
-        /// The maximum allowable riser height. 
+        /// The maximum allowable rake angle in radians. 
         /// </summary>
         public double MaxRakeAngle { get; set; }
         /// <summary>
@@ -152,18 +164,18 @@ namespace StadiumTools
         {
             this.Unit = UnitHandler.m;
             this.RefPtType = ReferencePtType.ByPOF;
-            this.StartH = 5.0 * Unit;
-            this.StartV = 1.0 * Unit;
-            this.Cvalue = 0.10 * Unit;
-            this.EyeH = 0.4 * Unit;
-            this.EyeV = 0.9 * Unit;
-            this.SEyeH = 0.6 * Unit;
-            this.SEyeV = 1.7 * Unit;
+            this.StartX = 5.0 * Unit;
+            this.StartY = 1.0 * Unit;
+            this.MinimumC = 0.10 * Unit;
+            this.EyeX = 0.4 * Unit;
+            this.EyeY = 0.9 * Unit;
+            this.SEyeX = 0.6 * Unit;
+            this.SEyeY = 1.7 * Unit;
             this.RowCount = 20;
 
             // Initialize all row widths to default value
             List<double> rowWidths = new List<double>();
-            double defaultRW = 0.8;
+            double defaultRW = 0.8 * Unit;
             for (int i = 0; i < this.RowCount; i++)
             {
                 rowWidths.Add(defaultRW);
@@ -175,14 +187,27 @@ namespace StadiumTools
             this.VomHeight = 5;
             this.FasciaH = 1.0 * Unit;
             this.HasSuper = true;
-            this.SuperRow = 15;
+            this.SuperRow = 10;
+
+            //Catch if SuperRow is out-of-bounds
+            this.SuperRow = this.SuperRow <= 0 ? 1 : this.SuperRow;
+            this.SuperRow = this.SuperRow >= (this.RowCount - 1) ? (this.RowCount - 1) : this.SuperRow;
+
+            if (this.VomHas)
+            {
+                rowWidths[this.SuperRow - 1] = defaultRW * 3;
+            }
+            int swFactor = 3;
+            this.SuperWidth = (defaultRW * swFactor);
             this.SuperCurb = 0.0 * Unit;
-            this.SuperEyeH = 0.8 * Unit;
-            this.SuperEyeV = 2.5 * Unit;
+            this.SuperEyeX = (swFactor - 1) + 0.8 * Unit;
+            this.SuperEyeY = 0.45 * Unit;
+            this.SuperSEyeX = (swFactor - 1) + 0.8 * Unit;
+            this.SuperSEyeY = 1.75;
             this.RoundTo = 0.001 * Unit;
             this.Points2dCount = GetTierPtCount(this);
             this.Points2d = new Pt2d[this.Points2dCount];
-            this.MaxRakeAngle = 34.0;
+            this.MaxRakeAngle = .593412; //34 degrees
             this.Spectators = new Spectator[this.RowCount];
         }
 
