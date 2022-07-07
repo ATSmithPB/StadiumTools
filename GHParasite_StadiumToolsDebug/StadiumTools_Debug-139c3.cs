@@ -53,13 +53,14 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
+  private void RunScript(double x, ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
   {
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
     Tier tier3 = new Tier();
     tier2.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
     tier3.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
+    tier1.StartH = x;
     tier2.StartH = -2.0;
     tier3.StartH = -3.0;
     tier2.StartV = 4.0;
@@ -112,7 +113,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     return rcVecs;
   }
 
- 
+
   /// <summary>
   /// Casts a jagged array of Pt2d objects into a data tree of RhinoCommon Point2d
   /// </summary>

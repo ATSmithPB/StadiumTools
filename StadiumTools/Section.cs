@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using static System.Math;
 
 namespace StadiumTools
 {
@@ -232,7 +233,8 @@ namespace StadiumTools
                 CalcRowSpectator(tier, currentPt, row);
 
                 //Calc rear riser top point (PtC) for current row and add to list
-                currentPt.V += 0.37;
+                double n = RiserHeightFromCVal(tier, currentPt, row, false);
+                currentPt.V += n;
                 tier.Points2d[p] = currentPt;
                 p++;
 
@@ -259,5 +261,33 @@ namespace StadiumTools
             Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
             tier.Spectators[row] = spectator;
         }
+
+        /// <summary>
+        /// Calculates the riser height based on minimum C-Value requirement using triangle proportionality
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="r"></param>
+        /// <param name="d"></param>
+        /// <param name="t"></param>
+        /// <param name="rounding"></param>
+        /// <returns></returns>
+        private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int row, bool standing)
+        {
+            double c = tier.Cvalue;
+            double h = ptB.V + tier.EyeV;
+            double t = tier.RowWidth[row + 1];
+            double d = (ptB.H - tier.EyeH) + t;
+
+            //Function of N, Triangle Proportionality Theroum 
+            double r = ((c + h) / (d - t)) * (d);
+
+            double n = (r - tier.EyeV - ptB.V);
+            double nR = n;
+            return n;
+        }
+
+
+
+
     }
 }

@@ -119,6 +119,10 @@ namespace StadiumTools
         /// </summary>
         public double RoundTo { get; set; }
         /// <summary>
+        /// The maximum allowable riser height. 
+        /// </summary>
+        public double MaxRakeAngle { get; set; }
+        /// <summary>
         /// An ordered list of Spectators in the tier
         /// </summary>
         public Spectator[] Spectators { get; set; }
@@ -131,7 +135,6 @@ namespace StadiumTools
         /// </summary>
         public Pt2d[] Points2d { get; set; }
        
-
         //Constructors
         /// <summary>
         /// Initializes a new default Tier
@@ -179,6 +182,7 @@ namespace StadiumTools
             this.RoundTo = 0.001 * Unit;
             this.Points2dCount = GetTierPtCount(this);
             this.Points2d = new Pt2d[this.Points2dCount];
+            this.MaxRakeAngle = 34.0;
             this.Spectators = new Spectator[this.RowCount];
         }
 
