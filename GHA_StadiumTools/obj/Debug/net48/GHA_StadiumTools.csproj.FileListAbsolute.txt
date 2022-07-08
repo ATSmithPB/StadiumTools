@@ -1,5 +1,0 @@
-C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.csproj.AssemblyReference.cache
-C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.AssemblyInfoInputs.cache
-C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.AssemblyInfo.cs
-C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.csproj.CoreCompileInputs.cache
