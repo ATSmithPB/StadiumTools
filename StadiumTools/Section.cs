@@ -228,7 +228,7 @@ namespace StadiumTools
             {
                 //Get rear riser bottom point (PtB) for current row
                 Pt2d currentPt = new Pt2d();
-                currentPt.X = prevPt.X + (tier.RowWidth[row]);
+                currentPt.X = prevPt.X + (tier.RowWidths[row]);
                 currentPt.Y = prevPt.Y;
                 tier.Points2d[p] = currentPt;
                 p++;
@@ -246,7 +246,7 @@ namespace StadiumTools
             }
 
             //Add final tier point (PtD) to tier
-            prevPt.X += (tier.RowWidth[tier.RowCount - 1]);
+            prevPt.X += (tier.RowWidths[tier.RowCount - 1]);
             tier.Points2d[p] = prevPt;
             CalcRowSpectator(tier, prevPt, tier.RowCount - 1);
         }
@@ -263,7 +263,7 @@ namespace StadiumTools
             double eyeXStanding = tier.SEyeX;
             double eyeYStanding = tier.SEyeY;
 
-            if (tier.HasSuper && row == tier.SuperRow)
+            if (tier.SuperHas && row == tier.SuperRow)
             {
                 eyeX = tier.SuperEyeX;
                 eyeY = tier.SuperEyeY;
@@ -287,21 +287,43 @@ namespace StadiumTools
         /// <param name="row"></param>
         /// <param name="standing"></param>
         /// <returns>double</returns>
-        private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int row, bool standing)
+        private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int currentRow, bool standing)
         {
-            double eyeX = standing ? tier.SEyeX : tier.EyeX;
-            double eyeY = standing ? tier.SEyeY : tier.EyeY;
+            double currentRowEyeX = tier.EyeX;
+            double currentRowEyeY = tier.EyeY;
+            double nextRowEyeX = currentRowEyeX;
+            double nextRowEyeY = currentRowEyeY;
+            double maxRakeAngle = tier.MaxRakeAngle;
 
-            double t = tier.RowWidth[row + 1];
+            if (tier.SuperHas)
+            {
+                if (currentRow + 1 == tier.SuperRow)
+                {
+                    currentRowEyeX = tier.SEyeX;
+                    currentRowEyeY = tier.SEyeY;
+                    nextRowEyeX = tier.SuperEyeX;
+                    nextRowEyeY = tier.SuperEyeY;
+                    //Unlimited riser height for super riser
+                    maxRakeAngle = 1.57;
+                }
+                else if (currentRow == tier.SuperRow)
+                {
+                    currentRowEyeX = tier.SuperEyeX;
+                    currentRowEyeY = tier.SuperEyeY;
+                }
+            }
+
+            double t = (tier.RowWidths[currentRow + 1] + currentRowEyeX) - nextRowEyeX;
             double c = tier.MinimumC;
-            double h = ptB.Y + tier.EyeY;
-            double d = (ptB.X - tier.EyeX) + t;
+            double h = ptB.Y + currentRowEyeY;
+            double d = (ptB.X - currentRowEyeX) + t;
 
             //Function of N, Triangle Proportionality Theroum 
             double r = ((c + h) / (d - t)) * (d);
-            double n = (r - tier.EyeY - ptB.Y);
+            double n = (r - nextRowEyeY - ptB.Y);
 
-            double nMax = (Tan(tier.MaxRakeAngle) * t);
+            double nMax = (Tan(maxRakeAngle) * t);
+
             n = n > nMax ? nMax : n;
 
             double nR = n;

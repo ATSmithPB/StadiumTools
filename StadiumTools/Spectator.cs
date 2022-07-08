@@ -85,7 +85,7 @@ namespace StadiumTools
         /// <summary>
         /// Initializes a spectator with default values.
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
             this.Loc2d = new Pt2d();
             this.Loc2dStanding = new Pt2d();

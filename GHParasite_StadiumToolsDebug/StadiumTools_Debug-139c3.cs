@@ -53,7 +53,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(double x, ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
+  private void RunScript(double x, double y, double z, ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
   {
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
@@ -65,6 +65,8 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     tier3.StartX = -3.0;
     tier2.StartY = 4.0;
     tier3.StartY = 4.0;
+    tier1.SuperEyeX = y;
+    tier1.SuperEyeY = z;
 
     Tier[] tiers = new Tier[3] { tier1, tier2, tier3 };
 

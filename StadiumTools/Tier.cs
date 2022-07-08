@@ -77,7 +77,7 @@ namespace StadiumTools
         /// <summary>
         /// Width(s) of row (distance from riser to riser)
         /// </summary>
-        public List<double> RowWidth { get; set; }
+        public double[] RowWidths { get; set; }
         /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
@@ -97,7 +97,7 @@ namespace StadiumTools
         /// <summary>
         /// True if tier has a super riser
         /// </summary>
-        public bool HasSuper { get; set; }
+        public bool SuperHas { get; set; }
         /// <summary>
         /// Row number for inserting super riser
         /// </summary>
@@ -160,54 +160,50 @@ namespace StadiumTools
         /// <summary>
         /// Initializes a tier 2d instance with default values
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
             this.Unit = UnitHandler.m;
             this.RefPtType = ReferencePtType.ByPOF;
             this.StartX = 5.0 * Unit;
             this.StartY = 1.0 * Unit;
-            this.MinimumC = 0.10 * Unit;
-            this.EyeX = 0.4 * Unit;
-            this.EyeY = 0.9 * Unit;
+            this.MinimumC = 0.09 * Unit;
+            this.EyeX = 0.15 * Unit;
+            this.EyeY = 1.2 * Unit;
             this.SEyeX = 0.6 * Unit;
-            this.SEyeY = 1.7 * Unit;
-            this.RowCount = 20;
+            this.SEyeY = 1.4 * Unit;
+            this.RowCount = 25;
 
             // Initialize all row widths to default value
-            List<double> rowWidths = new List<double>();
-            double defaultRW = 0.8 * Unit;
-            for (int i = 0; i < this.RowCount; i++)
+            double[] rowWidths = new double[this.RowCount];
+            double defaultRowWidth = 0.8 * Unit;
+            foreach (int row in rowWidths)
             {
-                rowWidths.Add(defaultRW);
+                rowWidths[row] = defaultRowWidth;
             }
 
-            this.RowWidth = rowWidths;
-            this.VomHas = true;
+            this.RowWidths = rowWidths;
+            this.VomHas = false;
             this.VomStart = 5;
             this.VomHeight = 5;
             this.FasciaH = 1.0 * Unit;
-            this.HasSuper = true;
-            this.SuperRow = 10;
+            this.SuperHas = true;
+            this.SuperRow = 11;
+            this.SuperWidth = 2.4;
 
-            //Catch if SuperRow is out-of-bounds
-            this.SuperRow = this.SuperRow <= 0 ? 1 : this.SuperRow;
-            this.SuperRow = this.SuperRow >= (this.RowCount - 1) ? (this.RowCount - 1) : this.SuperRow;
-
-            if (this.VomHas)
+            if (this.SuperHas)
             {
-                rowWidths[this.SuperRow - 1] = defaultRW * 3;
+                rowWidths[this.SuperRow] = this.SuperWidth;
             }
-            int swFactor = 3;
-            this.SuperWidth = (defaultRW * swFactor);
+            
             this.SuperCurb = 0.0 * Unit;
-            this.SuperEyeX = (swFactor - 1) + 0.8 * Unit;
-            this.SuperEyeY = 0.45 * Unit;
-            this.SuperSEyeX = (swFactor - 1) + 0.8 * Unit;
-            this.SuperSEyeY = 1.75;
+            this.SuperEyeX = 1.6 * Unit;
+            this.SuperEyeY = 0.9 * Unit;
+            this.SuperSEyeX = 1.8 * Unit;
+            this.SuperSEyeY = 1.7;
             this.RoundTo = 0.001 * Unit;
             this.Points2dCount = GetTierPtCount(this);
             this.Points2d = new Pt2d[this.Points2dCount];
-            this.MaxRakeAngle = .593412; //34 degrees
+            this.MaxRakeAngle = .593412; //radians
             this.Spectators = new Spectator[this.RowCount];
         }
 
