@@ -176,9 +176,9 @@ namespace StadiumTools
             // Initialize all row widths to default value
             double[] rowWidths = new double[this.RowCount];
             double defaultRowWidth = 0.8 * Unit;
-            foreach (int row in rowWidths)
+            for (int i = 0; i < rowWidths.Length; i++)
             {
-                rowWidths[row] = defaultRowWidth;
+                rowWidths[i] = defaultRowWidth;
             }
 
             this.RowWidths = rowWidths;
@@ -197,9 +197,9 @@ namespace StadiumTools
             
             this.SuperCurb = 0.0 * Unit;
             this.SuperEyeX = 1.6 * Unit;
-            this.SuperEyeY = 0.9 * Unit;
+            this.SuperEyeY = 1.2 * Unit;
             this.SuperSEyeX = 1.8 * Unit;
-            this.SuperSEyeY = 1.7;
+            this.SuperSEyeY = 1.4;
             this.RoundTo = 0.001 * Unit;
             this.Points2dCount = GetTierPtCount(this);
             this.Points2d = new Pt2d[this.Points2dCount];
