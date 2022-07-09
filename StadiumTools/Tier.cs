@@ -109,7 +109,7 @@ namespace StadiumTools
         /// <summary>
         /// Optional curb distance before super riser 
         /// </summary>
-        public double SuperCurb { get; set; }
+        public double SuperCurbWidth { get; set; }
         /// <summary>
         /// Horizontal offset of spectator eyes from nose of super riser 
         /// </summary>
@@ -118,6 +118,10 @@ namespace StadiumTools
         /// Vertical offset of spectator eyes from floor of super riser
         /// </summary>
         public double SuperEyeY { get; set; }
+        /// <summary>
+        /// Width of guardrail behind super riser
+        /// </summary>
+        public double SuperGuardrailWidth { get; set; }
         /// <summary>
         /// Horizontal offset of STANDING spectator eyes from nose of super riser 
         /// </summary>
@@ -187,15 +191,16 @@ namespace StadiumTools
             this.VomHeight = 5;
             this.FasciaH = 1.0 * Unit;
             this.SuperHas = true;
-            this.SuperRow = 11;
+            this.SuperRow = 10;
             this.SuperWidth = 2.4;
 
             if (this.SuperHas)
             {
                 rowWidths[this.SuperRow] = this.SuperWidth;
             }
-            
-            this.SuperCurb = 0.0 * Unit;
+
+            this.SuperGuardrailWidth = 0.1 * Unit;
+            this.SuperCurbWidth = 0.1 * Unit;
             this.SuperEyeX = 1.6 * Unit;
             this.SuperEyeY = 1.2 * Unit;
             this.SuperSEyeX = 1.8 * Unit;
@@ -218,7 +223,7 @@ namespace StadiumTools
             {
                 tierPtCount += 1;
             }
-            if (tier.SuperCurb != 0.0)
+            if (tier.SuperCurbWidth != 0.0)
             {
                 tierPtCount += 1;
             }
