@@ -64,8 +64,8 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     tier1.StartY = -0.2;
     tier2.StartX = -2.0;
     tier3.StartX = -3.0;
-    tier2.StartY = 4.0;
-    tier3.StartY = 4.0;
+    tier2.StartY = 2.0;
+    tier3.StartY = 2.0;
 
     Tier[] tiers = new Tier[3] { tier1, tier2, tier3 };
 

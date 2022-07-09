@@ -79,6 +79,10 @@ namespace StadiumTools
         /// </summary>
         public double[] RowWidths { get; set; }
         /// <summary>
+        /// Height(s) of row risers
+        /// </summary>
+        public double[] RiserHeights { get; set; }
+        /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
         public bool VomHas { get; set; }
@@ -90,10 +94,6 @@ namespace StadiumTools
         /// Height of vomitory (in rows)
         /// </summary>
         public int VomHeight { get; set; }
-        /// <summary>
-        /// Vertical height of fascia below the first row.
-        /// </summary>
-        public double FasciaH { get; set; }
         /// <summary>
         /// True if tier has a super riser
         /// </summary>
@@ -110,6 +110,10 @@ namespace StadiumTools
         /// Optional curb distance before super riser 
         /// </summary>
         public double SuperCurbWidth { get; set; }
+        /// <summary>
+        /// Optional curb height before super riser
+        /// </summary>
+        public double SuperCurbHeight { get; set; }
         /// <summary>
         /// Horizontal offset of spectator eyes from nose of super riser 
         /// </summary>
@@ -186,13 +190,13 @@ namespace StadiumTools
             }
 
             this.RowWidths = rowWidths;
+            this.RiserHeights = new double[this.RowCount - 1];
             this.VomHas = false;
             this.VomStart = 5;
             this.VomHeight = 5;
-            this.FasciaH = 1.0 * Unit;
             this.SuperHas = true;
             this.SuperRow = 10;
-            this.SuperWidth = 2.4;
+            this.SuperWidth = defaultRowWidth * 3;
 
             if (this.SuperHas)
             {
@@ -200,6 +204,7 @@ namespace StadiumTools
             }
 
             this.SuperGuardrailWidth = 0.1 * Unit;
+            this.SuperCurbHeight = 0.1 * Unit;
             this.SuperCurbWidth = 0.1 * Unit;
             this.SuperEyeX = 1.6 * Unit;
             this.SuperEyeY = 1.2 * Unit;
@@ -219,15 +224,22 @@ namespace StadiumTools
         private static int GetTierPtCount(Tier tier)
         {
             int tierPtCount = (tier.RowCount * 2);
-            if (tier.FasciaH != 0.0)
-            {
-                tierPtCount += 1;
-            }
-            if (tier.SuperCurbWidth != 0.0)
-            {
-                tierPtCount += 1;
-            }
 
+            if (tier.SuperHas)
+            {
+                if (tier.SuperRow < (tier.RowCount - 1) && tier.SuperGuardrailWidth > 0.0)
+                {
+                    tierPtCount += 2;
+                }
+                if (tier.SuperCurbWidth > 0.0)
+                {
+                    tierPtCount += 1;
+                    if (tier.SuperCurbHeight > 0.0)
+                    {
+                        tierPtCount += 1;
+                    }
+                }
+            }
             return tierPtCount;   
         }
 

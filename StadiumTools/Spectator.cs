@@ -46,9 +46,13 @@ namespace StadiumTools
         /// </summary>
         public bool HasSightLineStanding { get; set; } = false;
         /// <summary>
-        /// The C-Value of the spectator. Calculated upon creation of Section object.
+        /// The desired C-Value of the spectator. Specified upon creation of Tier object.
         /// </summary>
-        public double CVal { get; set; } = 0.0;
+        public double TargetCValue { get; set; } = 0.0;
+        /// <summary>
+        /// The actual C-Value of the spectator. Calculated upon creation of Section object.
+        /// </summary>
+        public double Cvalue { get; set; } = 0.0;
 
         //Constructors 
         /// <summary>
@@ -92,5 +96,8 @@ namespace StadiumTools
             this.POF = new Pt2d();
             this.SightLine = new Vec2d();
         }
+
+        public void;
+
     }
 }

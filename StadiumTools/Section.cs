@@ -31,22 +31,7 @@ namespace StadiumTools
         {
             Tier[] tiers = tierList.ToArray();
             this.Tiers = tiers;
-            this.POF = new Pt2d(0.0, 0.0);
-
-            //Force first tier to get reference point from Point of Focus
-            if (tiers[0].RefPtType != Tier.ReferencePtType.ByPOF)
-            {
-                tiers[0].RefPtType = Tier.ReferencePtType.ByPOF;
-            }
-
-            //Apply the section POF to all contained tiers 
-            foreach (Tier t in tiers)
-            {
-                t.POF = this.POF;
-            }
-
-            //Calculate points for all tiers in the section
-            CalcPts(this);
+            Initialize();
         }
 
         /// <summary>
@@ -56,28 +41,239 @@ namespace StadiumTools
         public Section(Tier[] tiers)
         {
             this.Tiers = tiers;
+            Initialize();
+        }
+
+        //Methods
+   
+        /// <summary>
+        /// Initialize the section
+        /// </summary>
+        private void Initialize()
+        {
             this.POF = new Pt2d(0.0, 0.0);
 
-            for (int i = 0; i < tiers.Length; i++)
+            //Force first tier to use Point of Focus as reference point
+            if (this.Tiers[0].RefPtType != Tier.ReferencePtType.ByPOF)
             {
-                tiers[i].SectionIndex = i;
+                this.Tiers[0].RefPtType = Tier.ReferencePtType.ByPOF;
             }
 
+            //Apply the section POF to all contained tiers 
+            for (int i = 0; i < this.Tiers.Length; i++)
+            {
+                this.Tiers[i].SectionIndex = i; 
+                this.Tiers[i].POF = this.POF;
+            }
+
+            //Calculate surface and spectator points for all tiers in the section
             CalcPts(this);
         }
 
         /// <summary>
-        /// Construct an empty Section from riserHeight tiers 
+        /// Calculates 2d points that define a seating tier surface and it's spectators
         /// </summary>
-        /// <param name="nTiers"></param>
-        public Section(int nTiers)
+        /// <param name="t"></param>
+        /// <param name="success"></param>
+        /// <returns></returns>
+        private static void CalcPts(Section section)
         {
-            Tier[] tiers = new Tier[nTiers];
-            this.Tiers = tiers;
-            this.POF = new Pt2d(0.0, 0.0);
+            for (int t = 0; t < section.Tiers.Length; t++)
+            {
+                CalcTierPoints(section, section.Tiers[t]);
+            }
         }
 
-        //Methods
+        /// <summary>
+        /// Returns an array of Pt2d objects for a given tier within a section
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="tier"></param>
+        /// <returns>Pt2d[]</returns>
+        private static void CalcTierPoints(Section section, Tier currentTier)
+        {
+            if (currentTier.RefPtType == Tier.ReferencePtType.ByEndOfPrevTier)
+            {
+                
+                //set current tier's RefPt == Last point of previous tier
+                Tier lastTier = section.Tiers[currentTier.SectionIndex - 1];
+                int lastPtCount = lastTier.Points2d.Length;
+                Pt2d lastPt = lastTier.Points2d[lastPtCount - 1];
+                currentTier.RefPt = lastPt;
+            }
+            CalcRowPoints(currentTier);
+        }
+
+        /// <summary>
+        /// Calculates points for a tier iterativly, satisfying its minimum C-value (unless max rake angle is reached) 
+        /// </summary>
+        /// <param name="tier"></param>
+        private static void CalcRowPoints(Tier tier)
+        {
+            //Points increment
+            int p = 0;
+
+            //Calc first tier point (PtA)
+            Pt2d prevPt = new Pt2d(tier.RefPt.X + tier.StartX, tier.RefPt.Y + tier.StartY);
+            tier.Points2d[p] = prevPt;
+            p++;
+
+            //Calc riser points for each row iterativly | Pts(B) & Pts(C)
+            for (int row = 0; row < (tier.RowCount - 1); row++)
+            {
+                //Get rear riser bottom point (PtB) for current row
+                Pt2d currentPt = new Pt2d();
+                currentPt.X = prevPt.X + (tier.RowWidths[row]);
+                currentPt.Y = prevPt.Y;
+                tier.Points2d[p] = currentPt;
+                p++;
+
+                //Instance a spectator for current row
+                CalcRowSpectator(tier, currentPt, row);
+
+                if (tier.SuperHas)
+                {
+                    if (row + 1 == tier.SuperRow)
+                    {
+                        if (tier.SuperCurbWidth > 0.0)
+                        {
+                            if (tier.SuperCurbHeight > 0.0)
+                            {
+                                currentPt.Y += tier.SuperCurbHeight;
+                                tier.Points2d[p] = currentPt;
+                                p++;
+                            }
+                            currentPt.X += tier.SuperCurbWidth;
+                            tier.Points2d[p] = currentPt;
+                            p++;
+                        }
+                    }
+                    if (row == tier.SuperRow && row == tier.RowCount - 1)
+                    {
+                        break;
+                    }
+                }
+
+                //Calc rear riser top point (PtC) for current row and add to list
+                double n = RiserHeightFromCVal(tier, currentPt, row, false);
+                currentPt.Y += n;
+                tier.Points2d[p] = currentPt;
+                p++;
+
+                if (tier.SuperHas)
+                {
+                    if (row == tier.SuperRow)
+                    {
+                        currentPt.X += tier.SuperGuardrailWidth;
+                        tier.Points2d[p] = currentPt;
+                        p++;
+
+                        currentPt.Y -= 0.25;
+                        tier.Points2d[p] = currentPt;
+                        p++;
+                    }
+                }
+
+                prevPt = currentPt;
+            }
+
+            //Add final tier point (PtD) to tier
+            prevPt.X += (tier.RowWidths[tier.RowCount - 1]);
+            tier.Points2d[p] = prevPt;
+            CalcRowSpectator(tier, prevPt, tier.RowCount - 1);
+        }
+
+        /// <summary>
+        /// Creates and adds a row's spectator to the tier. PtB argument should be rear lower riser point.
+        /// </summary>
+        /// <param name="tier"></param>
+        /// <param name="pt"></param>
+        private static void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
+        {
+            double eyeX = tier.EyeX;
+            double eyeY = tier.EyeY;
+            double eyeXStanding = tier.SEyeX;
+            double eyeYStanding = tier.SEyeY;
+
+            if (tier.SuperHas && row == tier.SuperRow)
+            {
+                eyeX = tier.SuperEyeX;
+                eyeY = tier.SuperEyeY;
+                eyeXStanding = tier.SuperSEyeX;
+                eyeYStanding = tier.SuperSEyeY;
+            }
+
+            Pt2d specPt = new Pt2d(ptB.X - eyeX, ptB.Y + eyeY);
+            Pt2d specPtSt = new Pt2d(ptB.X - eyeXStanding, ptB.Y + eyeYStanding);
+            Vec2d sLine = new Vec2d(specPt, tier.POF);
+            Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
+            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
+            tier.Spectators[row] = spectator;
+        }
+
+        /// <summary>
+        /// Calculates the riser height based on minimum C-Value requirement using triangle proportionality
+        /// </summary>
+        /// <param name="tier"></param>
+        /// <param name="ptB"></param>
+        /// <param name="row"></param>
+        /// <param name="standing"></param>
+        /// <returns>double</returns>
+        private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int currentRow, bool standing)
+        {
+            double n = 0.0;
+            double currentRowEyeX = tier.EyeX;
+            double currentRowEyeY = tier.EyeY;
+            double nextRowEyeX = currentRowEyeX;
+            double nextRowEyeY = currentRowEyeY;
+
+            if (tier.SuperHas)
+            {
+                if (currentRow + 1 == tier.SuperRow)
+                {
+                    n -= tier.SuperCurbHeight;
+                    ptB.X -= tier.SuperCurbWidth;
+                    ptB.Y -= tier.SuperCurbHeight;
+                    currentRowEyeX = tier.SEyeX;
+                    currentRowEyeY = tier.SEyeY;
+                    nextRowEyeX = tier.SuperEyeX - tier.SuperCurbWidth;
+                    nextRowEyeY = tier.SuperEyeY;
+                }
+                else if (currentRow == tier.SuperRow)
+                {
+                    currentRowEyeX = tier.SuperEyeX;
+                    currentRowEyeY = tier.SuperEyeY;
+                    n += 0.25;
+                }
+            }
+
+            double t = (tier.RowWidths[currentRow + 1] + currentRowEyeX) - nextRowEyeX;
+            double c = tier.MinimumC;
+            double h = ptB.Y + currentRowEyeY;
+            double d = (ptB.X - currentRowEyeX) + t;
+
+            //Function of N, Triangle Proportionality Theroum 
+            double r = ((c + h) / (d - t)) * (d);
+            n += (r - nextRowEyeY - ptB.Y);
+
+            if (currentRow + 1 != tier.SuperRow || currentRow != tier.SuperRow)
+            {
+                double nMax = (Tan(tier.MaxRakeAngle) * t);
+                n = n > nMax ? nMax : n;
+            }
+
+            double nR = n;
+            return nR;
+        }
+
+        /// <summary>
+        /// Calculates the CValues for all spectators in a section.
+        /// </summary>
+        /// <param name="section"></param>
+        private static void CalcSpectatorCValues(Section section)
+        {
+
+        }
 
         /// <summary>
         /// Return a jagged array of all tier points in this section
@@ -171,165 +367,6 @@ namespace StadiumTools
             }
             return sightLines;
         }
-
-        /// <summary>
-        /// Returns a list of 2d points that define a seating tier
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="success"></param>
-        /// <returns></returns>
-        private static void CalcPts(Section section)
-        {
-            for (int t = 0; t < section.Tiers.Length; t++)
-            {
-                CalcTierPoints(section, section.Tiers[t]);
-            }
-        }
-
-        /// <summary>
-        /// Returns an array of Pt2d objects for a given tier within a section
-        /// </summary>
-        /// <param name="section"></param>
-        /// <param name="tier"></param>
-        /// <returns>Pt2d[]</returns>
-        private static void CalcTierPoints(Section section, Tier tier)
-        {
-            if (tier.RefPtType == Tier.ReferencePtType.ByEndOfPrevTier)
-            {
-                //This tier's RefPt == Last point of previous tier
-                tier.RefPt = section.Tiers[tier.SectionIndex - 1].Points2d[section.Tiers[tier.SectionIndex - 1].Points2dCount - 1];
-            }
-            CalcRowPoints(tier);
-        }
-
-        /// <summary>
-        /// Calculates B and C points for a tier iterativly.
-        /// </summary>
-        /// <param name="tier"></param>
-        private static void CalcRowPoints(Tier tier)
-        {
-            //Points increment
-            int p = 0;
-
-            //Calc optional Fascia Point
-            if (tier.FasciaH != 0.0)
-            {
-                tier.Points2d[p] = (new Pt2d(tier.RefPt.X + tier.StartX, ((tier.RefPt.Y + tier.StartY) - tier.FasciaH)));
-                p++;
-            }
-
-            //Calc first tier point (PtA)
-            Pt2d prevPt = new Pt2d(tier.RefPt.X + tier.StartX, tier.RefPt.Y + tier.StartY);
-            tier.Points2d[p] = prevPt;
-            p++;
-
-            //Calc riser points for each row iterativly | Pts(B) & Pts(C)
-            for (int row = 0; row < (tier.RowCount - 1); row++)
-            {
-                //Get rear riser bottom point (PtB) for current row
-                Pt2d currentPt = new Pt2d();
-                currentPt.X = prevPt.X + (tier.RowWidths[row]);
-                currentPt.Y = prevPt.Y;
-                tier.Points2d[p] = currentPt;
-                p++;
-
-                //Instance a spectator for current row
-                CalcRowSpectator(tier, currentPt, row);
-
-                //Calc rear riser top point (PtC) for current row and add to list
-                double n = RiserHeightFromCVal(tier, currentPt, row, false);
-                currentPt.Y += n;
-                tier.Points2d[p] = currentPt;
-                p++;
-
-                prevPt = currentPt;
-            }
-
-            //Add final tier point (PtD) to tier
-            prevPt.X += (tier.RowWidths[tier.RowCount - 1]);
-            tier.Points2d[p] = prevPt;
-            CalcRowSpectator(tier, prevPt, tier.RowCount - 1);
-        }
-
-        /// <summary>
-        /// Creates and adds a row's spectator to the tier. PtB argument should be rear lower riser point.
-        /// </summary>
-        /// <param name="tier"></param>
-        /// <param name="pt"></param>
-        private static void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
-        {
-            double eyeX = tier.EyeX;
-            double eyeY = tier.EyeY;
-            double eyeXStanding = tier.SEyeX;
-            double eyeYStanding = tier.SEyeY;
-
-            if (tier.SuperHas && row == tier.SuperRow)
-            {
-                eyeX = tier.SuperEyeX;
-                eyeY = tier.SuperEyeY;
-                eyeXStanding = tier.SuperSEyeX;
-                eyeYStanding = tier.SuperSEyeY;
-            }
-
-            Pt2d specPt = new Pt2d(ptB.X - eyeX, ptB.Y + eyeY);
-            Pt2d specPtSt = new Pt2d(ptB.X - eyeXStanding, ptB.Y + eyeYStanding);
-            Vec2d sLine = new Vec2d(specPt, tier.POF);
-            Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
-            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
-            tier.Spectators[row] = spectator;
-        }
-
-        /// <summary>
-        /// Calculates the riser height based on minimum C-Value requirement using triangle proportionality
-        /// </summary>
-        /// <param name="tier"></param>
-        /// <param name="ptB"></param>
-        /// <param name="row"></param>
-        /// <param name="standing"></param>
-        /// <returns>double</returns>
-        private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int currentRow, bool standing)
-        {
-            double currentRowEyeX = tier.EyeX;
-            double currentRowEyeY = tier.EyeY;
-            double nextRowEyeX = currentRowEyeX;
-            double nextRowEyeY = currentRowEyeY;
-            double maxRakeAngle = tier.MaxRakeAngle;
-
-            if (tier.SuperHas)
-            {
-                if (currentRow + 1 == tier.SuperRow)
-                {
-                    currentRowEyeX = tier.SEyeX;
-                    currentRowEyeY = tier.SEyeY;
-                    nextRowEyeX = tier.SuperEyeX;
-                    nextRowEyeY = tier.SuperEyeY;
-                    //Unlimited riser height for super riser
-                    maxRakeAngle = 1.57;
-                }
-                else if (currentRow == tier.SuperRow)
-                {
-                    currentRowEyeX = tier.SuperEyeX;
-                    currentRowEyeY = tier.SuperEyeY;
-                }
-            }
-
-            double t = (tier.RowWidths[currentRow + 1] + currentRowEyeX) - nextRowEyeX;
-            double c = tier.MinimumC;
-            double h = ptB.Y + currentRowEyeY;
-            double d = (ptB.X - currentRowEyeX) + t;
-
-            //Function of N, Triangle Proportionality Theroum 
-            double r = ((c + h) / (d - t)) * (d);
-            double n = (r - nextRowEyeY - ptB.Y);
-
-            double nMax = (Tan(maxRakeAngle) * t);
-
-            n = n > nMax ? nMax : n;
-
-            double nR = n;
-            return nR;
-        }
-
 
 
 
