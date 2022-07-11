@@ -7,21 +7,12 @@ namespace StadiumTools
     /// </summary>
     public class Tier
     {
-        //Enums
-        /// <summary>
-        /// Available methods to generate a reference point for a tier
-        /// </summary>
-        public enum ReferencePtType
-        {
-            ByPOF,
-            ByEndOfPrevTier
-        }
 
         //Properties
         /// <summary>
-        /// The method for determining the reference point of the tier
+        /// True if tier reference point is the last point of the previous tier.
         /// </summary>
-        public ReferencePtType RefPtType { get; set; }
+        public bool BuildFromPreviousTier { get; set; }
         /// <summary>
         /// Reference Point of tier relative to StartX and StartY
         /// </summary>
@@ -161,17 +152,17 @@ namespace StadiumTools
         /// </summary>
         public Tier()
         {
-            Initialize();
+            
         }
 
         //Methods
         /// <summary>
         /// Initializes a tier 2d instance with default values
         /// </summary>
-        private void Initialize()
+        public void InitializeDefault()
         {
             this.Unit = UnitHandler.m;
-            this.RefPtType = ReferencePtType.ByPOF;
+            this.BuildFromPreviousTier = true;
             this.StartX = 5.0 * Unit;
             this.StartY = 1.0 * Unit;
             this.MinimumC = 0.09 * Unit;

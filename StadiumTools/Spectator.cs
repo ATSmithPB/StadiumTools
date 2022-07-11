@@ -9,6 +9,7 @@ namespace StadiumTools
     public class Spectator
     {
         //Properties
+        public int SectionNum { get; set; }
         /// <summary>
         /// the index of the spectator's tier within their section
         /// </summary>
@@ -29,6 +30,10 @@ namespace StadiumTools
         /// Pt2d representing the location of the P.O.F (Point of focus). Inherited from section.
         /// </summary>
         public Pt2d POF { get; set; }
+        /// <summary>
+        /// Pt2d representing the eyes of the spectator in front (for determing C-Value)
+        /// </summary>
+        public Pt2d ForwardSpectatorLoc2d { get; set; }
         /// <summary>
         /// Vec2d representing the 2d X,Y components and Length of a seated spectator's sightline to the P.O.F
         /// </summary>
@@ -55,13 +60,6 @@ namespace StadiumTools
         public double Cvalue { get; set; } = 0.0;
 
         //Constructors 
-        /// <summary>
-        /// Initializes a new Spectator2D
-        /// </summary>
-        public Spectator()
-        {
-            Initialize();
-        }
 
         /// <summary>
         /// construct a Spectator from a collection of values
@@ -73,7 +71,8 @@ namespace StadiumTools
         /// <param name="pof"></param>
         /// <param name="sLine"></param>
         /// <param name="sLineSt"></param>
-        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt)
+        /// <param name="forwardSpec"></param>
+        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt, Pt2d forwardSpec)
         {
             this.TierNum = tierN;
             this.RowNum = rowN;
@@ -82,22 +81,27 @@ namespace StadiumTools
             this.POF = pof;
             this.SightLine = sLine;
             this.SightLineStanding = sLineSt;
+            this.ForwardSpectatorLoc2d = forwardSpec;
+
+            CalcSpectatorCValue(this);
         }
 
         //Methods
 
         /// <summary>
-        /// Initializes a spectator with default values.
+        /// Calculates the CValues for a spectator if it has a valid ForwardSpectator property
         /// </summary>
-        private void Initialize()
+        /// <param name="section"></param>
+        private static void CalcSpectatorCValue(Spectator spectator)
         {
-            this.Loc2d = new Pt2d();
-            this.Loc2dStanding = new Pt2d();
-            this.POF = new Pt2d();
-            this.SightLine = new Vec2d();
+            double r = spectator.Loc2d.Y;
+            double d = spectator.Loc2d.X;
+            double t = d - spectator.ForwardSpectatorLoc2d.X;
+            double n = r - spectator.ForwardSpectatorLoc2d.Y;
+            double h = spectator.ForwardSpectatorLoc2d.Y;
+            double Tan02 = (r / d);
+            double c = (Tan02 * (d - t)) - h; 
+            spectator.Cvalue = c;
         }
-
-        public void;
-
     }
 }

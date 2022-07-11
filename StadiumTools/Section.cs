@@ -14,7 +14,7 @@ namespace StadiumTools
         /// </summary>
         public Tier[] Tiers { get; set; }
         /// <summary>
-        /// A list of 2d points that represent the outline of a seating tier
+        /// The Point of Focus for spectators in this section.
         /// </summary>
         public Pt2d POF { get; set; }
         /// <summary>
@@ -54,12 +54,9 @@ namespace StadiumTools
             this.POF = new Pt2d(0.0, 0.0);
 
             //Force first tier to use Point of Focus as reference point
-            if (this.Tiers[0].RefPtType != Tier.ReferencePtType.ByPOF)
-            {
-                this.Tiers[0].RefPtType = Tier.ReferencePtType.ByPOF;
-            }
-
-            //Apply the section POF to all contained tiers 
+            this.Tiers[0].BuildFromPreviousTier = false;
+            
+            //Apply the Section POF to all contained tiers 
             for (int i = 0; i < this.Tiers.Length; i++)
             {
                 this.Tiers[i].SectionIndex = i; 
@@ -92,10 +89,9 @@ namespace StadiumTools
         /// <returns>Pt2d[]</returns>
         private static void CalcTierPoints(Section section, Tier currentTier)
         {
-            if (currentTier.RefPtType == Tier.ReferencePtType.ByEndOfPrevTier)
-            {
-                
-                //set current tier's RefPt == Last point of previous tier
+            if (currentTier.BuildFromPreviousTier)
+            { 
+                //set current tier's RefPt to be last point of previous tier
                 Tier lastTier = section.Tiers[currentTier.SectionIndex - 1];
                 int lastPtCount = lastTier.Points2d.Length;
                 Pt2d lastPt = lastTier.Points2d[lastPtCount - 1];
@@ -129,7 +125,7 @@ namespace StadiumTools
                 p++;
 
                 //Instance a spectator for current row
-                CalcRowSpectator(tier, currentPt, row);
+                AddRowSpectator(tier, currentPt, row);
 
                 if (tier.SuperHas)
                 {
@@ -180,15 +176,15 @@ namespace StadiumTools
             //Add final tier point (PtD) to tier
             prevPt.X += (tier.RowWidths[tier.RowCount - 1]);
             tier.Points2d[p] = prevPt;
-            CalcRowSpectator(tier, prevPt, tier.RowCount - 1);
+            AddRowSpectator(tier, prevPt, tier.RowCount - 1);
         }
 
         /// <summary>
-        /// Creates and adds a row's spectator to the tier. PtB argument should be rear lower riser point.
+        /// Adds a spectator object to current row. PtB argument should be rear lower riser point.
         /// </summary>
         /// <param name="tier"></param>
         /// <param name="pt"></param>
-        private static void CalcRowSpectator(Tier tier, Pt2d ptB, int row)
+        private static void AddRowSpectator(Tier tier, Pt2d ptB, int row)
         {
             double eyeX = tier.EyeX;
             double eyeY = tier.EyeY;
@@ -207,7 +203,18 @@ namespace StadiumTools
             Pt2d specPtSt = new Pt2d(ptB.X - eyeXStanding, ptB.Y + eyeYStanding);
             Vec2d sLine = new Vec2d(specPt, tier.POF);
             Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
-            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt);
+            Pt2d forwardSpec;
+
+            if (row == 0)
+            {
+                forwardSpec = tier.Points2d[0];
+            }
+            else
+            {
+                forwardSpec = tier.Spectators[row - 1].Loc2d;
+            }
+
+            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt, forwardSpec);
             tier.Spectators[row] = spectator;
         }
 
@@ -226,6 +233,7 @@ namespace StadiumTools
             double currentRowEyeY = tier.EyeY;
             double nextRowEyeX = currentRowEyeX;
             double nextRowEyeY = currentRowEyeY;
+            double nextRowWidth = tier.RowWidths[currentRow + 1];
 
             if (tier.SuperHas)
             {
@@ -241,13 +249,14 @@ namespace StadiumTools
                 }
                 else if (currentRow == tier.SuperRow)
                 {
+                    nextRowWidth += tier.SuperGuardrailWidth;
                     currentRowEyeX = tier.SuperEyeX;
                     currentRowEyeY = tier.SuperEyeY;
                     n += 0.25;
                 }
             }
 
-            double t = (tier.RowWidths[currentRow + 1] + currentRowEyeX) - nextRowEyeX;
+            double t = (nextRowWidth + currentRowEyeX) - nextRowEyeX;
             double c = tier.MinimumC;
             double h = ptB.Y + currentRowEyeY;
             double d = (ptB.X - currentRowEyeX) + t;
@@ -256,7 +265,7 @@ namespace StadiumTools
             double r = ((c + h) / (d - t)) * (d);
             n += (r - nextRowEyeY - ptB.Y);
 
-            if (currentRow + 1 != tier.SuperRow || currentRow != tier.SuperRow)
+            if (currentRow + 1 != tier.SuperRow && currentRow != tier.SuperRow)
             {
                 double nMax = (Tan(tier.MaxRakeAngle) * t);
                 n = n > nMax ? nMax : n;
@@ -264,15 +273,6 @@ namespace StadiumTools
 
             double nR = n;
             return nR;
-        }
-
-        /// <summary>
-        /// Calculates the CValues for all spectators in a section.
-        /// </summary>
-        /// <param name="section"></param>
-        private static void CalcSpectatorCValues(Section section)
-        {
-
         }
 
         /// <summary>
@@ -289,6 +289,41 @@ namespace StadiumTools
                 sectionPts[i] = s.Tiers[i].Points2d;
             }
             return sectionPts;
+        }
+
+        ///
+        public static double[][] GetCValues(Section section, bool standing)
+        {
+            double[][] cValues = new double[section.Tiers.Length][];
+
+            if (standing)
+            {
+                for (int i = 0; i < section.Tiers.Length; i++)
+                {
+                    double[] thisTierCValues = new double[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        double specC = section.Tiers[i].Spectators[j].Cvalue;
+                        thisTierCValues[j] = specC;
+                    }
+                    cValues[i] = thisTierCValues;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < section.Tiers.Length; i++)
+                {
+                    double[] thisTierCValues = new double[section.Tiers[i].RowCount];
+                    for (int j = 0; j < section.Tiers[i].RowCount; j++)
+                    {
+                        double specC = section.Tiers[i].Spectators[j].Cvalue;
+                        thisTierCValues[j] = specC;
+                    }
+                    cValues[i] = thisTierCValues;
+                }
+            }
+
+            return cValues;
         }
 
         /// <summary>

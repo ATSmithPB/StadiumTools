@@ -53,13 +53,11 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(double x, double y, double z, ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object A)
+  private void RunScript(double x, double y, double z, ref object sectionPoints, ref object specPoints, ref object specSightLines, ref object specPointsStanding, ref object specSightLinesStanding, ref object specCValues, ref object B)
   {
     Tier tier1 = new Tier();
     Tier tier2 = new Tier();
     Tier tier3 = new Tier();
-    tier2.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
-    tier3.RefPtType = Tier.ReferencePtType.ByEndOfPrevTier;
     tier1.StartX = x;
     tier1.StartY = -0.2;
     tier2.StartX = -2.0;
@@ -85,6 +83,8 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     //Section Sightlines Standing
     Vec2d[][] section1Vecs2dSt = Section.GetSightlines(section1, true);
     DataTree<Vector2d> sightLinesSt = Vec2dToVector2d(section1Vecs2dSt);
+    double[][] specCvals = Section.GetCValues(section1, false);
+    DataTree<double> spectatorCValues = DataTreeFromArray(specCvals);
 
     //Outputs
     sectionPoints = section1Pts;
@@ -92,7 +92,7 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
     specSightLines = sightLines;
     specPointsStanding = specPtsSt;
     specSightLinesStanding = sightLinesSt;
-    A = true;
+    specCValues = spectatorCValues;
   }
   #endregion
   #region Additional
@@ -133,6 +133,36 @@ public abstract class Script_Instance_139c3 : GH_ScriptInstance
       }
     }
     return rcPts;
+  }
+
+  public DataTree<double> DataTreeFromArray(double[][] cVals)
+  {
+    DataTree<double> rcDub = new DataTree<double>();
+    for (int i = 0; i < cVals.Length; i++)
+    {
+      for (int j = 0; j < cVals[i].Length; j++)
+      {
+        GH_Path path = new GH_Path(i);
+        double item = cVals[i][j];
+        rcDub.Add(item, path);
+      }
+    }
+    return rcDub;
+  }
+
+  public DataTree<int> DataTreeFromArray(int[][] cVals)
+  {
+    DataTree<int> rcInt = new DataTree<int>();
+    for (int i = 0; i < cVals.Length; i++)
+    {
+      for (int j = 0; j < cVals[i].Length; j++)
+      {
+        GH_Path path = new GH_Path(i);
+        int item = cVals[i][j];
+        rcInt.Add(item, path);
+      }
+    }
+    return rcInt;
   }
 
   /// <summary>

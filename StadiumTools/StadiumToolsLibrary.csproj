@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RhinoCommon">
+      <HintPath>..\..\..\..\..\Program Files\Rhino 7\System\RhinoCommon.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IO_Grasshopper.cs" />
+    <Compile Include="IO_Rhino.cs" />
     <Compile Include="Pln3d.cs" />
     <Compile Include="Pt2d.cs" />
     <Compile Include="Pt3d.cs" />
