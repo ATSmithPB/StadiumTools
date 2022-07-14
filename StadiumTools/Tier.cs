@@ -7,7 +7,6 @@ namespace StadiumTools
     /// </summary>
     public class Tier
     {
-
         //Properties
         /// <summary>
         /// True if tier reference point is the last point of the previous tier.
@@ -65,6 +64,10 @@ namespace StadiumTools
         /// Number of rows in this tier (super riser == row)
         /// </summary>
         public int RowCount { get; set; }
+        /// <summary>
+        /// Default row width to apply to all rows
+        /// </summary>
+        public double DefaultRowWidth { get; set; }
         /// <summary>
         /// Width(s) of row (distance from riser to riser)
         /// </summary>
@@ -171,13 +174,13 @@ namespace StadiumTools
             this.SEyeX = 0.6 * Unit;
             this.SEyeY = 1.4 * Unit;
             this.RowCount = 25;
+            this.DefaultRowWidth = 0.8 * Unit;
 
             // Initialize all row widths to default value
             double[] rowWidths = new double[this.RowCount];
-            double defaultRowWidth = 0.8 * Unit;
             for (int i = 0; i < rowWidths.Length; i++)
             {
-                rowWidths[i] = defaultRowWidth;
+                rowWidths[i] = this.DefaultRowWidth;
             }
 
             this.RowWidths = rowWidths;
@@ -187,7 +190,7 @@ namespace StadiumTools
             this.VomHeight = 5;
             this.SuperHas = true;
             this.SuperRow = 10;
-            this.SuperWidth = defaultRowWidth * 3;
+            this.SuperWidth = this.DefaultRowWidth * 3;
 
             if (this.SuperHas)
             {

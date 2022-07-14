@@ -35,11 +35,11 @@ namespace StadiumTools
         /// </summary>
         public Pt2d ForwardSpectatorLoc2d { get; set; }
         /// <summary>
-        /// Vec2d representing the 2d X,Y components and Length of a seated spectator's sightline to the P.O.F
+        /// Vec2d representing the 2d X,Y components and Magnitude of a seated spectator's sightline to the P.O.F
         /// </summary>
         public Vec2d SightLine { get; set; }
         /// <summary>
-        /// Vec2d representing the 2d X,Y components and Length of a standing spectator's sightline to the P.O.F
+        /// Vec2d representing the 2d X,Y components and Magnitude of a standing spectator's sightline to the P.O.F
         /// </summary>
         public Vec2d SightLineStanding { get; set; }
         /// <summary>
@@ -60,7 +60,6 @@ namespace StadiumTools
         public double Cvalue { get; set; } = 0.0;
 
         //Constructors 
-
         /// <summary>
         /// construct a Spectator from a collection of values
         /// </summary>
@@ -87,7 +86,6 @@ namespace StadiumTools
         }
 
         //Methods
-
         /// <summary>
         /// Calculates the CValues for a spectator if it has a valid ForwardSpectator property
         /// </summary>

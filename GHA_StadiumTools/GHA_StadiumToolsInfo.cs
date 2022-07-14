@@ -13,14 +13,14 @@ namespace GHA_StadiumTools
         public override Bitmap Icon => null;
 
         //Return a short string describing the purpose of this GHA library.
-        public override string Description => "";
+        public override string Description => "A collection of components to aid in the parametric modeling and analysis of common stadium elements";
 
         public override Guid Id => new Guid("8ac43183-56cd-4ad0-a2a9-4f82dc35ad14");
 
         //Return a string identifying you or your company.
-        public override string AuthorName => "";
+        public override string AuthorName => "Andrew T Smith";
 
         //Return a string representing your preferred contact details.
-        public override string AuthorContact => "";
+        public override string AuthorContact => "github.com/ATSmithPB/";
     }
 }

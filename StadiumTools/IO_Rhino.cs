@@ -17,6 +17,12 @@ namespace StadiumTools
                 Pt2d pt = new Pt2d(point3d.X, point3d.Y);
                 return pt;
             }
+
+            public static Pln3d Pln3dFromPlane(Plane plane)
+            {
+                Pln3d pln = new Pln3d(plane.Origin, plane.XAxis, plane.YAxis, plane.ZAxis)
+                return pln;
+            }
         }
     }
 }

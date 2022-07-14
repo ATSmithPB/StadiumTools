@@ -7,6 +7,7 @@ namespace StadiumTools
     /// </summary>
     public struct UnitHandler
     {
+        //Properties
         public const double mm = 1000.0;
         public const double cm = 100.0;
         public const double m = 1.0;

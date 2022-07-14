@@ -30,7 +30,7 @@ namespace GHA_StadiumTools
             pManager.AddNumberParameter("Start Y", "sY", "Vertical start distance from P.O.F", GH_ParamAccess.item, defaultTier.StartY);
             pManager.AddNumberParameter("C-Value", "C", "Max allowable spectator C-value", GH_ParamAccess.item, defaultTier.MinimumC);
             pManager.AddIntegerParameter("Row Count", "rC", "Number of rows", GH_ParamAccess.item, defaultTier.RowCount);
-            pManager.AddNumberParameter("Row Width", "rW", "Row width", GH_ParamAccess.item, defaultTier.RowWidths);
+            pManager.AddNumberParameter("Row Width", "rW", "Row width", GH_ParamAccess.item, defaultTier.DefaultRowWidth);
             pManager.AddNumberParameter("Eye Horizontal", "eX", "Horizontal distance of spectator eyes from rear riser", GH_ParamAccess.item, defaultTier.EyeX);
             pManager.AddNumberParameter("Eye Verical", "eY", "Vertical distance of spectator eyes from floor", GH_ParamAccess.item, defaultTier.EyeY);
             pManager.AddNumberParameter("Standing Eye Horizontal", "SteX", "Eye Horizontal for standing spectators", GH_ParamAccess.item, defaultTier.SEyeX);
@@ -39,8 +39,9 @@ namespace GHA_StadiumTools
             pManager.AddIntegerParameter("Super Row", "sR", "Start row for super riser", GH_ParamAccess.item, defaultTier.SuperRow);
             pManager.AddNumberParameter("Super Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, defaultTier.SuperCurbWidth);
             pManager.AddNumberParameter("Super Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, defaultTier.SuperCurbHeight);
-            pManager.AddNumberParameter("Super Eye Vertical", "SeX", "Eye Horizontal offset for SuperRiser", GH_ParamAccess.item, defaultTier.SuperEyeX);
-            pManager.AddNumberParameter("Super Eye Horizontal", "SeY", "Eye Vertical offset for SuperRiser", GH_ParamAccess.item, defaultTier.SuperEyeY);
+            pManager.AddNumberParameter("Super Eye Horizontal", "SeX", "Eye Vertical offset for SuperRiser", GH_ParamAccess.item, defaultTier.SuperEyeX);
+            pManager.AddNumberParameter("Super Eye Vertical", "SeY", "Eye Horizontal offset for SuperRiser", GH_ParamAccess.item, defaultTier.SuperEyeY);
+            pManager.AddNumberParameter("Super Rail Width", "srW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, defaultTier.SuperGuardrailWidth);
         }
 
         /// <summary>
@@ -102,9 +103,9 @@ namespace GHA_StadiumTools
             if (!DA.GetData<int>(4, ref intItem))
                 return;
             tier.RowCount = intItem;
-            if (!DA.GetData<double[]>(5, ref doubleArrayItem))
+            if (!DA.GetData<double>(5, ref doubleItem))
                 return;
-            tier.RowWidths = doubleArrayItem;
+            tier.DefaultRowWidth = doubleItem;
             if (!DA.GetData<double>(6, ref doubleItem))
                 return;
             tier.EyeX = doubleItem;
@@ -120,9 +121,24 @@ namespace GHA_StadiumTools
             if (!DA.GetData<bool>(10, ref boolItem))
                 return;
             tier.SuperHas = boolItem;
-            if (!DA.GetData<int>(9, ref intItem))
+            if (!DA.GetData<int>(11, ref intItem))
                 return;
             tier.SuperRow = intItem;
+            if (!DA.GetData<double>(12, ref doubleItem))
+                return;
+            tier.SuperCurbWidth = doubleItem;
+            if (!DA.GetData<double>(13, ref doubleItem))
+                return;
+            tier.SuperCurbHeight = doubleItem;
+            if (!DA.GetData<double>(14, ref doubleItem))
+                return;
+            tier.SuperEyeX = doubleItem;
+            if (!DA.GetData<double>(15, ref doubleItem))
+                return;
+            tier.SuperEyeY = doubleItem;
+            if (!DA.GetData<double>(16, ref doubleItem))
+                return;
+            tier.SuperGuardrailWidth = doubleItem;
 
         }
 

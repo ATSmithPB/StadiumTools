@@ -24,6 +24,14 @@ namespace StadiumTools
 
         //Constructors
         /// <summary>
+        /// Construct an empty section object 
+        /// </summary>
+        public Section()
+        {
+
+        }
+        
+        /// <summary>
         /// Construct a Section from a list of tiers 
         /// </summary>
         /// <param name="tiers"></param>
