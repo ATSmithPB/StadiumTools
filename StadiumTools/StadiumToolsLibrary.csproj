@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,6 +53,7 @@
     <Compile Include="Spectator.cs" />
     <Compile Include="Tier.cs" />
     <Compile Include="TierFascia.cs" />
+    <Compile Include="Transform3d.cs" />
     <Compile Include="UnitHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vec2d.cs" />
