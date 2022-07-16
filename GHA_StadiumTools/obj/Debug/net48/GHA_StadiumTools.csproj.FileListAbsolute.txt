@@ -10,3 +10,5 @@ C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools.pdb
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.csproj.CopyComplete
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.gha
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.pdb
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhino.dll
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhino.pdb

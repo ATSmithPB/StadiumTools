@@ -16,6 +16,9 @@
     <Reference Include="StadiumTools">
       <HintPath>..\StadiumTools\bin\Debug\StadiumTools.dll</HintPath>
     </Reference>
+    <Reference Include="StadiumTools_IO_Rhino">
+      <HintPath>..\StadiumTools_IO_Rhino\bin\Debug\StadiumTools_IO_Rhino.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">

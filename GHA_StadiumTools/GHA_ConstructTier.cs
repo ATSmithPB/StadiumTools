@@ -90,7 +90,7 @@ namespace GHA_StadiumTools
             
             if (!DA.GetData<Rhino.Geometry.Point3d>(0, ref pointItem))
                 return;
-            tier.POF = StadiumTools.IO.Rhino.Pt2dFromPoint3d(pointItem);
+            tier.POF = StadiumTools.IO.Pt2dFromPoint3d(pointItem);
             if (!DA.GetData<double>(1, ref doubleItem))
                 return;
             tier.StartX = doubleItem;

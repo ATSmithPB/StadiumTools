@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
@@ -24,7 +26,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             StadiumTools.Tier defaultTier = new StadiumTools.Tier();
-            pManager.AddGenericParameter("Tiers", "T", "Seating Tiers that comprise this section", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Tiers", "T", "Seating Tiers that comprise a section", GH_ParamAccess.list);
             pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldYZ);
         }
 
@@ -67,16 +69,15 @@ namespace GHA_StadiumTools
         public static void ConstructSectionFromDA(IGH_DataAccess DA, StadiumTools.Section section)
         {
             Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
-            StadiumTools.Tier tierItem = new StadiumTools.Tier();
+            List<StadiumTools.Tier> tierList = new List<StadiumTools.Tier>();
 
-            if (!DA.GetData<Rhino.Geometry.Plane>(0, ref planeItem))
+            if (!DA.GetDataList<StadiumTools.Tier>(0, tierList))
                 return;
-            section.Plane3d = StadiumTools.IO.Rhino.Pln3dFromPlane(planeItem);
-            if (!DA.GetData<double>(1, ref doubleItem))
+            section.Tiers = tierList.ToArray();
+            if (!DA.GetData<Rhino.Geometry.Plane>(1, ref planeItem))
                 return;
-            section.StartX = doubleItem;
+            section.Plane3d = StadiumTools.IO.Pln3dFromPlane(planeItem);
             
-
         }
 
 

@@ -47,6 +47,7 @@ namespace StadiumTools
         /// Gets Vector with Default XAxis components (0.0, 1.0, 0.0)
         /// </summary>
         public static Vec3d YAxis => new Vec3d(0.0, 1.0, 0.0);
+        
         /// <summary>
         /// Gets Vector with Default XAxis components (0.0, 0.0, 1.0)
         /// </summary>
