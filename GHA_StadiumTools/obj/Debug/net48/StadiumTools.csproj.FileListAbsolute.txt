@@ -1,0 +1,15 @@
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools.gha
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools.pdb
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools.dll
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhino.dll
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhino.pdb
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.csproj.AssemblyReference.cache
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.Properties.Resources.resources
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.csproj.GenerateResource.cache
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.AssemblyInfoInputs.cache
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.AssemblyInfo.cs
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.csproj.CoreCompileInputs.cache
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.csproj.CopyComplete
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.gha
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\StadiumTools.pdb

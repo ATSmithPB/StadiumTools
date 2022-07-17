@@ -2,6 +2,7 @@
 using Grasshopper.Kernel;
 using System;
 using System.Drawing;
+using GHA_StadiumTools.Properties;
 
 namespace GHA_StadiumTools
 {
@@ -10,7 +11,7 @@ namespace GHA_StadiumTools
         public override string Name => "StadiumTools";
 
         //Return a 24x24 pixel bitmap to represent this GHA library.
-        public override Bitmap Icon => null;
+        public override Bitmap Icon => Resources.ST_Icon;
 
         //Return a short string describing the purpose of this GHA library.
         public override string Description => "A collection of components to aid in the parametric modeling and analysis of common stadium elements";
