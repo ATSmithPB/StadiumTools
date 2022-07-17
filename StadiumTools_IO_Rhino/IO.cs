@@ -40,6 +40,18 @@ namespace StadiumTools
             pln.isValid = true;
             return pln;
         }
+
+        /// <summary>
+        /// Returns a Pt3d object that represents the origin of a Rhino Plane
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <returns></returns>
+        public static Pt3d Pt3dFromPlane(Plane plane)
+        {
+            Pt3d pt = new Pt3d();
+            pt = Pt3dFromPoint3d(plane.Origin);
+            return pt;
+        }
  
         /// <summary>
         /// Returns a Pt3d object from a Rhino Point3d
@@ -63,7 +75,6 @@ namespace StadiumTools
             return vec;
         }
         
-
         /// <summary>
         /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
         /// </summary>
@@ -100,6 +111,11 @@ namespace StadiumTools
             return rcPts;
         }
 
+        /// <summary>
+        /// Returns a Data Tree of doubles based on a jagged array
+        /// </summary>
+        /// <param name="cVals"></param>
+        /// <returns>DataTree<double></double></returns>
         public static DataTree<double> DataTreeFromArray(double[][] cVals)
         {
             DataTree<double> rcDub = new DataTree<double>();
@@ -115,6 +131,11 @@ namespace StadiumTools
             return rcDub;
         }
 
+        /// <summary>
+        /// Returns a Data Tree of doubles based on a list
+        /// </summary>
+        /// <param name="cVals"></param>
+        /// <returns></returns>
         public static DataTree<int> DataTreeFromArray(int[][] cVals)
         {
             DataTree<int> rcInt = new DataTree<int>();
