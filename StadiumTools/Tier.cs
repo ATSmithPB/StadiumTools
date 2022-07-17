@@ -9,6 +9,10 @@ namespace StadiumTools
     {
         //Properties
         /// <summary>
+        /// A spectator object that defines the pectator parameters for generating the tier (Target C-Val, EyeX, EyeY, etc..)
+        /// </summary>
+        public Spectator SpectatorParameters { get; set; }
+        /// <summary>
         /// True if tier reference point is the last point of the previous tier.
         /// </summary>
         public bool BuildFromPreviousTier { get; set; }
@@ -25,10 +29,6 @@ namespace StadiumTools
         /// </summary>
         public int PlanIndex { get; set; }
         /// <summary>
-        /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
-        /// </summary>
-        public double Unit;
-        /// <summary>
         /// Point of focus for all spectators in this tier 
         /// </summary>
         public Pt2d POF { get; set; }
@@ -40,26 +40,6 @@ namespace StadiumTools
         /// Vertical offset of tier start from reference point
         /// </summary>
         public double StartY { get; set; }
-        /// <summary>
-        /// Minimum allowable c-value for spectators in this tier.
-        /// </summary>
-        public double MinimumC { get; set; }
-        /// <summary>
-        /// Horizontal offset of seated spectator eyes from row start 
-        /// </summary>
-        public double EyeX { get; set; }
-        /// <summary>
-        /// Vertical offset of seated spectator eyes from row floor
-        /// </summary>
-        public double EyeY { get; set; }
-        /// <summary>
-        /// Horizontal offset of standing spectator eyes from row start
-        /// </summary>
-        public double SEyeX { get; set; }
-        /// <summary>
-        /// Vertical offset of seated spectator eyes from row floor
-        /// </summary>
-        public double SEyeY { get; set; }
         /// <summary>
         /// Number of rows in this tier (super riser == row)
         /// </summary>
@@ -89,46 +69,6 @@ namespace StadiumTools
         /// </summary>
         public int VomHeight { get; set; }
         /// <summary>
-        /// True if tier has a super riser
-        /// </summary>
-        public bool SuperHas { get; set; }
-        /// <summary>
-        /// Row number for inserting super riser
-        /// </summary>
-        public int SuperRow { get; set; }
-        /// <summary>
-        /// Width of super riser row
-        /// </summary>
-        public double SuperWidth { get; set; }
-        /// <summary>
-        /// Optional curb distance before super riser 
-        /// </summary>
-        public double SuperCurbWidth { get; set; }
-        /// <summary>
-        /// Optional curb height before super riser
-        /// </summary>
-        public double SuperCurbHeight { get; set; }
-        /// <summary>
-        /// Horizontal offset of spectator eyes from nose of super riser 
-        /// </summary>
-        public double SuperEyeX { get; set; }
-        /// <summary>
-        /// Vertical offset of spectator eyes from floor of super riser
-        /// </summary>
-        public double SuperEyeY { get; set; }
-        /// <summary>
-        /// Width of guardrail behind super riser
-        /// </summary>
-        public double SuperGuardrailWidth { get; set; }
-        /// <summary>
-        /// Horizontal offset of STANDING spectator eyes from nose of super riser 
-        /// </summary>
-        public double SuperSEyeX { get; set; }
-        /// <summary>
-        /// Vertical offset of STANDING spectator eyes from floor of super riser
-        /// </summary>
-        public double SuperSEyeY { get; set; }
-        /// <summary>
         /// Increment size to round riser heights to
         /// </summary>
         public double RoundTo { get; set; }
@@ -136,6 +76,14 @@ namespace StadiumTools
         /// The maximum allowable rake angle in radians. 
         /// </summary>
         public double MaxRakeAngle { get; set; }
+        /// <summary>
+        /// A SuperRiser object that defines the optional super riser parameters for the tier (Super EyeX, Super EyeY, Guardrail Width etc...)
+        /// </summary>
+        public SuperRiser SuperRiser { get; set; }
+        /// <summary>
+        /// True if tier has a super riser
+        /// </summary>
+        public bool SuperHas { get; set; }
         /// <summary>
         /// An ordered list of Spectators in the tier
         /// </summary>
@@ -164,17 +112,20 @@ namespace StadiumTools
         /// </summary>
         public void InitializeDefault()
         {
-            this.Unit = UnitHandler.m;
+            //Instance a default spectator
+            Spectator defaultSpectatorParameters = new Spectator();
+            Spectator.InitializeDefault(defaultSpectatorParameters);
+            this.SpectatorParameters = defaultSpectatorParameters;
+
+            //Instance a default SuperRiser
+            SuperRiser defaultSuperRiserParameters = new SuperRiser();
+            defaultSuperRiserParameters.InitializeDefault();
+
             this.BuildFromPreviousTier = true;
-            this.StartX = 5.0 * Unit;
-            this.StartY = 1.0 * Unit;
-            this.MinimumC = 0.09 * Unit;
-            this.EyeX = 0.15 * Unit;
-            this.EyeY = 1.2 * Unit;
-            this.SEyeX = 0.6 * Unit;
-            this.SEyeY = 1.4 * Unit;
+            this.StartX = 5.0 * this.SpectatorParameters.Unit;
+            this.StartY = 1.0 * this.SpectatorParameters.Unit;
             this.RowCount = 25;
-            this.DefaultRowWidth = 0.8 * Unit;
+            this.DefaultRowWidth = 0.8 * this.SpectatorParameters.Unit;
 
             // Initialize all row widths to default value
             double[] rowWidths = new double[this.RowCount];
@@ -183,28 +134,23 @@ namespace StadiumTools
                 rowWidths[i] = this.DefaultRowWidth;
             }
 
+            if (this.SuperRiser.Row == 0)
+            {
+                this.SuperHas = true;
+            }
+
+            if (this.SuperHas)
+            {
+                rowWidths[this.SuperRiser.Row] = (this.SuperRiser.Width * rowWidths[this.SuperRiser.Row]);
+            }
+
             this.RowWidths = rowWidths;
             this.RiserHeights = new double[this.RowCount - 1];
             this.VomHas = false;
             this.VomStart = 5;
             this.VomHeight = 5;
             this.SuperHas = true;
-            this.SuperRow = 10;
-            this.SuperWidth = this.DefaultRowWidth * 3;
-
-            if (this.SuperHas)
-            {
-                rowWidths[this.SuperRow] = this.SuperWidth;
-            }
-
-            this.SuperGuardrailWidth = 0.1 * Unit;
-            this.SuperCurbHeight = 0.1 * Unit;
-            this.SuperCurbWidth = 0.1 * Unit;
-            this.SuperEyeX = 1.6 * Unit;
-            this.SuperEyeY = 1.2 * Unit;
-            this.SuperSEyeX = 1.8 * Unit;
-            this.SuperSEyeY = 1.4;
-            this.RoundTo = 0.001 * Unit;
+            this.RoundTo = 0.001 * this.SpectatorParameters.Unit;
             this.Points2dCount = GetTierPtCount(this);
             this.Points2d = new Pt2d[this.Points2dCount];
             this.MaxRakeAngle = .593412; //radians
@@ -221,14 +167,14 @@ namespace StadiumTools
 
             if (tier.SuperHas)
             {
-                if (tier.SuperRow < (tier.RowCount - 1) && tier.SuperGuardrailWidth > 0.0)
+                if (tier.SuperRiser.Row < (tier.RowCount - 1) && tier.SuperRiser.GuardrailWidth > 0.0)
                 {
                     tierPtCount += 2;
                 }
-                if (tier.SuperCurbWidth > 0.0)
+                if (tier.SuperRiser.CurbWidth > 0.0)
                 {
                     tierPtCount += 1;
-                    if (tier.SuperCurbHeight > 0.0)
+                    if (tier.SuperRiser.CurbHeight > 0.0)
                     {
                         tierPtCount += 1;
                     }

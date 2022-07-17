@@ -137,22 +137,22 @@ namespace StadiumTools
 
                 if (tier.SuperHas)
                 {
-                    if (row + 1 == tier.SuperRow)
+                    if (row + 1 == tier.SuperRiser.Row)
                     {
-                        if (tier.SuperCurbWidth > 0.0)
+                        if (tier.SuperRiser.CurbWidth > 0.0)
                         {
-                            if (tier.SuperCurbHeight > 0.0)
+                            if (tier.SuperRiser.CurbHeight > 0.0)
                             {
-                                currentPt.Y += tier.SuperCurbHeight;
+                                currentPt.Y += tier.SuperRiser.CurbHeight;
                                 tier.Points2d[p] = currentPt;
                                 p++;
                             }
-                            currentPt.X += tier.SuperCurbWidth;
+                            currentPt.X += tier.SuperRiser.CurbWidth;
                             tier.Points2d[p] = currentPt;
                             p++;
                         }
                     }
-                    if (row == tier.SuperRow && row == tier.RowCount - 1)
+                    if (row == tier.SuperRiser.Row && row == tier.RowCount - 1)
                     {
                         break;
                     }
@@ -166,9 +166,9 @@ namespace StadiumTools
 
                 if (tier.SuperHas)
                 {
-                    if (row == tier.SuperRow)
+                    if (row == tier.SuperRiser.Row)
                     {
-                        currentPt.X += tier.SuperGuardrailWidth;
+                        currentPt.X += tier.SuperRiser.GuardrailWidth;
                         tier.Points2d[p] = currentPt;
                         p++;
 
@@ -194,17 +194,17 @@ namespace StadiumTools
         /// <param name="pt"></param>
         private static void AddRowSpectator(Tier tier, Pt2d ptB, int row)
         {
-            double eyeX = tier.EyeX;
-            double eyeY = tier.EyeY;
-            double eyeXStanding = tier.SEyeX;
-            double eyeYStanding = tier.SEyeY;
+            double eyeX = tier.SpectatorParameters.EyeX;
+            double eyeY = tier.SpectatorParameters.EyeY;
+            double eyeXStanding = tier.SpectatorParameters.SEyeX;
+            double eyeYStanding = tier.SpectatorParameters.SEyeY;
 
-            if (tier.SuperHas && row == tier.SuperRow)
+            if (tier.SuperHas && row == tier.SuperRiser.Row)
             {
-                eyeX = tier.SuperEyeX;
-                eyeY = tier.SuperEyeY;
-                eyeXStanding = tier.SuperSEyeX;
-                eyeYStanding = tier.SuperSEyeY;
+                eyeX = tier.SuperRiser.EyeX;
+                eyeY = tier.SuperRiser.EyeY;
+                eyeXStanding = tier.SuperRiser.SEyeX;
+                eyeYStanding = tier.SuperRiser.SEyeY;
             }
 
             Pt2d specPt = new Pt2d(ptB.X - eyeX, ptB.Y + eyeY);
@@ -237,35 +237,35 @@ namespace StadiumTools
         private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int currentRow, bool standing)
         {
             double n = 0.0;
-            double currentRowEyeX = tier.EyeX;
-            double currentRowEyeY = tier.EyeY;
+            double currentRowEyeX = tier.SpectatorParameters.EyeX;
+            double currentRowEyeY = tier.SpectatorParameters.EyeY;
             double nextRowEyeX = currentRowEyeX;
             double nextRowEyeY = currentRowEyeY;
             double nextRowWidth = tier.RowWidths[currentRow + 1];
 
             if (tier.SuperHas)
             {
-                if (currentRow + 1 == tier.SuperRow)
+                if (currentRow + 1 == tier.SuperRiser.Row)
                 {
-                    n -= tier.SuperCurbHeight;
-                    ptB.X -= tier.SuperCurbWidth;
-                    ptB.Y -= tier.SuperCurbHeight;
-                    currentRowEyeX = tier.SEyeX;
-                    currentRowEyeY = tier.SEyeY;
-                    nextRowEyeX = tier.SuperEyeX - tier.SuperCurbWidth;
-                    nextRowEyeY = tier.SuperEyeY;
+                    n -= tier.SuperRiser.CurbHeight;
+                    ptB.X -= tier.SuperRiser.CurbWidth;
+                    ptB.Y -= tier.SuperRiser.CurbHeight;
+                    currentRowEyeX = tier.SpectatorParameters.SEyeX;
+                    currentRowEyeY = tier.SpectatorParameters.SEyeY;
+                    nextRowEyeX = tier.SuperRiser.EyeX - tier.SuperRiser.CurbWidth;
+                    nextRowEyeY = tier.SuperRiser.EyeY;
                 }
-                else if (currentRow == tier.SuperRow)
+                else if (currentRow == tier.SuperRiser.Row)
                 {
-                    nextRowWidth += tier.SuperGuardrailWidth;
-                    currentRowEyeX = tier.SuperEyeX;
-                    currentRowEyeY = tier.SuperEyeY;
+                    nextRowWidth += tier.SuperRiser.GuardrailWidth;
+                    currentRowEyeX = tier.SuperRiser.EyeX;
+                    currentRowEyeY = tier.SuperRiser.EyeY;
                     n += 0.25;
                 }
             }
 
             double t = (nextRowWidth + currentRowEyeX) - nextRowEyeX;
-            double c = tier.MinimumC;
+            double c = tier.SpectatorParameters.TargetCValue;
             double h = ptB.Y + currentRowEyeY;
             double d = (ptB.X - currentRowEyeX) + t;
 
@@ -273,7 +273,7 @@ namespace StadiumTools
             double r = ((c + h) / (d - t)) * (d);
             n += (r - nextRowEyeY - ptB.Y);
 
-            if (currentRow + 1 != tier.SuperRow && currentRow != tier.SuperRow)
+            if (currentRow + 1 != tier.SuperRiser.Row && currentRow != tier.SuperRiser.Row)
             {
                 double nMax = (Tan(tier.MaxRakeAngle) * t);
                 n = n > nMax ? nMax : n;

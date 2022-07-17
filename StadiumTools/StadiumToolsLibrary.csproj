@@ -50,6 +50,7 @@
     <Compile Include="Pt3d.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="Spectator.cs" />
+    <Compile Include="SuperRiser.cs" />
     <Compile Include="Tier.cs" />
     <Compile Include="TierFascia.cs" />
     <Compile Include="Transform3d.cs" />

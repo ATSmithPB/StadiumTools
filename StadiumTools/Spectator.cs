@@ -9,6 +9,26 @@ namespace StadiumTools
     public class Spectator
     {
         //Properties
+        /// <summary>
+        /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
+        /// </summary>
+        public double Unit;
+        /// <summary>
+        /// Horizontal offset of seated spectator eyes from row start 
+        /// </summary>
+        public double EyeX { get; set; }
+        /// <summary>
+        /// Vertical offset of seated spectator eyes from row floor
+        /// </summary>
+        public double EyeY { get; set; }
+        /// <summary>
+        /// Horizontal offset of standing spectator eyes from row start
+        /// </summary>
+        public double SEyeX { get; set; }
+        /// <summary>
+        /// Vertical offset of seated spectator eyes from row floor
+        /// </summary>
+        public double SEyeY { get; set; }
         public int SectionNum { get; set; }
         /// <summary>
         /// the index of the spectator's tier within their section
@@ -60,6 +80,10 @@ namespace StadiumTools
         public double Cvalue { get; set; } = 0.0;
 
         //Constructors 
+        public Spectator()
+        {
+        }
+        
         /// <summary>
         /// construct a Spectator from a collection of values
         /// </summary>
@@ -86,6 +110,20 @@ namespace StadiumTools
         }
 
         //Methods
+        /// <summary>
+        /// Initialize a spectator with default parameters
+        /// </summary>
+        public static void InitializeDefault(Spectator spectator)
+        {
+            double unit;
+            spectator.Unit = unit = UnitHandler.m;
+            spectator.EyeX = 0.15 * unit;
+            spectator.EyeY = 1.2 * unit;
+            spectator.SEyeX = 0.6 * unit;
+            spectator.SEyeY = 1.4 * unit;
+            spectator.TargetCValue = 0.09 * unit;
+        }
+        
         /// <summary>
         /// Calculates the CValues for a spectator if it has a valid ForwardSpectator property
         /// </summary>

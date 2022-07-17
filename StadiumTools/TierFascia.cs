@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StadiumTools
 {
-    internal class TierFascia
+    public struct TierFascia
     {
     }
 }
