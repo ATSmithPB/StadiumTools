@@ -119,7 +119,11 @@ namespace StadiumTools
             vN.M = 1.0;
             return vN;
         }
-     
 
+        //public Vec3d ToPt3d(Pln3d pln)
+        //{
+        //    Vec3d vec3d = Vec3d.LocalComponents(this, pln);
+        //    return vec3d;
+        //}
     }
 }

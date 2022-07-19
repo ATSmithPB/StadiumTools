@@ -74,6 +74,11 @@ namespace StadiumTools
             
             IsValid(this);
         }
+        //Delegates
+        /// <summary>
+        /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
+        /// </summary>
+        public static Pln3d XYPlane => new Pln3d(Pt3d.Origin, Vec3d.XAxis, Vec3d.YAxis, Vec3d.ZAxis);
 
         //Methods
         /// <summary>
@@ -83,9 +88,15 @@ namespace StadiumTools
         /// <returns></returns>
         private static bool IsValid(Pln3d p)
         {
-            bool isValid = false;
+            bool isValid = true;
 
             return isValid;
+        }
+
+        public Pt3d ToPt3d(Pln3d pln)
+        {
+            Pt3d pt3d = pln.OriginPt;
+            return pt3d;
         }
 
     }

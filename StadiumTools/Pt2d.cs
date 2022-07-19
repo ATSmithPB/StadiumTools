@@ -41,5 +41,10 @@ namespace StadiumTools
 
 
         //Methods
+        public Pt3d ToPt3d(Pln3d pln)
+        {
+            Pt3d pt3d = Pt3d.LocalCoordinates(this, pln);
+            return pt3d;
+        }
     }
 }

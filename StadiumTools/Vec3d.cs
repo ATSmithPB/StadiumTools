@@ -56,8 +56,7 @@ namespace StadiumTools
         //Operator Overloads
         public static double operator * (Vec3d a, Vec3d b)
         {
-            double result = (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
-            return result;
+            return DotProduct(a, b);
         }
 
         public static Vec3d operator + (Vec3d a, Vec3d b)
@@ -109,5 +108,52 @@ namespace StadiumTools
             vN.M = 1.0;
             return vN;
         }
+
+        /// <summary>
+        /// Returns the numeric dot product of two vectors
+        /// </summary>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static double DotProduct(Vec3d u, Vec3d v)
+        {
+            return (u.X * v.X) + (u.Y * v.Y) + (u.Z * v.Z);
+        }
+
+        
+        ///// <summary>
+        ///// Returns the vector vec in local components of the coordinate system parameter
+        ///// </summary>
+        ///// <param name="pt"></param>
+        ///// <param name="coordSystem"></param>
+        ///// <returns></returns>
+        //public static Pt3d LocalComponents(Vec3d vec, Pln3d coordSystem)
+        //{
+        //    Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
+        //    double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
+        //    double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
+        //    double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
+
+        //    return new Pt3d(projX, projY, projZ);
+        //}
+
+        ///// <summary>
+        ///// Returns the vector vec in local components of the coordinate system parameter
+        ///// </summary>
+        ///// <param name="pt2d"></param>
+        ///// <param name="coordSystem"></param>
+        ///// <returns></returns>
+        //public static Pt3d LocalComponents(Vec2d vec, Pln3d coordSystem)
+        //{
+        //    Pt3d pt = new Pt3d(pt2d, 0.0);
+        //    Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
+        //    double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
+        //    double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
+        //    double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
+
+        //    return new Pt3d(projX, projY, projZ);
+        //}
+
+
     }
 }

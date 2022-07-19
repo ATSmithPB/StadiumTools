@@ -9,18 +9,15 @@ namespace StadiumTools
     public class Section
     {
         //Properties
+        public Pt2d POF { get; set; }
         /// <summary>
         /// An ordered list of tiers to comprise the section.
         /// </summary>
         public Tier[] Tiers { get; set; }
         /// <summary>
-        /// The Point of Focus for spectators in this section.
-        /// </summary>
-        public Pt2d POF { get; set; }
-        /// <summary>
         /// The 3d plane of the section.
         /// </summary>
-        public Pln3d Plane3d { get; set; }
+        public Pln3d Plane { get; set; }
 
         //Constructors
         /// <summary>
@@ -38,8 +35,22 @@ namespace StadiumTools
         public Section(List<Tier> tierList)
         {
             Tier[] tiers = tierList.ToArray();
+            this.Plane = Pln3d.XYPlane;
             this.Tiers = tiers;
-            Initialize();
+            Init();
+        }
+
+        /// <summary>
+        /// Construct a Section from a list of tiers and a Pln3d
+        /// </summary>
+        /// <param name="tierList"></param>
+        /// <param name="plane"></param>
+        public Section(List<Tier> tierList, Pln3d plane)
+        {
+            Tier[] tiers = tierList.ToArray();
+            this.Plane = plane;
+            this.Tiers = tiers;
+            Init();
         }
 
         /// <summary>
@@ -48,27 +59,39 @@ namespace StadiumTools
         /// <param name="tiers"></param>
         public Section(Tier[] tiers)
         {
+            this.Plane = Pln3d.XYPlane;
             this.Tiers = tiers;
-            Initialize();
+            Init();
+        }
+
+        /// <summary>
+        /// Construct a Section from an array of tiers and a 3d plane
+        /// </summary>
+        /// <param name="tiers"></param>
+        public Section(Tier[] tiers, Pln3d plane)
+        {
+            this.Plane = plane;
+            this.Tiers = tiers;
+            Init();
         }
 
         //Methods
-   
-        /// <summary>
-        /// Initialize the section
-        /// </summary>
-        private void Initialize()
-        {
-            this.POF = new Pt2d(0.0, 0.0);
 
+        /// <summary>
+        /// Init the section
+        /// </summary>
+        private void Init()
+        {
+            
+           
             //Force first tier to use Point of Focus as reference point
             this.Tiers[0].BuildFromPreviousTier = false;
             
-            //Apply the Section POF to all contained tiers 
+            //Apply the Section Plane(POF) to all contained tiers 
             for (int i = 0; i < this.Tiers.Length; i++)
             {
                 this.Tiers[i].SectionIndex = i; 
-                this.Tiers[i].POF = this.POF;
+                this.Tiers[i].Plane = this.Plane;
             }
 
             //Calculate surface and spectator points for all tiers in the section
@@ -99,11 +122,11 @@ namespace StadiumTools
         {
             if (currentTier.BuildFromPreviousTier)
             { 
-                //set current tier's RefPt to be last point of previous tier
+                //set current tier's StartPt to be last point of previous tier
                 Tier lastTier = section.Tiers[currentTier.SectionIndex - 1];
                 int lastPtCount = lastTier.Points2d.Length;
                 Pt2d lastPt = lastTier.Points2d[lastPtCount - 1];
-                currentTier.RefPt = lastPt;
+                currentTier.StartPt = lastPt;
             }
             CalcRowPoints(currentTier);
         }
@@ -118,7 +141,7 @@ namespace StadiumTools
             int p = 0;
 
             //Calc first tier point (PtA)
-            Pt2d prevPt = new Pt2d(tier.RefPt.X + tier.StartX, tier.RefPt.Y + tier.StartY);
+            Pt2d prevPt = new Pt2d(tier.StartPt.X + tier.StartX, tier.StartPt.Y + tier.StartY);
             tier.Points2d[p] = prevPt;
             p++;
 
@@ -207,10 +230,12 @@ namespace StadiumTools
                 eyeYStanding = tier.SuperRiser.SEyeY;
             }
 
+            Pln3d plane = tier.Plane;
+            Pt2d pointOfFocus = tier.Plane.OriginPt.ToPt2d();
             Pt2d specPt = new Pt2d(ptB.X - eyeX, ptB.Y + eyeY);
             Pt2d specPtSt = new Pt2d(ptB.X - eyeXStanding, ptB.Y + eyeYStanding);
-            Vec2d sLine = new Vec2d(specPt, tier.POF);
-            Vec2d sLineSt = new Vec2d(specPtSt, tier.POF);
+            Vec2d sLine = new Vec2d(specPt, pointOfFocus);
+            Vec2d sLineSt = new Vec2d(specPtSt, pointOfFocus);
             Pt2d forwardSpec;
 
             if (row == 0)
@@ -222,7 +247,7 @@ namespace StadiumTools
                 forwardSpec = tier.Spectators[row - 1].Loc2d;
             }
 
-            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, tier.POF, sLine, sLineSt, forwardSpec);
+            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, pointOfFocus, sLine, sLineSt, forwardSpec, plane);
             tier.Spectators[row] = spectator;
         }
 

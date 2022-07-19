@@ -29,15 +29,15 @@ namespace StadiumTools
         /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
         public double SEyeY { get; set; }
-        public int SectionNum { get; set; }
+        public int SectionIndex { get; set; }
         /// <summary>
         /// the index of the spectator's tier within their section
         /// </summary>
-        public int TierNum { get; set; }
+        public int TierIndex { get; set; }
         /// <summary>
         /// the index of the spectators row within their tier
         /// </summary>
-        public int RowNum { get; set; }
+        public int RowIndex { get; set; }
         /// <summary>
         /// Pt2d representing the location of the spectator eyes relative to the P.O.F
         /// </summary>
@@ -78,6 +78,10 @@ namespace StadiumTools
         /// The actual C-Value of the spectator. Calculated upon creation of Section object.
         /// </summary>
         public double Cvalue { get; set; } = 0.0;
+        /// <summary>
+        /// The 3d Plane of this spectators tier if hosted
+        /// </summary>
+        public Pln3d Plane { get; set; }
 
         //Constructors 
         public Spectator()
@@ -95,25 +99,26 @@ namespace StadiumTools
         /// <param name="sLine"></param>
         /// <param name="sLineSt"></param>
         /// <param name="forwardSpec"></param>
-        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt, Pt2d forwardSpec)
+        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt, Pt2d forwardSpec, Pln3d plane)
         {
-            this.TierNum = tierN;
-            this.RowNum = rowN;
+            this.TierIndex = tierN;
+            this.RowIndex = rowN;
             this.Loc2d = pt;
             this.Loc2dStanding = ptSt;
             this.POF = pof;
             this.SightLine = sLine;
             this.SightLineStanding = sLineSt;
             this.ForwardSpectatorLoc2d = forwardSpec;
+            this.Plane = plane;
 
             CalcSpectatorCValue(this);
         }
 
         //Methods
         /// <summary>
-        /// Initialize a spectator with default parameters
+        /// Init a spectator with default parameters
         /// </summary>
-        public static void InitializeDefault(Spectator spectator)
+        public static void InitDefault(Spectator spectator)
         {
             double unit;
             spectator.Unit = unit = UnitHandler.m;

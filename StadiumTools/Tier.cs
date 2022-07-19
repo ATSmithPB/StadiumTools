@@ -9,73 +9,13 @@ namespace StadiumTools
     {
         //Properties
         /// <summary>
-        /// A spectator object that defines the pectator parameters for generating the tier (Target C-Val, EyeX, EyeY, etc..)
+        /// The 3d plane of this tier, where (0,0,0) is also the Point of Focus.
+        /// </summary>
+        public Pln3d Plane { get; set; }
+        /// <summary>
+        /// A spectator object that contains the spectator parameters for generating the tier.
         /// </summary>
         public Spectator SpectatorParameters { get; set; }
-        /// <summary>
-        /// True if tier reference point is the last point of the previous tier.
-        /// </summary>
-        public bool BuildFromPreviousTier { get; set; }
-        /// <summary>
-        /// Reference Point of tier relative to StartX and StartY
-        /// </summary>
-        public Pt2d RefPt { get; set; }
-        /// <summary>
-        /// Index of the tier within a section
-        /// </summary>
-        public int SectionIndex { get; set; }
-        /// <summary>
-        /// Index of the tier within the plan
-        /// </summary>
-        public int PlanIndex { get; set; }
-        /// <summary>
-        /// Point of focus for all spectators in this tier 
-        /// </summary>
-        public Pt2d POF { get; set; }
-        /// <summary>
-        /// Horizontal offset of tier start from reference point
-        /// </summary>
-        public double StartX { get; set; }
-        /// <summary>
-        /// Vertical offset of tier start from reference point
-        /// </summary>
-        public double StartY { get; set; }
-        /// <summary>
-        /// Number of rows in this tier (super riser == row)
-        /// </summary>
-        public int RowCount { get; set; }
-        /// <summary>
-        /// Default row width to apply to all rows
-        /// </summary>
-        public double DefaultRowWidth { get; set; }
-        /// <summary>
-        /// Width(s) of row (distance from riser to riser)
-        /// </summary>
-        public double[] RowWidths { get; set; }
-        /// <summary>
-        /// Height(s) of row risers
-        /// </summary>
-        public double[] RiserHeights { get; set; }
-        /// <summary>
-        /// True if tier contains a vomitory
-        /// </summary>
-        public bool VomHas { get; set; }
-        /// <summary>
-        /// Row number of vomitory start
-        /// </summary>
-        public int VomStart { get; set; }
-        /// <summary>
-        /// Height of vomitory (in rows)
-        /// </summary>
-        public int VomHeight { get; set; }
-        /// <summary>
-        /// Increment size to round riser heights to
-        /// </summary>
-        public double RoundTo { get; set; }
-        /// <summary>
-        /// The maximum allowable rake angle in radians. 
-        /// </summary>
-        public double MaxRakeAngle { get; set; }
         /// <summary>
         /// A SuperRiser object that defines the optional super riser parameters for the tier (Super EyeX, Super EyeY, Guardrail Width etc...)
         /// </summary>
@@ -85,15 +25,71 @@ namespace StadiumTools
         /// </summary>
         public bool SuperHas { get; set; }
         /// <summary>
+        /// A Vomatory object that defines the optional vomitory parameters for the tier (Vomatory Start, Vomatory Width, etc...)
+        /// </summary>
+        public Vomatory Vomatory { get; set; }
+        /// <summary>
+        /// True if tier contains a vomitory
+        /// </summary>
+        public bool VomHas { get; set; }
+        /// <summary>
+        /// True if tier reference point is the last point of the previous tier.
+        /// </summary>
+        public bool BuildFromPreviousTier { get; set; }
+        /// <summary>
+        /// Reference Point of tier relative to StartX and StartY
+        /// </summary>
+        public Pt2d StartPt { get; set; }
+        /// <summary>
+        /// Index of the tier within a section
+        /// </summary>
+        public int SectionIndex { get; set; }
+        /// <summary>
+        /// Index of the tier within a plan
+        /// </summary>
+        public int PlanIndex { get; set; }
+        /// <summary>
+        /// Horizontal offset of tier start from the start point
+        /// </summary>
+        public double StartX { get; set; }
+        /// <summary>
+        /// Vertical offset of tier start from the start point
+        /// </summary>
+        public double StartY { get; set; }
+        /// <summary>
+        /// Number of rows in this tier (a super riser is treated as a row)
+        /// </summary>
+        public int RowCount { get; set; }
+        /// <summary>
+        /// A default row width to apply to all rows
+        /// </summary>
+        public double DefaultRowWidth { get; set; }
+        /// <summary>
+        /// Width(s) of all rows (distance from riser to riser)
+        /// </summary>
+        public double[] RowWidths { get; set; }
+        /// <summary>
+        /// Height(s) of row risers
+        /// </summary>
+        public double[] RiserHeights { get; set; }
+        /// <summary>
+        /// Increment size to round riser heights to
+        /// </summary>
+        public double RoundTo { get; set; }
+        /// <summary>
+        /// The maximum allowable rake angle in radians. Tan(Riser / Row) 
+        /// </summary>
+        public double MaxRakeAngle { get; set; }
+        /// <summary>
         /// An ordered list of Spectators in the tier
         /// </summary>
         public Spectator[] Spectators { get; set; }
         /// <summary>
-        /// Number of Pt2d objects this tier describes
+        /// Number of Pt2d objects this tier profile contains
         /// </summary>
         public int Points2dCount { get; set; }
         /// <summary>
-        /// Pt2d objects that represents the top outline geometry of the tier
+        /// Pt2d objects that represents the top outline geometry of the tier profile
         /// </summary>
         public Pt2d[] Points2d { get; set; }
        
@@ -103,65 +99,61 @@ namespace StadiumTools
         /// </summary>
         public Tier()
         {
-            
         }
 
         //Methods
         /// <summary>
         /// Initializes a tier 2d instance with default values
         /// </summary>
-        public void InitializeDefault()
+        public static void InitDefault(Tier tier)
         {
             //Instance a default spectator
             Spectator defaultSpectatorParameters = new Spectator();
-            Spectator.InitializeDefault(defaultSpectatorParameters);
-            this.SpectatorParameters = defaultSpectatorParameters;
+            Spectator.InitDefault(defaultSpectatorParameters);
+            tier.SpectatorParameters = defaultSpectatorParameters;
 
             //Instance a default SuperRiser
             SuperRiser defaultSuperRiserParameters = new SuperRiser();
-            defaultSuperRiserParameters.InitializeDefault();
+            SuperRiser.InitDefault(defaultSuperRiserParameters);
 
-            this.BuildFromPreviousTier = true;
-            this.StartX = 5.0 * this.SpectatorParameters.Unit;
-            this.StartY = 1.0 * this.SpectatorParameters.Unit;
-            this.RowCount = 25;
-            this.DefaultRowWidth = 0.8 * this.SpectatorParameters.Unit;
+            tier.Plane = Pln3d.XYPlane;
+            tier.BuildFromPreviousTier = true;
+            tier.StartX = 5.0 * tier.SpectatorParameters.Unit;
+            tier.StartY = 1.0 * tier.SpectatorParameters.Unit;
+            tier.RowCount = 25;
+            tier.DefaultRowWidth = 0.8 * tier.SpectatorParameters.Unit;
 
-            // Initialize all row widths to default value
-            double[] rowWidths = new double[this.RowCount];
+            // Init all row widths to default value
+            double[] rowWidths = new double[tier.RowCount];
             for (int i = 0; i < rowWidths.Length; i++)
             {
-                rowWidths[i] = this.DefaultRowWidth;
+                rowWidths[i] = tier.DefaultRowWidth;
             }
 
-            if (this.SuperRiser.Row == 0)
+            if (tier.SuperRiser.Row > 0)
             {
-                this.SuperHas = true;
+                tier.SuperHas = true;
             }
 
-            if (this.SuperHas)
+            if (tier.SuperHas)
             {
-                rowWidths[this.SuperRiser.Row] = (this.SuperRiser.Width * rowWidths[this.SuperRiser.Row]);
+                rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
             }
 
-            this.RowWidths = rowWidths;
-            this.RiserHeights = new double[this.RowCount - 1];
-            this.VomHas = false;
-            this.VomStart = 5;
-            this.VomHeight = 5;
-            this.SuperHas = true;
-            this.RoundTo = 0.001 * this.SpectatorParameters.Unit;
-            this.Points2dCount = GetTierPtCount(this);
-            this.Points2d = new Pt2d[this.Points2dCount];
-            this.MaxRakeAngle = .593412; //radians
-            this.Spectators = new Spectator[this.RowCount];
+            tier.RowWidths = rowWidths;
+            tier.RiserHeights = new double[tier.RowCount - 1];
+            tier.RoundTo = 0.001 * tier.SpectatorParameters.Unit;
+            tier.Points2dCount = GetTierPtCount(tier);
+            tier.Points2d = new Pt2d[tier.Points2dCount];
+            tier.MaxRakeAngle = .593412; //radians
+            tier.Spectators = new Spectator[tier.RowCount];
         }
 
         /// <summary>
         /// Calculates the geometric point count for a Tier
         /// </summary>
         /// <param name="tier"></param>
-        private static int GetTierPtCount(Tier tier)
+        public static int GetTierPtCount(Tier tier)
         {
             int tierPtCount = (tier.RowCount * 2);
 

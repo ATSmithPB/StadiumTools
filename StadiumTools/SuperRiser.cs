@@ -48,20 +48,20 @@ namespace StadiumTools
 
         //Constructors
 
-        public void InitializeDefault()
+        public static void InitDefault(SuperRiser superRiser)
         {
             Spectator defaultSpectatorParameters = new Spectator();
-            Spectator.InitializeDefault(defaultSpectatorParameters);
-            this.SpectatorParameters = defaultSpectatorParameters;
-            this.Row = 10;
-            this.Width = 3;
-            this.GuardrailWidth = 0.1 * this.SpectatorParameters.Unit;
-            this.CurbHeight = 0.1 * this.SpectatorParameters.Unit;
-            this.CurbWidth = 0.1 * this.SpectatorParameters.Unit;
-            this.EyeX = 1.6 * this.SpectatorParameters.Unit;
-            this.EyeY = 1.2 * this.SpectatorParameters.Unit;
-            this.SEyeX = 1.8 * this.SpectatorParameters.Unit;
-            this.SEyeY = 1.4;
+            Spectator.InitDefault(defaultSpectatorParameters);
+            superRiser.SpectatorParameters = defaultSpectatorParameters;
+            superRiser.Row = 10;
+            superRiser.Width = 3;
+            superRiser.GuardrailWidth = 0.1 * superRiser.SpectatorParameters.Unit;
+            superRiser.CurbHeight = 0.1 * superRiser.SpectatorParameters.Unit;
+            superRiser.CurbWidth = 0.1 * superRiser.SpectatorParameters.Unit;
+            superRiser.EyeX = 1.6 * superRiser.SpectatorParameters.Unit;
+            superRiser.EyeY = 1.2 * superRiser.SpectatorParameters.Unit;
+            superRiser.SEyeX = 1.8 * superRiser.SpectatorParameters.Unit;
+            superRiser.SEyeY = 1.4;
         }
     }
 }
