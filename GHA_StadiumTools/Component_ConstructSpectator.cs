@@ -2,6 +2,7 @@
 using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
+using GHA_StadiumTools.Properties;
 
 namespace GHA_StadiumTools
 {
@@ -14,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
         public ST_ConstructSpectator()
-            : base(nameof(ST_ConstructSpectator), "cS", "Construct a Spectator from parameters", "StadiumTools", "BowlTools")
+            : base(nameof(ST_ConstructSpectator), "cSp", "Construct a Spectator from parameters", "StadiumTools", "BowlTools")
         {
         }
 
@@ -24,7 +25,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             StadiumTools.Spectator defaultSpectator = new StadiumTools.Spectator();
-            StadiumTools.Spectator.InitializeDefault(defaultSpectator);
+            StadiumTools.Spectator.InitDefault(defaultSpectator);
             pManager.AddNumberParameter("C-Value", "C", "Target spectator C-value", GH_ParamAccess.item, defaultSpectator.TargetCValue);
             pManager.AddNumberParameter("Eye Horizontal", "eX", "Horizontal distance of spectator eyes from rear riser", GH_ParamAccess.item, defaultSpectator.EyeX);
             pManager.AddNumberParameter("Eye Verical", "eY", "Vertical distance of spectator eyes from floor", GH_ParamAccess.item, defaultSpectator.EyeY);
@@ -37,7 +38,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Spectator", "S", "A Spectator object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Spectator", "Sp", "A Spectator object", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             StadiumTools.Spectator newSpectator = new StadiumTools.Spectator();
+            newSpectator.Unit = 1.0;
             ST_ConstructSpectator.ConstructSpectatorFromDA(DA, newSpectator);
             DA.SetData(0, (object)newSpectator);
         }
@@ -58,7 +60,7 @@ namespace GHA_StadiumTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructSpectator;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
@@ -88,6 +90,7 @@ namespace GHA_StadiumTools
             if (!DA.GetData<double>(4, ref doubleItem))
                 return;
             spectator.SEyeY = doubleItem;
+            
         }
 
 

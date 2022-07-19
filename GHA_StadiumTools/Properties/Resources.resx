@@ -118,6 +118,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ST_ConstructSection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructSection.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructSpectator" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructSpectator.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructSuperRiser" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructSuperRiser.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructTier" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructTier.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructVomatory" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructVomatory.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_DeConstructSection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_DeConstructSection.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_DeConstructSpectator_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_DeConstructSpectator_.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_DeConstructTier" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_DeConstructTier.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_DeconstructVomatory" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_DeconstructVomatory.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ST_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_Icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

@@ -3,11 +3,11 @@
 fe579af2-ac4c-4829-b108-b41fc2a4c322 : ST_ConstructSection2D
 58377ebd-7006-4eb0-8b11-c419e01b50d3 : ST_ConstructSpectator
 89a005fd-3c4c-4ee4-be01-c9fc11ef0a7d : ST_ConstructSuperRiser2D
-83d42ddf-835d-4b3d-8aa0-e4bb640807b0
-b2d52636-fcd3-4759-9cb8-3b5ca49bc1ee
-c5060562-1cc0-4a35-9454-570182885cd4
-1f72f1d3-d687-4b4c-ab5f-fc7cdbc21500
-d97a242d-7ec4-461d-9934-fed350a41dd9
+83d42ddf-835d-4b3d-8aa0-e4bb640807b0 : ST_DeconstructSection2D
+b2d52636-fcd3-4759-9cb8-3b5ca49bc1ee : ST_DeconstructSpectator
+c5060562-1cc0-4a35-9454-570182885cd4 : ST_DeconstructTier2D
+1f72f1d3-d687-4b4c-ab5f-fc7cdbc21500 : ST_ConstructVomatory
+d97a242d-7ec4-461d-9934-fed350a41dd9 : ST_DeconstructVomatory
 580a5fe9-5ef7-46e6-acfb-aa15b9f4efbc
 ecf154c4-c77d-4f91-a76f-e955b11108f6
 7baed942-3f4d-4ed9-a2b7-b08b0581ca61

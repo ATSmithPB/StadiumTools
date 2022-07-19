@@ -63,6 +63,96 @@ namespace GHA_StadiumTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructSection {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructSection", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructSpectator {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructSpectator", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructSuperRiser {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructSuperRiser", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructTier {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructTier", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructVomatory {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructVomatory", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_DeConstructSection {
+            get {
+                object obj = ResourceManager.GetObject("ST_DeConstructSection", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_DeConstructSpectator_ {
+            get {
+                object obj = ResourceManager.GetObject("ST_DeConstructSpectator_", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_DeConstructTier {
+            get {
+                object obj = ResourceManager.GetObject("ST_DeConstructTier", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_DeconstructVomatory {
+            get {
+                object obj = ResourceManager.GetObject("ST_DeconstructVomatory", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ST_Icon {
             get {
                 object obj = ResourceManager.GetObject("ST_Icon", resourceCulture);

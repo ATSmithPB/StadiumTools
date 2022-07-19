@@ -2,6 +2,7 @@
 using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
+using GHA_StadiumTools.Properties;
 
 namespace GHA_StadiumTools
 {
@@ -24,7 +25,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             StadiumTools.SuperRiser defaultSuperRiser = new StadiumTools.SuperRiser();
-            defaultSuperRiser.InitializeDefault();
+            StadiumTools.SuperRiser.InitDefault(defaultSuperRiser);
             pManager.AddIntegerParameter("Super Row", "sR", "Row to replace with super riser", GH_ParamAccess.item, defaultSuperRiser.Row);
             pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, defaultSuperRiser.CurbWidth);
             pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, defaultSuperRiser.CurbHeight);
@@ -68,7 +69,7 @@ namespace GHA_StadiumTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructSuperRiser;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
