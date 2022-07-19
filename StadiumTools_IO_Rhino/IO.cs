@@ -42,6 +42,20 @@ namespace StadiumTools
         }
 
         /// <summary>
+        /// Returns a Plane from a Pln3d object
+        /// </summary>
+        /// <param name="pln"></param>
+        /// <returns></returns>
+        public static Plane PlaneFromPln3d(Pln3d pln)
+        {
+            Point3d pOrigin = Point3dFromPt3d(pln.OriginPt);
+            Vector3d xAxis = Vector3dFromVec3d(pln.Xaxis);
+            Vector3d yAxis = Vector3dFromVec3d(pln.Yaxis);
+            Plane plane = new Plane(pOrigin, xAxis, yAxis);
+            return plane;
+        }
+
+        /// <summary>
         /// Returns a Pt3d object that represents the origin of a Rhino Plane
         /// </summary>
         /// <param name="plane"></param>
@@ -63,7 +77,18 @@ namespace StadiumTools
             Pt3d pt = new Pt3d(point3d.X, point3d.Y, point3d.Z);
             return pt;
         }
-       
+
+        /// <summary>
+        /// Returns a Point3d from a Pt3d object
+        /// </summary>
+        /// <param name="pt3d"></param>
+        /// <returns></returns>
+        public static Point3d Point3dFromPt3d(Pt3d pt3d)
+        {
+            Point3d point3d = new Point3d(pt3d.X, pt3d.Y, pt3d.Z);
+            return point3d;
+        }
+
         /// <summary>
         /// Returns a Vec3d object from a Rhino Vector3d3d
         /// </summary>
@@ -74,7 +99,18 @@ namespace StadiumTools
             Vec3d vec = new Vec3d(vector3d.X, vector3d.Y, vector3d.Z);
             return vec;
         }
-        
+
+        /// <summary>
+        /// Returns a Vector3d from a Vec3d object
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        public static Vector3d Vector3dFromVec3d(Vec3d vec)
+        {
+            Vector3d vector3d = new Vector3d(vec.X, vec.Y, vec.Z);
+            return vector3d;
+        }
+
         /// <summary>
         /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
         /// </summary>
@@ -96,7 +132,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="pts"></param>
         /// <returns>DataTree<Point2d></Point2d></returns>
-        public static DataTree<Point2d> Pt2dToPoint2d(Pt2d[][] pts)
+        public static DataTree<Point2d> DataTreeFromJaggedArray(Pt2d[][] pts)
         {
             DataTree<Point2d> rcPts = new DataTree<Point2d>();
             for (int i = 0; i < pts.Length; i++)
@@ -116,7 +152,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="cVals"></param>
         /// <returns>DataTree<double></double></returns>
-        public static DataTree<double> DataTreeFromArray(double[][] cVals)
+        public static DataTree<double> DataTreeFromJaggedArray(double[][] cVals)
         {
             DataTree<double> rcDub = new DataTree<double>();
             for (int i = 0; i < cVals.Length; i++)
@@ -136,7 +172,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="cVals"></param>
         /// <returns></returns>
-        public static DataTree<int> DataTreeFromArray(int[][] cVals)
+        public static DataTree<int> DataTreeFromJaggedArray(int[][] cVals)
         {
             DataTree<int> rcInt = new DataTree<int>();
             for (int i = 0; i < cVals.Length; i++)
@@ -151,12 +187,53 @@ namespace StadiumTools
             return rcInt;
         }
 
+        //public static DataTree<int> DataTreeFromArray(Tier[] tiers)
+        //{
+        //    DataTree<int> rcInt = new DataTree<int>();
+        //    for (int i = 0; i < tiers.Length; i++)
+        //    {
+                
+        //        GH_Path path = new GH_Path(i);
+        //        int item = tiers[i];
+        //        rcInt.Add(item, path);
+                
+        //    }
+        //    return rcInt;
+        //}
+
+        public static Polyline PolylineFromTier(Tier tier)
+        {
+            Polyline polyline = new Polyline();
+            Point3d[] rhinoPts = new Point3d[tier.Points2dCount];
+            for (int i = 0; i < tier.Points2dCount; i++)
+            {
+                Pt3d pt3d = tier.Points2d[i].ToPt3d(tier.Plane);
+                rhinoPts[i] = Point3dFromPt3d(pt3d);
+            }
+
+            polyline.AddRange(rhinoPts);
+            return polyline;
+        }
+
+        public static Point3d[] PointsFromTier(Tier tier)
+        {
+            Point3d[] rhinoPts = new Point3d[tier.Points2dCount];
+
+            for (int i = 0; i < tier.Points2dCount; i++)
+            {
+                Pt3d pt3d = tier.Points2d[i].ToPt3d(tier.Plane);
+                rhinoPts[i] = Point3dFromPt3d(pt3d);
+            }
+
+            return rhinoPts;
+        }
+
         /// <summary>
         /// Casts a jagged array of Vec2d objects into a data tree of RhinoCommon Vector2d
         /// </summary>
         /// <param name="pts"></param>
         /// <returns>DataTree<Point2d></Point2d></returns>
-        public static DataTree<Vector2d> Vec2dToVector2d(Vec2d[][] vecs)
+        public static DataTree<Vector2d> DataTreeFromJaggedArray(Vec2d[][] vecs)
         {
             DataTree<Vector2d> rcVecs = new DataTree<Vector2d>();
             for (int i = 0; i < vecs.Length; i++)
