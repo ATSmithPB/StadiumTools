@@ -84,20 +84,26 @@ namespace GHA_StadiumTools
                 return;
 
             //Section plane of spectator
-            StadiumTools.Pln3d spectatorPlane = new StadiumTools.Pln3d();
-            spectatorPlane = specItem.Plane;
+            StadiumTools.Pln3d specPln3d = new StadiumTools.Pln3d();
+            Rhino.Geometry.Plane specPlane = new Rhino.Geometry.Plane();
+            specPln3d = specItem.Plane;
+            specPlane = StadiumTools.IO.PlaneFromPln3d(specPln3d);
 
             //Set Seated Eye Point
-            DA.SetData(0, StadiumTools.IO.Point3dFromPt3d(specItem.Loc2d.ToPt3d(spectatorPlane)));
+            Rhino.Geometry.Point3d eyePt = StadiumTools.IO.Point3dFromPt3d(specItem.Loc2d.ToPt3d(specPln3d));
+            DA.SetData(0, eyePt);
 
             //Set Seated SightLine
-            //DA.SetData(1, StadiumTools.IO.Vector3dFromVec3d(specItem.SightLine.ToVec3d(spectatorPlane);
+            Rhino.Geometry.Line sightLine = new Rhino.Geometry.Line(eyePt, specPlane.Origin);
+            DA.SetData(1, sightLine);
 
             //Set Standing Eye Point
-            DA.SetData(2, StadiumTools.IO.Point3dFromPt3d(specItem.Loc2dStanding.ToPt3d(spectatorPlane)));
+            Rhino.Geometry.Point3d eyePtStanding = StadiumTools.IO.Point3dFromPt3d(specItem.Loc2dStanding.ToPt3d(specPln3d));
+            DA.SetData(2, eyePtStanding);
 
             //Set Standing SightLine
-            //DA.SetData(3, StadiumTools.IO.Vector3dFromVec3d(specItem.SightLineStanding.ToVec3d(spectatorPlane);
+            Rhino.Geometry.Line sightLineStanding = new Rhino.Geometry.Line(eyePtStanding, specPlane.Origin);
+            DA.SetData(3, sightLineStanding);
 
             //Set C-Value
             DA.SetData(4, specItem.Cvalue);
@@ -115,7 +121,7 @@ namespace GHA_StadiumTools
             DA.SetData(8, specItem.RowIndex);
 
             //Set Blocker
-            DA.SetData(9, specItem.ForwardSpectatorLoc2d);
+            DA.SetData(9, StadiumTools.IO.Point3dFromPt3d(specItem.ForwardSpectatorLoc2d.ToPt3d(specPln3d)));
 
         }
 

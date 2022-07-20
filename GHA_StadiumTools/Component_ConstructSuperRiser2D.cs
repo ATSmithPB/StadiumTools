@@ -24,14 +24,14 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            StadiumTools.SuperRiser defaultSuperRiser = new StadiumTools.SuperRiser();
-            StadiumTools.SuperRiser.InitDefault(defaultSuperRiser);
-            pManager.AddIntegerParameter("Super Row", "sR", "Row to replace with super riser", GH_ParamAccess.item, defaultSuperRiser.Row);
-            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, defaultSuperRiser.CurbWidth);
-            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, defaultSuperRiser.CurbHeight);
-            pManager.AddNumberParameter("Eye Horizontal", "SeX", "Eye Vertical offset for SuperRiser", GH_ParamAccess.item, defaultSuperRiser.EyeX);
-            pManager.AddNumberParameter("Eye Vertical", "SeY", "Eye Horizontal offset for SuperRiser", GH_ParamAccess.item, defaultSuperRiser.EyeY);
-            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, defaultSuperRiser.GuardrailWidth);
+            StadiumTools.Spectator s = new StadiumTools.Spectator();
+            StadiumTools.Spectator.InitDefault(s);
+            pManager.AddGenericParameter("Spectator", "Sp", "Spectator object to inerit parameters from", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Super Row", "sR", "Row to replace with super riser", GH_ParamAccess.item, 10);
+            pManager.AddIntegerParameter("Width", "sW", "Width of SuperRiser as a multiple of the default tier row width", GH_ParamAccess.item, 3);
+            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
+            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
+            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.01 * s.Unit);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             int destination = 0;
-            if (DA.GetData<int>(0, ref destination))
+            if (DA.GetData<int>(1, ref destination))
             {
                 if (destination < 0)
                 {
@@ -58,9 +58,7 @@ namespace GHA_StadiumTools
                 }
             }
 
-            StadiumTools.SuperRiser newSuperRiser = new StadiumTools.SuperRiser();
-            ST_ConstructSuperRiser2D.ConstructSuperRiserFromDA(DA, newSuperRiser);
-            DA.SetData(0, (object)newSuperRiser);
+            ST_ConstructSuperRiser2D.ConstructSuperRiserFromDA(DA);
         }
 
         /// <summary>
@@ -79,41 +77,45 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("89a005fd-3c4c-4ee4-be01-c9fc11ef0a7d");
 
         //Methods
-        public static void ConstructSuperRiserFromDA(IGH_DataAccess DA, StadiumTools.SuperRiser superRiser)
+        public static void ConstructSuperRiserFromDA(IGH_DataAccess DA)
         {
+            StadiumTools.SuperRiser superRiser = new StadiumTools.SuperRiser();
+            StadiumTools.Spectator specItem = new StadiumTools.Spectator();
             int intItem = 0;
             double doubleItem = 0.0;
-            double[] doubleArrayItem = new double[0];
+
+            //Set Spectator Params
+            if (!DA.GetData<StadiumTools.Spectator>(0, ref specItem))
+                return;
+            superRiser.SpectatorParameters = specItem;
 
             //Set SuperRow
-            if (!DA.GetData<int>(0, ref intItem))
+            if (!DA.GetData<int>(1, ref intItem))
                 return;
             superRiser.Row = intItem;
-            
+
+            //Set SuperRow
+            if (!DA.GetData<int>(2, ref intItem))
+                return;
+            superRiser.Width = intItem;
+
             //Set SuperCurbWidth
-            if (!DA.GetData<double>(1, ref doubleItem))
+            if (!DA.GetData<double>(3, ref doubleItem))
                 return;
             superRiser.CurbWidth = doubleItem;
 
             //Set SuperCurbHeight
-            if (!DA.GetData<double>(2, ref doubleItem))
-                return;
-            superRiser.CurbHeight = doubleItem;
-
-            //Set StartEyeX
-            if (!DA.GetData<double>(3, ref doubleItem))
-                return;
-            superRiser.EyeX = doubleItem;
-
-            //Set SuperEyeY
             if (!DA.GetData<double>(4, ref doubleItem))
                 return;
-            superRiser.EyeY = doubleItem;
+            superRiser.CurbHeight = doubleItem;
 
             //Set SuperGuardRailWidth
             if (!DA.GetData<double>(5, ref doubleItem))
                 return;
             superRiser.GuardrailWidth = doubleItem;
+
+            //Output New Super Riser
+            DA.SetData(0, (object)superRiser);
         }
 
 

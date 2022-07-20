@@ -90,7 +90,7 @@ namespace GHA_StadiumTools
             DA.GetData(0, ref spectatorItem);
             tier.SpectatorParameters = spectatorItem;
 
-            DA.GetData(1, ref doubleItem);
+            DA.GetData(1, ref doubleItem); 
             tier.StartX = doubleItem * tier.SpectatorParameters.Unit;
 
             DA.GetData(2, ref doubleItem);
@@ -137,7 +137,7 @@ namespace GHA_StadiumTools
                 rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
             }
 
-            tier.RowWidths = rowWidths;
+            tier.RowWidths = rowWidths; 
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.RoundTo = 0.001 * tier.SpectatorParameters.Unit;
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
