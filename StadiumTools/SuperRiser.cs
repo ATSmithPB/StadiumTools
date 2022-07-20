@@ -46,7 +46,7 @@ namespace StadiumTools
         /// </summary>
         public double SEyeY { get; set; }
 
-        //Constructors
+        //Constructors 
 
         public static void InitDefault(SuperRiser superRiser)
         {
