@@ -33,6 +33,14 @@ namespace GHA_StadiumTools
             pManager.AddNumberParameter("Standing Eye Vertical", "SteY", "Eye Vertical for standing spectators", GH_ParamAccess.item, defaultSpectator.SEyeY);
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_C_Value = 0;
+        private static int IN_Eye_Horizontal = 1;
+        private static int IN_Eye_Vertical = 2;
+        private static int IN_Standing_Eye_Horiz = 3;
+        private static int IN_Standing_Eye_Vert = 4;
+        private static int OUT_Spectator = 0;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -51,7 +59,7 @@ namespace GHA_StadiumTools
             StadiumTools.Spectator newSpectator = new StadiumTools.Spectator();
             newSpectator.Unit = 1.0;
             ST_ConstructSpectator.ConstructSpectatorFromDA(DA, newSpectator);
-            DA.SetData(0, (object)newSpectator);
+            DA.SetData(OUT_Spectator, (object)newSpectator);
         }
 
         /// <summary>
@@ -70,27 +78,53 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("58377ebd-7006-4eb0-8b11-c419e01b50d3");
 
         //Methods
-        public static void ConstructSpectatorFromDA(IGH_DataAccess DA, StadiumTools.Spectator spectator)
+        private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
+        {
+            double doubleItem = 0.0;
+
+            //Row number must be => 1
+            if (DA.GetData<double>(IN_C_Value, ref doubleItem))
+            {
+                if (doubleItem < 0.06)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "A C-Value below 60mm is not ideal");
+                    
+                    if (doubleItem <= 0)
+                    {
+                        thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "C-Value must be non-negative and greater than zero");
+                    }
+                }
+            }
+            //Guardrail Width must be > 0
+            if (DA.GetData<double>(IN_Eye_Vertical, ref doubleItem)) 
+            {
+                if (doubleItem <= 0.5)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Eye Vertical must be non-negative and not equal to 0");
+                }
+            }
+
+        }
+        private static void ConstructSpectatorFromDA(IGH_DataAccess DA, StadiumTools.Spectator spectator)
         {
             double doubleItem = 0.0;
             double[] doubleArrayItem = new double[0];
 
-            if (!DA.GetData<double>(0, ref doubleItem))
+            if (!DA.GetData<double>(IN_C_Value, ref doubleItem))
                 return;
             spectator.TargetCValue = doubleItem;
-            if (!DA.GetData<double>(1, ref doubleItem))
+            if (!DA.GetData<double>(IN_Eye_Horizontal, ref doubleItem))
                 return;
             spectator.EyeX = doubleItem;
-            if (!DA.GetData<double>(2, ref doubleItem))
+            if (!DA.GetData<double>(IN_Eye_Vertical, ref doubleItem))
                 return;
             spectator.EyeY = doubleItem;
-            if (!DA.GetData<double>(3, ref doubleItem))
+            if (!DA.GetData<double>(IN_Standing_Eye_Horiz, ref doubleItem))
                 return;
             spectator.SEyeX = doubleItem;
-            if (!DA.GetData<double>(4, ref doubleItem))
+            if (!DA.GetData<double>(IN_Standing_Eye_Vert, ref doubleItem))
                 return;
             spectator.SEyeY = doubleItem;
-            
         }
 
 

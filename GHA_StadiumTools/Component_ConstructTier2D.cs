@@ -40,6 +40,19 @@ namespace GHA_StadiumTools
             pManager[9].Optional = true;
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Spectator = 0;
+        private static int IN_Start_X = 1;
+        private static int IN_Start_Y = 2;
+        private static int IN_Start = 3;
+        private static int IN_Row_Count = 4;
+        private static int IN_Row_Width = 5;
+        private static int IN_Rounding = 6;
+        private static int IN_Maximum_Rake_Angle = 7;
+        private static int IN_SuperRiser = 8;
+        private static int IN_Vomatory = 9;
+        private static int OUT_Tier = 0;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -56,7 +69,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             StadiumTools.Tier newTier = ST_ConstructTier2D.ConstructTierFromDA(DA);
-            DA.SetData(0, newTier);
+            DA.SetData(OUT_Tier, newTier);
         }
 
         /// <summary>
@@ -75,7 +88,7 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("072677e1-616c-4028-ab7e-b9717e7699b1");
 
         //Methods
-        public static StadiumTools.Tier ConstructTierFromDA(IGH_DataAccess DA)
+        private static StadiumTools.Tier ConstructTierFromDA(IGH_DataAccess DA)
         {
             //Item Containers (Destinations)
             StadiumTools.Tier tier = new StadiumTools.Tier();
@@ -87,45 +100,43 @@ namespace GHA_StadiumTools
             double doubleItem = 0.0;
             double[] doubleArrayItem = new double[0];
 
-            DA.GetData(0, ref spectatorItem);
+            DA.GetData(IN_Spectator, ref spectatorItem);
             tier.SpectatorParameters = spectatorItem;
 
-            DA.GetData(1, ref doubleItem); 
+            DA.GetData(IN_Start_X, ref doubleItem); 
             tier.StartX = doubleItem * tier.SpectatorParameters.Unit;
 
-            DA.GetData(2, ref doubleItem);
+            DA.GetData(IN_Start_Y, ref doubleItem);
             tier.StartY = doubleItem * tier.SpectatorParameters.Unit;
 
-            DA.GetData(3, ref boolItem);
+            DA.GetData(IN_Start, ref boolItem);
             tier.BuildFromPreviousTier = boolItem;
 
-            DA.GetData(4, ref intItem);
+            DA.GetData(IN_Row_Count, ref intItem);
             tier.RowCount = intItem;
-
-            DA.GetData(5, ref doubleItem);
-            tier.DefaultRowWidth = doubleItem * tier.SpectatorParameters.Unit;
-
-            DA.GetData(6, ref doubleItem);
-            tier.RoundTo = doubleItem;
-
-            DA.GetData(7, ref doubleItem);
-            tier.MaxRakeAngle = doubleItem;
             tier.Spectators = new StadiumTools.Spectator[tier.RowCount];
 
-            DA.GetData(8, ref superItem);
-            tier.SuperRiser = superItem;
-
-            DA.GetData(9, ref vomItem);
-            tier.Vomatory = vomItem;
-
-            tier.Plane = StadiumTools.Pln3d.XYPlane;
-
-            // Init all row widths to default value
+            DA.GetData(IN_Row_Width, ref doubleItem);
+            tier.DefaultRowWidth = doubleItem * tier.SpectatorParameters.Unit;
+            
+            //Set all row widths to default value
             double[] rowWidths = new double[tier.RowCount];
             for (int i = 0; i < rowWidths.Length; i++)
             {
                 rowWidths[i] = tier.DefaultRowWidth;
             }
+
+            DA.GetData(IN_Rounding, ref doubleItem);
+            tier.RoundTo = doubleItem * tier.SpectatorParameters.Unit;
+
+            DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem);
+            tier.MaxRakeAngle = doubleItem;
+            
+            DA.GetData(IN_SuperRiser, ref superItem);
+            tier.SuperRiser = superItem;
+
+            DA.GetData(IN_Vomatory, ref vomItem);
+            tier.Vomatory = vomItem;
 
             if (tier.SuperRiser.Row > 0)
             {
@@ -137,9 +148,10 @@ namespace GHA_StadiumTools
                 rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
             }
 
+            //Set Remaining parameters
+            tier.Plane = StadiumTools.Pln3d.XYPlane;
             tier.RowWidths = rowWidths; 
             tier.RiserHeights = new double[tier.RowCount - 1];
-            tier.RoundTo = 0.001 * tier.SpectatorParameters.Unit;
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
 

@@ -30,6 +30,11 @@ namespace GHA_StadiumTools
             pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldYZ);
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Tiers = 0;
+        private static int IN_SectionPlane = 1;
+        private static int OUT_Section = 0;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -46,7 +51,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA);
-            DA.SetData(0, (object)newSection);
+            DA.SetData(OUT_Section, newSection);
         }
 
         /// <summary>
@@ -65,17 +70,17 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("fe579af2-ac4c-4829-b108-b41fc2a4c322");
 
         //Methods
-        public static StadiumTools.Section ConstructSectionFromDA(IGH_DataAccess DA)
+        private static StadiumTools.Section ConstructSectionFromDA(IGH_DataAccess DA)
         {
             //Item Containers
             Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
             List<StadiumTools.Tier> tierList = new List<StadiumTools.Tier>();
 
             //Get Tiers
-            DA.GetDataList<StadiumTools.Tier>(0, tierList);
+            DA.GetDataList<StadiumTools.Tier>(IN_Tiers, tierList);
 
             //Get Plane3d
-            DA.GetData<Rhino.Geometry.Plane>(1, ref planeItem);
+            DA.GetData<Rhino.Geometry.Plane>(IN_SectionPlane, ref planeItem);
             StadiumTools.Pln3d pln = StadiumTools.IO.Pln3dFromPlane(planeItem);
 
             //Construct a new section

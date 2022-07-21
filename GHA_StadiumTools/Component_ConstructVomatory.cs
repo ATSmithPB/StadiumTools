@@ -31,6 +31,11 @@ namespace GHA_StadiumTools
             
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Start_Row = 0;
+        private static int IN_Height = 1;
+        private static int OUT_Vomatory = 0;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -48,7 +53,7 @@ namespace GHA_StadiumTools
         {
             StadiumTools.Vomatory newVomatory = new StadiumTools.Vomatory();
             ST_ConstructVomatory.ConstructVomatoryFromDA(DA, newVomatory);
-            DA.SetData(0, (object)newVomatory);
+            DA.SetData(OUT_Vomatory, newVomatory);
         }
 
         /// <summary>
@@ -67,24 +72,21 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("1f72f1d3-d687-4b4c-ab5f-fc7cdbc21500");
 
         //Methods
-        public static void ConstructVomatoryFromDA(IGH_DataAccess DA, StadiumTools.Vomatory vomatory)
+        private static void ConstructVomatoryFromDA(IGH_DataAccess DA, StadiumTools.Vomatory vomatory)
         {
             //Item Containers (Destinations)
             int intItem = 0;
 
             //Set Start
-            if (!DA.GetData<int>(0, ref intItem))
+            if (!DA.GetData<int>(IN_Start_Row, ref intItem))
                 return;
             vomatory.Start = intItem;
 
             //Set Width
-            if (!DA.GetData<int>(1, ref intItem))
+            if (!DA.GetData<int>(IN_Height, ref intItem))
                 return;
             vomatory.Height = intItem;
-
-            
         }
-
 
     }
 }

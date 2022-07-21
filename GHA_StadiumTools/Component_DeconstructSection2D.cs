@@ -29,6 +29,11 @@ namespace GHA_StadiumTools
             pManager.AddGenericParameter("Section", "S", "A Section object to deconstruct", GH_ParamAccess.item);
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Section = 0;
+        private static int OUT_Tiers = 0;
+        private static int OUT_Section_Plane = 1;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -64,22 +69,22 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("83d42ddf-835d-4b3d-8aa0-e4bb640807b0");
 
         //Methods
-        public static void DeconstructSectionFromDA(IGH_DataAccess DA)
+        private static void DeconstructSectionFromDA(IGH_DataAccess DA)
         {
             //Item Containers (Destinations)
             StadiumTools.Section sectionItem = new StadiumTools.Section();
             
             //Get Input Section Object
-            if (!DA.GetData<StadiumTools.Section>(0, ref sectionItem))
+            if (!DA.GetData<StadiumTools.Section>(IN_Section, ref sectionItem))
                 return;
 
             //Deconstruct Section object and ouput data
             //Set Tiers
-            DA.SetDataList(0, sectionItem.Tiers);
+            DA.SetDataList(OUT_Tiers, sectionItem.Tiers);
 
             //Set PlanePOF
             Rhino.Geometry.Plane sectionPlane = StadiumTools.IO.PlaneFromPln3d(sectionItem.Plane);
-            DA.SetData(1, sectionPlane);
+            DA.SetData(OUT_Section_Plane, sectionPlane);
         }
 
 

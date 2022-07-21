@@ -30,14 +30,26 @@ namespace GHA_StadiumTools
             
         }
 
+        private static int IN_Spectator = 0;
+        private static int OUT_Eye_Point = 0;
+        private static int OUT_SightLine = 1;
+        private static int OUT_Standing_Eye_Point = 2;
+        private static int OUT_Standing_SightLine = 3;
+        private static int OUT_C_Value = 4;
+        private static int OUT_Target_C_Value = 5;
+        private static int OUT_Section_Index = 6;
+        private static int OUT_Tier_Index = 7;
+        private static int OUT_Row_Index = 8;
+        private static int OUT_Blocker = 9;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             //pManager.AddPointParameter("Reference Point", "rP", "The origin of the spectator (point from which EyeX, EyeY params are applied) ", GH_ParamAccess.item);
-            pManager.AddPointParameter("Seated Eye Point", "EP", "The location of spectator's eyes when seated", GH_ParamAccess.item);
-            pManager.AddLineParameter("Seated SightLine", "SL", "The Sightline of the spectator when seated", GH_ParamAccess.item);
+            pManager.AddPointParameter("Eye Point", "EP", "The location of spectator's eyes when seated", GH_ParamAccess.item);
+            pManager.AddLineParameter("SightLine", "SL", "The Sightline of the spectator when seated", GH_ParamAccess.item);
             pManager.AddPointParameter("Standing Eye Point", "SEP", "The location of spectator's eyes when standing", GH_ParamAccess.item);
             pManager.AddLineParameter("Standing SightLine", "SSL", "The Sightline of the spectator when standing", GH_ParamAccess.item);
             pManager.AddNumberParameter("C-Value", "C", "The actual C-Value of the Spectator within their tier", GH_ParamAccess.item);
@@ -80,7 +92,7 @@ namespace GHA_StadiumTools
             StadiumTools.Spectator specItem = new StadiumTools.Spectator();
 
             //Get Input Spectator
-            if (!DA.GetData<StadiumTools.Spectator>(0, ref specItem))
+            if (!DA.GetData<StadiumTools.Spectator>(IN_Spectator, ref specItem))
                 return;
 
             //Section plane of spectator
@@ -91,7 +103,7 @@ namespace GHA_StadiumTools
 
             //Set Seated Eye Point
             Rhino.Geometry.Point3d eyePt = StadiumTools.IO.Point3dFromPt3d(specItem.Loc2d.ToPt3d(specPln3d));
-            DA.SetData(0, eyePt);
+            DA.SetData(OUT_Eye_Point, eyePt);
 
             //Set Seated SightLine
             Rhino.Geometry.Line sightLine = new Rhino.Geometry.Line(eyePt, specPlane.Origin);

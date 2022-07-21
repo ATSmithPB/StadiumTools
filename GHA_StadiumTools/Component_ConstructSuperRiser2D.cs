@@ -27,12 +27,21 @@ namespace GHA_StadiumTools
             StadiumTools.Spectator s = new StadiumTools.Spectator();
             StadiumTools.Spectator.InitDefault(s);
             pManager.AddGenericParameter("Spectator", "Sp", "Spectator object to inerit parameters from", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Super Row", "sR", "Row to replace with super riser", GH_ParamAccess.item, 10);
+            pManager.AddIntegerParameter("Row", "R", "Row to replace with super riser", GH_ParamAccess.item, 10);
             pManager.AddIntegerParameter("Width", "sW", "Width of SuperRiser as a multiple of the default tier row width", GH_ParamAccess.item, 3);
             pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
             pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
             pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.01 * s.Unit);
         }
+
+        //Set parameter indixes to names (for readability)
+        private static int IN_Spectator = 0;
+        private static int IN_Row = 1;
+        private static int IN_Width = 2;
+        private static int IN_Curb_Width = 3;
+        private static int IN_Curb_Height = 4;
+        private static int IN_Guardrail_Width = 5;
+        private static int OUT_SuperRiser = 0;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -49,15 +58,8 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int destination = 0;
-            if (DA.GetData<int>(1, ref destination))
-            {
-                if (destination < 0)
-                {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Row must be non-negative and not equal 0");
-                }
-            }
-
+            
+            ST_ConstructSuperRiser2D.HandleErrors(DA, this);
             ST_ConstructSuperRiser2D.ConstructSuperRiserFromDA(DA);
         }
 
@@ -77,7 +79,31 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("89a005fd-3c4c-4ee4-be01-c9fc11ef0a7d");
 
         //Methods
-        public static void ConstructSuperRiserFromDA(IGH_DataAccess DA)
+        private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
+        {
+            int intItem = 0;
+            double doubleItem = 0.0;
+
+            //Row number must be => 1
+            if (DA.GetData<int>(IN_Row, ref intItem))
+            {
+                if (intItem < 1)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Row must be non-negative and not equal to 0");
+                }
+            }
+            //Guardrail Width must be > 0
+            if (DA.GetData<double>(IN_Guardrail_Width, ref doubleItem))
+            {
+                if (doubleItem <= 0)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Guardrail Width must be non-negative and not equal to 0");
+                }
+            }
+
+        }
+
+        private static void ConstructSuperRiserFromDA(IGH_DataAccess DA)
         {
             StadiumTools.SuperRiser superRiser = new StadiumTools.SuperRiser();
             StadiumTools.Spectator specItem = new StadiumTools.Spectator();
@@ -85,37 +111,41 @@ namespace GHA_StadiumTools
             double doubleItem = 0.0;
 
             //Set Spectator Params
-            if (!DA.GetData<StadiumTools.Spectator>(0, ref specItem))
+            if (!DA.GetData<StadiumTools.Spectator>(IN_Spectator, ref specItem))
                 return;
             superRiser.SpectatorParameters = specItem;
+            superRiser.EyeX = specItem.EyeX * specItem.Unit;
+            superRiser.EyeY = specItem.EyeY * specItem.Unit;
+            superRiser.SEyeX = specItem.SEyeX * specItem.Unit;
+            superRiser.SEyeY = specItem.EyeX * specItem.Unit;
 
             //Set SuperRow
-            if (!DA.GetData<int>(1, ref intItem))
+            if (!DA.GetData<int>(IN_Row, ref intItem))
                 return;
             superRiser.Row = intItem;
 
-            //Set SuperRow
-            if (!DA.GetData<int>(2, ref intItem))
+            //Set Width
+            if (!DA.GetData<int>(IN_Width, ref intItem))
                 return;
             superRiser.Width = intItem;
 
             //Set SuperCurbWidth
-            if (!DA.GetData<double>(3, ref doubleItem))
+            if (!DA.GetData<double>(IN_Curb_Width, ref doubleItem))
                 return;
             superRiser.CurbWidth = doubleItem;
 
             //Set SuperCurbHeight
-            if (!DA.GetData<double>(4, ref doubleItem))
+            if (!DA.GetData<double>(IN_Curb_Height, ref doubleItem))
                 return;
             superRiser.CurbHeight = doubleItem;
 
             //Set SuperGuardRailWidth
-            if (!DA.GetData<double>(5, ref doubleItem))
+            if (!DA.GetData<double>(IN_Guardrail_Width, ref doubleItem))
                 return;
             superRiser.GuardrailWidth = doubleItem;
 
             //Output New Super Riser
-            DA.SetData(0, (object)superRiser);
+            DA.SetData(OUT_SuperRiser, superRiser);
         }
 
 
