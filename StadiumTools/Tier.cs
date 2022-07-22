@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace StadiumTools
 {
     /// <summary>
     /// Represents the data of a single seating tier.
     /// </summary>
-    public class Tier
+    public class Tier : ICloneable
     {
         //Properties
+        public bool IsValid { get; set; } = true;
         /// <summary>
         /// The 3d plane of this tier, where (0,0,0) is also the Point of Focus.
         /// </summary>
@@ -92,7 +94,7 @@ namespace StadiumTools
         /// Pt2d objects that represents the top outline geometry of the tier profile
         /// </summary>
         public Pt2d[] Points2d { get; set; }
-       
+
         //Constructors
         /// <summary>
         /// Initializes a new default Tier
@@ -172,9 +174,42 @@ namespace StadiumTools
                     }
                 }
             }
-            return tierPtCount;   
+            return tierPtCount;
         }
 
+        /// <summary>
+        /// create a deep copy of a tier
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            Tier tierClone = new Tier
+            {
+                IsValid = IsValid,
+                Plane = Plane,
+                SuperRiser = SuperRiser,
+                SuperHas = SuperHas,
+                Vomatory = Vomatory,
+                VomHas = VomHas,
+                BuildFromPreviousTier = BuildFromPreviousTier,
+                StartPt = StartPt,
+                SectionIndex = SectionIndex,
+                PlanIndex = PlanIndex,
+                StartX = StartX,
+                StartY = StartY,
+                RowCount = RowCount,
+                DefaultRowWidth = DefaultRowWidth,
+                RowWidths = RowWidths,
+                RiserHeights = RiserHeights,
+                RoundTo = RoundTo,
+                MaxRakeAngle = MaxRakeAngle,
+                Spectators = Spectators,
+                Points2dCount = Points2dCount,
+                Points2d = Points2d,
+            };
+            return tierClone;
+        }
+    
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 
 namespace StadiumTools
@@ -6,9 +7,10 @@ namespace StadiumTools
     /// <summary>
     /// Represents the properties of a single Spectator. 
     /// </summary>
-    public class Spectator
+    public class Spectator : ICloneable
     {
         //Properties
+        public bool IsValid { get; set; } = true;
         /// <summary>
         /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
         /// </summary>
@@ -87,9 +89,9 @@ namespace StadiumTools
         public Spectator()
         {
         }
-        
+
         /// <summary>
-        /// construct a Spectator from a collection of values
+        /// construct a hostedSpectator from a collection of values
         /// </summary>
         /// <param name="tierN"></param>
         /// <param name="rowN"></param>
@@ -99,7 +101,19 @@ namespace StadiumTools
         /// <param name="sLine"></param>
         /// <param name="sLineSt"></param>
         /// <param name="forwardSpec"></param>
-        public Spectator(int tierN, int rowN, Pt2d pt, Pt2d ptSt, Pt2d pof, Vec2d sLine, Vec2d sLineSt, Pt2d forwardSpec, Pln3d plane)
+        public Spectator
+            (
+            int tierN, 
+            int rowN, 
+            Pt2d pt, 
+            Pt2d ptSt, 
+            Pt2d pof, 
+            Vec2d sLine, 
+            Vec2d sLineSt, 
+            Pt2d forwardSpec, 
+            Pln3d plane
+            )
+
         {
             this.TierIndex = tierN;
             this.RowIndex = rowN;
@@ -128,7 +142,7 @@ namespace StadiumTools
             spectator.SEyeY = 1.4 * unit;
             spectator.TargetCValue = 0.09 * unit;
         }
-        
+
         /// <summary>
         /// Calculates the CValues for a spectator if it has a valid ForwardSpectator property
         /// </summary>
@@ -141,8 +155,41 @@ namespace StadiumTools
             double n = r - spectator.ForwardSpectatorLoc2d.Y;
             double h = spectator.ForwardSpectatorLoc2d.Y;
             double Tan02 = (r / d);
-            double c = (Tan02 * (d - t)) - h; 
+            double c = (Tan02 * (d - t)) - h;
             spectator.Cvalue = c;
+        }
+
+        /// <summary>
+        /// create a deep copy of a spectator
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            Spectator spectatorClone = new Spectator
+            {
+                IsValid = IsValid,
+                Unit = Unit,
+                EyeX = EyeX,
+                EyeY = EyeY,
+                SEyeX = SEyeX,
+                SEyeY = SEyeY,
+                SectionIndex = SectionIndex,
+                TierIndex = TierIndex,
+                RowIndex = RowIndex,
+                Loc2d = Loc2d,
+                Loc2dStanding = Loc2dStanding,
+                POF = POF,
+                ForwardSpectatorLoc2d = ForwardSpectatorLoc2d,
+                SightLine = SightLine,
+                SightLineStanding = SightLineStanding,
+                HasSightLine = HasSightLine,
+                HasSightLineStanding = HasSightLineStanding,
+                TargetCValue = TargetCValue,
+                Cvalue = Cvalue,
+                Plane = Plane
+            };
+
+            return spectatorClone;
         }
     }
 }

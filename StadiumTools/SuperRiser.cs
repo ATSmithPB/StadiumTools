@@ -61,7 +61,7 @@ namespace StadiumTools
             superRiser.EyeX = 1.6 * superRiser.SpectatorParameters.Unit;
             superRiser.EyeY = 1.2 * superRiser.SpectatorParameters.Unit;
             superRiser.SEyeX = 1.8 * superRiser.SpectatorParameters.Unit;
-            superRiser.SEyeY = 1.4;
+            superRiser.SEyeY = 1.4 * superRiser.SpectatorParameters.Unit;
         }
     }
 }

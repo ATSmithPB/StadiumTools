@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using static System.Math;
+using System;
 
 namespace StadiumTools
 {
     /// <summary>
     /// Represents an ordered collection of Tier objects that exist in the same plane
     /// </summary>
-    public class Section
+    public class Section : ICloneable
     {
         //Properties
+        public bool IsValid { get; set; } = true;
         public Pt2d POF { get; set; }
         /// <summary>
         /// An ordered list of tiers to comprise the section.
@@ -113,7 +115,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Returns an array of Pt2d objects for a given tier within a section
+        /// Returns an array of Pt2d objects for a given tier within a section 
         /// </summary>
         /// <param name="section"></param>
         /// <param name="tier"></param>
@@ -436,7 +438,21 @@ namespace StadiumTools
             return sightLines;
         }
 
-
+        /// <summary>
+        /// create a deep copy of a section
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            Section sectionClone = new Section
+            {
+                IsValid = IsValid,
+                POF = POF,
+                Tiers = Tiers,
+                Plane = Plane,
+            };
+            return sectionClone;
+        }
 
     }
 }
