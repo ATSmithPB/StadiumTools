@@ -50,8 +50,14 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            //Construct a new section from Data Access
             StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA);
-            DA.SetData(OUT_Section, newSection);
+
+            //GH_Goo<T> wrapper
+            StadiumTools.SectionGoo newSectionGoo = new StadiumTools.SectionGoo(newSection);
+
+            //Output Goo
+            DA.SetData(OUT_Section, newSectionGoo);
         }
 
         /// <summary>
@@ -74,18 +80,40 @@ namespace GHA_StadiumTools
         {
             //Item Containers
             Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
-            List<StadiumTools.Tier> tierList = new List<StadiumTools.Tier>();
+            List<StadiumTools.TierGoo> tierGooList = new List<StadiumTools.TierGoo>();
 
-            //Get Tiers
-            DA.GetDataList<StadiumTools.Tier>(IN_Tiers, tierList);
+            //Get TiersGoo
+            DA.GetDataList<StadiumTools.TierGoo>(IN_Tiers, tierGooList);
+
+            //Retrieve Tier Array from TiersGoo List
+            StadiumTools.Tier[] tierArray = CloneTierGooToArray(tierGooList);
 
             //Get Plane3d
             DA.GetData<Rhino.Geometry.Plane>(IN_SectionPlane, ref planeItem);
             StadiumTools.Pln3d pln = StadiumTools.IO.Pln3dFromPlane(planeItem);
 
             //Construct a new section
-            StadiumTools.Section newSection = new StadiumTools.Section(tierList, pln);
+            StadiumTools.Section newSection = new StadiumTools.Section(tierArray, pln);
             return newSection;
+        }
+
+        /// <summary>
+        /// Method to deep copy a list of TierGoo objects to an array of Tier objects.
+        /// </summary>
+        /// <param name="tierList"></param>
+        /// <returns></returns>
+        private static StadiumTools.Tier[] CloneTierGooToArray(List<StadiumTools.TierGoo> tierGooList)
+        {
+            StadiumTools.Tier[] tierArray = new StadiumTools.Tier[tierGooList.Count];
+            for (int i = 0; i < tierGooList.Count; i++)
+            {
+                //Unwrap the TierGoo,
+                //Clone the unwrapped Tier
+                //Casts the cloned object to a Tier type
+                //and adds it to the array
+                tierArray[i] = (StadiumTools.Tier)tierGooList[i].Value.Clone();
+            }
+            return tierArray;
         }
 
 

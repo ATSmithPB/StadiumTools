@@ -30,6 +30,7 @@ namespace GHA_StadiumTools
             
         }
 
+        //Set parameter indixes to names (for readability)
         private static int IN_Spectator = 0;
         private static int OUT_Eye_Point = 0;
         private static int OUT_SightLine = 1;
@@ -89,11 +90,14 @@ namespace GHA_StadiumTools
         public static void DeconstructSpectatorFromDA(IGH_DataAccess DA)
         {
             //Item Containers
-            StadiumTools.Spectator specItem = new StadiumTools.Spectator();
+            StadiumTools.SpectatorGoo specGooItem = new StadiumTools.SpectatorGoo();
 
             //Get Input Spectator
-            if (!DA.GetData<StadiumTools.Spectator>(IN_Spectator, ref specItem))
+            if (!DA.GetData<StadiumTools.SpectatorGoo>(IN_Spectator, ref specGooItem))
                 return;
+
+            //Unwrap Spectator Goo
+            StadiumTools.Spectator specItem = specGooItem.Value;
 
             //Section plane of spectator
             StadiumTools.Pln3d specPln3d = new StadiumTools.Pln3d();
@@ -107,33 +111,33 @@ namespace GHA_StadiumTools
 
             //Set Seated SightLine
             Rhino.Geometry.Line sightLine = new Rhino.Geometry.Line(eyePt, specPlane.Origin);
-            DA.SetData(1, sightLine);
+            DA.SetData(OUT_SightLine, sightLine);
 
             //Set Standing Eye Point
             Rhino.Geometry.Point3d eyePtStanding = StadiumTools.IO.Point3dFromPt3d(specItem.Loc2dStanding.ToPt3d(specPln3d));
-            DA.SetData(2, eyePtStanding);
+            DA.SetData(OUT_Standing_Eye_Point, eyePtStanding);
 
             //Set Standing SightLine
             Rhino.Geometry.Line sightLineStanding = new Rhino.Geometry.Line(eyePtStanding, specPlane.Origin);
-            DA.SetData(3, sightLineStanding);
+            DA.SetData(OUT_Standing_SightLine, sightLineStanding);
 
             //Set C-Value
-            DA.SetData(4, specItem.Cvalue);
+            DA.SetData(OUT_C_Value, specItem.Cvalue);
 
             //Set Target C-Value
-            DA.SetData(5, specItem.TargetCValue);
+            DA.SetData(OUT_Target_C_Value, specItem.TargetCValue);
 
             //Set Section Index
-            DA.SetData(6, specItem.SectionIndex);
+            DA.SetData(OUT_Section_Index, specItem.SectionIndex);
 
             //SetTier Index
-            DA.SetData(7, specItem.TierIndex);
+            DA.SetData(OUT_Tier_Index, specItem.TierIndex);
 
             //Set Row Index
-            DA.SetData(8, specItem.RowIndex);
+            DA.SetData(OUT_Row_Index, specItem.RowIndex);
 
             //Set Blocker
-            DA.SetData(9, StadiumTools.IO.Point3dFromPt3d(specItem.ForwardSpectatorLoc2d.ToPt3d(specPln3d)));
+            DA.SetData(OUT_Blocker, StadiumTools.IO.Point3dFromPt3d(specItem.ForwardSpectatorLoc2d.ToPt3d(specPln3d)));
 
         }
 

@@ -106,18 +106,20 @@ namespace GHA_StadiumTools
         private static void ConstructSuperRiserFromDA(IGH_DataAccess DA)
         {
             StadiumTools.SuperRiser superRiser = new StadiumTools.SuperRiser();
-            StadiumTools.Spectator specItem = new StadiumTools.Spectator();
+            StadiumTools.SpectatorGoo spectatorGooItem = new StadiumTools.SpectatorGoo();
             int intItem = 0;
             double doubleItem = 0.0;
 
             //Set Spectator Params
-            if (!DA.GetData<StadiumTools.Spectator>(IN_Spectator, ref specItem))
+            if (!DA.GetData<StadiumTools.SpectatorGoo>(IN_Spectator, ref spectatorGooItem))
                 return;
-            superRiser.SpectatorParameters = specItem;
-            superRiser.EyeX = specItem.EyeX * specItem.Unit;
-            superRiser.EyeY = specItem.EyeY * specItem.Unit;
-            superRiser.SEyeX = specItem.SEyeX * specItem.Unit;
-            superRiser.SEyeY = specItem.EyeX * specItem.Unit;
+
+            StadiumTools.Spectator spectatorItem = spectatorGooItem.Value;
+            superRiser.SpectatorParameters = spectatorItem;
+            superRiser.EyeX = spectatorItem.EyeX * spectatorItem.Unit;
+            superRiser.EyeY = spectatorItem.EyeY * spectatorItem.Unit;
+            superRiser.SEyeX = spectatorItem.SEyeX * spectatorItem.Unit;
+            superRiser.SEyeY = spectatorItem.EyeX * spectatorItem.Unit;
 
             //Set SuperRow
             if (!DA.GetData<int>(IN_Row, ref intItem))

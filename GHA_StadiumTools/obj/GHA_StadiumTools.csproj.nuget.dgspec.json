@@ -43,7 +43,7 @@
             "Grasshopper": {
               "include": "Compile, Build",
               "target": "Package",
-              "version": "[7.19.22180.9001, )"
+              "version": "[7.20.22193.9001, )"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"

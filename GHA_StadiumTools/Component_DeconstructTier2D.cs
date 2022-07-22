@@ -30,6 +30,15 @@ namespace GHA_StadiumTools
 
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Tier = 0;
+        private static int OUT_Spectators = 0;
+        private static int OUT_Points = 1;
+        private static int OUT_Profile = 2;
+        private static int OUT_Plane = 3;
+        private static int OUT_Section_Index = 4;
+        private static int OUT_Debug = 5;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -72,12 +81,13 @@ namespace GHA_StadiumTools
         public static void DeconstructTierFromDA(IGH_DataAccess DA)
         {
             //Item Containers
-            StadiumTools.Tier tierItem = new StadiumTools.Tier();
-            
+            StadiumTools.TierGoo tierGooItem = new StadiumTools.TierGoo();
 
             //Get Input Tier Object
-            if (!DA.GetData<StadiumTools.Tier>(0, ref tierItem))
-                return;
+            if (!DA.GetData<StadiumTools.TierGoo>(IN_Tier, ref tierGooItem)) { return; }
+
+            //Uwrap TierGoo
+            StadiumTools.Tier tierItem = tierGooItem.Value;
 
             List<string> stringList = new List<string>();
             for (int i = 0; i < tierItem.Points2dCount; i++)
@@ -88,26 +98,37 @@ namespace GHA_StadiumTools
                 stringList.Add(str);
             }
 
-            //Deconstruct Section object and ouput data
-            //Set Spectators
-            DA.SetDataList(0, tierItem.Spectators);
+            if (tierItem.Spectators.Length > 0)
+            {
+                //Wrap Speectators in Goo
+                List<StadiumTools.SpectatorGoo> spectatorGooList = new List<StadiumTools.SpectatorGoo>();
+                for (int i = 0; i < tierItem.Spectators.Length; i++)
+                {
+                    spectatorGooList[i] = new StadiumTools.SpectatorGoo(tierItem.Spectators[i]);
+                }
+
+                //Deconstruct Section object and ouput data
+                //Set Spectators
+                DA.SetDataList(OUT_Spectators, spectatorGooList);
+            }
 
             //Set Points
             Rhino.Geometry.Point3d[] points = StadiumTools.IO.PointsFromTier(tierItem);
-            DA.SetDataList(1, points);
+            DA.SetDataList(OUT_Points, points);
 
             //Set Profile Polyline
             Rhino.Geometry.Polyline pline = StadiumTools.IO.PolylineFromTier(tierItem);
-            DA.SetData(2, pline);
+            DA.SetData(OUT_Profile, pline);
 
             //Set Plane (POF)
             Rhino.Geometry.Plane tierPlane = StadiumTools.IO.PlaneFromPln3d(tierItem.Plane);
-            DA.SetData(3, tierPlane);
+            DA.SetData(OUT_Plane, tierPlane);
 
             //Set Section Index
-            DA.SetData(4, tierItem.SectionIndex);
+            DA.SetData(OUT_Section_Index, tierItem.SectionIndex);
 
-            DA.SetDataList(5, stringList);
+            //Set Debug
+            DA.SetDataList(OUT_Debug, stringList);
         }
 
 

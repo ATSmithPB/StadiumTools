@@ -27,6 +27,11 @@ namespace GHA_StadiumTools
             pManager.AddGenericParameter("Vomatory", "V", "A Vomatory object", GH_ParamAccess.item);
         }
 
+        //Set parameter indixes to names (for readability)
+        private static int IN_Vomatory = 0;
+        private static int OUT_Start_Row = 0;
+        private static int OUT_Height = 1;
+
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
@@ -68,14 +73,14 @@ namespace GHA_StadiumTools
             StadiumTools.Vomatory vomItem = new StadiumTools.Vomatory();
 
             //Get Vomatory
-            if (!DA.GetData<StadiumTools.Vomatory>(0, ref vomItem))
+            if (!DA.GetData<StadiumTools.Vomatory>(IN_Vomatory, ref vomItem))
                 return;
             
             //Set Start
-            DA.SetData(0, vomItem.Start);
+            DA.SetData(OUT_Start_Row, vomItem.Start);
 
             //Set Height
-            DA.SetData(1, vomItem.Height);
+            DA.SetData(OUT_Height, vomItem.Height);
         }
 
     }

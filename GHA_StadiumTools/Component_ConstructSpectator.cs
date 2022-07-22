@@ -56,10 +56,19 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            //Instance a new Spectator
             StadiumTools.Spectator newSpectator = new StadiumTools.Spectator();
             newSpectator.Unit = 1.0;
+
+            //Set parameters from Data Access
             ST_ConstructSpectator.ConstructSpectatorFromDA(DA, newSpectator);
-            DA.SetData(OUT_Spectator, (object)newSpectator);
+
+            //GH_Goo<T> wrapper
+            StadiumTools.SpectatorGoo newSpectatorGoo = new StadiumTools.SpectatorGoo(newSpectator);
+
+            //Output Goo
+            DA.SetData(OUT_Spectator, newSpectatorGoo);
+
         }
 
         /// <summary>
@@ -105,26 +114,25 @@ namespace GHA_StadiumTools
             }
 
         }
-        private static void ConstructSpectatorFromDA(IGH_DataAccess DA, StadiumTools.Spectator spectator)
+        private static void ConstructSpectatorFromDA(IGH_DataAccess DA, StadiumTools.Spectator newSpectator)
         {
             double doubleItem = 0.0;
             double[] doubleArrayItem = new double[0];
 
-            if (!DA.GetData<double>(IN_C_Value, ref doubleItem))
-                return;
-            spectator.TargetCValue = doubleItem;
-            if (!DA.GetData<double>(IN_Eye_Horizontal, ref doubleItem))
-                return;
-            spectator.EyeX = doubleItem;
-            if (!DA.GetData<double>(IN_Eye_Vertical, ref doubleItem))
-                return;
-            spectator.EyeY = doubleItem;
-            if (!DA.GetData<double>(IN_Standing_Eye_Horiz, ref doubleItem))
-                return;
-            spectator.SEyeX = doubleItem;
-            if (!DA.GetData<double>(IN_Standing_Eye_Vert, ref doubleItem))
-                return;
-            spectator.SEyeY = doubleItem;
+            if (!DA.GetData<double>(IN_C_Value, ref doubleItem)) { return; }
+            newSpectator.TargetCValue = doubleItem;
+
+            if (!DA.GetData<double>(IN_Eye_Horizontal, ref doubleItem)) { return; }
+            newSpectator.EyeX = doubleItem;
+
+            if (!DA.GetData<double>(IN_Eye_Vertical, ref doubleItem)) { return; }
+            newSpectator.EyeY = doubleItem;
+
+            if (!DA.GetData<double>(IN_Standing_Eye_Horiz, ref doubleItem)) { return; }
+            newSpectator.SEyeX = doubleItem;
+
+            if (!DA.GetData<double>(IN_Standing_Eye_Vert, ref doubleItem)) { return; }
+            newSpectator.SEyeY = doubleItem;
         }
 
 

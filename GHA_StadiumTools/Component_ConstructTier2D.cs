@@ -68,8 +68,17 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            StadiumTools.Tier newTier = ST_ConstructTier2D.ConstructTierFromDA(DA);
-            DA.SetData(OUT_Tier, newTier);
+            //Instance a new tier
+            StadiumTools.Tier newTier = new StadiumTools.Tier();
+
+            //Set parameters from Data Access
+            ST_ConstructTier2D.ConstructTierFromDA(DA, newTier);
+
+            //GH_Goo<T> wrapper
+            StadiumTools.TierGoo newTierGoo = new StadiumTools.TierGoo(newTier);
+
+            //Output Goo
+            DA.SetData(OUT_Tier, newTierGoo);
         }
 
         /// <summary>
@@ -88,11 +97,10 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("072677e1-616c-4028-ab7e-b9717e7699b1");
 
         //Methods
-        private static StadiumTools.Tier ConstructTierFromDA(IGH_DataAccess DA)
+        private static void ConstructTierFromDA(IGH_DataAccess DA, StadiumTools.Tier tier)
         {
             //Item Containers (Destinations)
-            StadiumTools.Tier tier = new StadiumTools.Tier();
-            StadiumTools.Spectator spectatorItem = new StadiumTools.Spectator();
+            StadiumTools.SpectatorGoo spectatorGooItem = new StadiumTools.SpectatorGoo();
             StadiumTools.SuperRiser superItem = new StadiumTools.SuperRiser();
             StadiumTools.Vomatory vomItem = new StadiumTools.Vomatory();
             int intItem = 0;
@@ -100,23 +108,24 @@ namespace GHA_StadiumTools
             double doubleItem = 0.0;
             double[] doubleArrayItem = new double[0];
 
-            DA.GetData(IN_Spectator, ref spectatorItem);
-            tier.SpectatorParameters = spectatorItem;
+            if(!DA.GetData(IN_Spectator, ref spectatorGooItem)) { return; }   
+            tier.SpectatorParameters = spectatorGooItem.Value;
 
-            DA.GetData(IN_Start_X, ref doubleItem); 
+            if (!DA.GetData(IN_Start_X, ref doubleItem)) { return; }
             tier.StartX = doubleItem * tier.SpectatorParameters.Unit;
 
-            DA.GetData(IN_Start_Y, ref doubleItem);
+            if (!DA.GetData(IN_Start_Y, ref doubleItem)) { return; }
             tier.StartY = doubleItem * tier.SpectatorParameters.Unit;
 
-            DA.GetData(IN_Start, ref boolItem);
+            if (!DA.GetData(IN_Start, ref boolItem)) { return; }
             tier.BuildFromPreviousTier = boolItem;
 
-            DA.GetData(IN_Row_Count, ref intItem);
+            if (!DA.GetData(IN_Row_Count, ref intItem)) { return; }
             tier.RowCount = intItem;
+
             tier.Spectators = new StadiumTools.Spectator[tier.RowCount];
 
-            DA.GetData(IN_Row_Width, ref doubleItem);
+            if (!DA.GetData(IN_Row_Width, ref doubleItem)) { return; }
             tier.DefaultRowWidth = doubleItem * tier.SpectatorParameters.Unit;
             
             //Set all row widths to default value
@@ -126,12 +135,12 @@ namespace GHA_StadiumTools
                 rowWidths[i] = tier.DefaultRowWidth;
             }
 
-            DA.GetData(IN_Rounding, ref doubleItem);
+            if (!DA.GetData(IN_Rounding, ref doubleItem)) { return; }
             tier.RoundTo = doubleItem * tier.SpectatorParameters.Unit;
 
-            DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem);
+            if (!DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem)) { return; }
             tier.MaxRakeAngle = doubleItem;
-            
+
             DA.GetData(IN_SuperRiser, ref superItem);
             tier.SuperRiser = superItem;
 
@@ -154,10 +163,6 @@ namespace GHA_StadiumTools
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
-
-            return tier;
         }
-
-
     }
 }

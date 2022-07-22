@@ -72,15 +72,25 @@ namespace GHA_StadiumTools
         private static void DeconstructSectionFromDA(IGH_DataAccess DA)
         {
             //Item Containers (Destinations)
-            StadiumTools.Section sectionItem = new StadiumTools.Section();
+            StadiumTools.SectionGoo sectionGooItem = new StadiumTools.SectionGoo();
             
             //Get Input Section Object
-            if (!DA.GetData<StadiumTools.Section>(IN_Section, ref sectionItem))
+            if (!DA.GetData<StadiumTools.SectionGoo>(IN_Section, ref sectionGooItem))
                 return;
+
+            //Unwrap Section Goo
+            StadiumTools.Section sectionItem = sectionGooItem.Value;
+
+            //Wrap Tier Goo
+            List<StadiumTools.TierGoo> tierGooList = new List<StadiumTools.TierGoo>();
+            for (int i = 0; i < sectionItem.Tiers.Length; i++)
+            {
+                tierGooList.Add(new StadiumTools.TierGoo(sectionItem.Tiers[i]));
+            }
 
             //Deconstruct Section object and ouput data
             //Set Tiers
-            DA.SetDataList(OUT_Tiers, sectionItem.Tiers);
+            DA.SetDataList(OUT_Tiers, tierGooList);
 
             //Set PlanePOF
             Rhino.Geometry.Plane sectionPlane = StadiumTools.IO.PlaneFromPln3d(sectionItem.Plane);

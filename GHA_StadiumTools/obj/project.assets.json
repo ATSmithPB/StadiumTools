@@ -2,10 +2,10 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.8": {
-      "Grasshopper/7.19.22180.9001": {
+      "Grasshopper/7.20.22193.9001": {
         "type": "package",
         "dependencies": {
-          "RhinoCommon": "[7.19.22180.9001]"
+          "RhinoCommon": "[7.20.22193.9001]"
         },
         "compile": {
           "lib/net48/GH_IO.dll": {},
@@ -18,7 +18,7 @@
           "build/net48/Grasshopper.targets": {}
         }
       },
-      "RhinoCommon/7.19.22180.9001": {
+      "RhinoCommon/7.20.22193.9001": {
         "type": "package",
         "compile": {
           "lib/net48/Eto.dll": {},
@@ -35,15 +35,15 @@
     }
   },
   "libraries": {
-    "Grasshopper/7.19.22180.9001": {
-      "sha512": "iFM93FsfXSSemNWJRtqvaEYDe7RNrd9APNbzDNHi4l1peJvqe+8/E+1qVy7Uo1YXYwOwsSqyMqpsK2Z7QeLk5A==",
+    "Grasshopper/7.20.22193.9001": {
+      "sha512": "JDKBg5w5//jpQ3CWA/Gy1MXbN/lbbR2HIWQpMXvAzUEPHLCWWFV0hHrPJ43clDY0wWro/cY9s7G63NYn3k/Acw==",
       "type": "package",
-      "path": "grasshopper/7.19.22180.9001",
+      "path": "grasshopper/7.20.22193.9001",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "build/net48/Grasshopper.targets",
-        "grasshopper.7.19.22180.9001.nupkg.sha512",
+        "grasshopper.7.20.22193.9001.nupkg.sha512",
         "grasshopper.nuspec",
         "grasshopper.png",
         "lib/net48/GH_IO.XML",
@@ -52,10 +52,10 @@
         "lib/net48/Grasshopper.xml"
       ]
     },
-    "RhinoCommon/7.19.22180.9001": {
-      "sha512": "EwJycZupeOXMGjkKVoSfiFfedMtRBl2hw3EUXnMZmSygfKmEQKpkIde0l+Bzja64ewU4+CwS4CjlJGKp1rhLpQ==",
+    "RhinoCommon/7.20.22193.9001": {
+      "sha512": "nUTUWoE8hl4NMQ2tIgxSzPYnp780usmEGaRtcGwYQrsxmEvYYdGyVIiw2KY4IvuYaoSpVFm3YMf/Gs77wkjL9A==",
       "type": "package",
-      "path": "rhinocommon/7.19.22180.9001",
+      "path": "rhinocommon/7.20.22193.9001",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -66,7 +66,7 @@
         "lib/net48/Rhino.UI.dll",
         "lib/net48/RhinoCommon.XML",
         "lib/net48/RhinoCommon.dll",
-        "rhinocommon.7.19.22180.9001.nupkg.sha512",
+        "rhinocommon.7.20.22193.9001.nupkg.sha512",
         "rhinocommon.nuspec",
         "rhinocommon.png"
       ]
@@ -74,7 +74,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
-      "Grasshopper >= 7.19.22180.9001"
+      "Grasshopper >= 7.20.22193.9001"
     ]
   },
   "packageFolders": {
@@ -119,7 +119,7 @@
           "Grasshopper": {
             "include": "Compile, Build",
             "target": "Package",
-            "version": "[7.19.22180.9001, )"
+            "version": "[7.20.22193.9001, )"
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
