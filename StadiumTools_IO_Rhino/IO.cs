@@ -13,7 +13,7 @@ namespace StadiumTools
 {
     public static class IO
     {
-        //Extensions Methods
+
         /// <summary>
         /// Returns a Pt2d object from a Rhino Point3d
         /// </summary>
@@ -167,11 +167,11 @@ namespace StadiumTools
             return rcDub;
         }
 
-        /// <summary>
+        /// <summary> 
         /// Returns a Data Tree of doubles based on a list
         /// </summary>
         /// <param name="cVals"></param>
-        /// <returns></returns>
+        /// <returns></returns> 
         public static DataTree<int> DataTreeFromJaggedArray(int[][] cVals)
         {
             DataTree<int> rcInt = new DataTree<int>();
