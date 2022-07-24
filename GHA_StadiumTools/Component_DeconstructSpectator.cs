@@ -54,7 +54,7 @@ namespace GHA_StadiumTools
             pManager.AddPointParameter("Standing Eye Point", "SEP", "The location of spectator's eyes when standing", GH_ParamAccess.item);
             pManager.AddLineParameter("Standing SightLine", "SSL", "The Sightline of the spectator when standing", GH_ParamAccess.item);
             pManager.AddNumberParameter("C-Value", "C", "The actual C-Value of the Spectator within their tier", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Target C-Value", "TC", "The goal C-Value of the Spectator within their tier based on set parameters", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Target C-Value", "TC", "The target C-Value of the Spectator within their tier based on set parameters", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Section Index", "Si", "The numeric index of the section this spectator belongs to", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Tier Index", "Ti", "The numeric index of the tier this spectator belongs to", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Row Index", "Ri", "The numeric index of the row this spectator belongs to", GH_ParamAccess.item);

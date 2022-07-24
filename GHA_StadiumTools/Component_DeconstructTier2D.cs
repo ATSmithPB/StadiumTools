@@ -104,7 +104,7 @@ namespace GHA_StadiumTools
                 List<StadiumTools.SpectatorGoo> spectatorGooList = new List<StadiumTools.SpectatorGoo>();
                 for (int i = 0; i < tierItem.Spectators.Length; i++)
                 {
-                    spectatorGooList[i] = new StadiumTools.SpectatorGoo(tierItem.Spectators[i]);
+                    spectatorGooList.Add(new StadiumTools.SpectatorGoo(tierItem.Spectators[i]));
                 }
 
                 //Deconstruct Section object and ouput data

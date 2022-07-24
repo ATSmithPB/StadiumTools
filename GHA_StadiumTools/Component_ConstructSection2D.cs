@@ -86,7 +86,7 @@ namespace GHA_StadiumTools
             DA.GetDataList<StadiumTools.TierGoo>(IN_Tiers, tierGooList);
 
             //Retrieve Tier Array from TiersGoo List
-            StadiumTools.Tier[] tierArray = CloneTierGooToArray(tierGooList);
+            StadiumTools.Tier[] tierArray = StadiumTools.TierGoo.CloneListToArray(tierGooList);
 
             //Get Plane3d
             DA.GetData<Rhino.Geometry.Plane>(IN_SectionPlane, ref planeItem);
@@ -97,24 +97,7 @@ namespace GHA_StadiumTools
             return newSection;
         }
 
-        /// <summary>
-        /// Method to deep copy a list of TierGoo objects to an array of Tier objects.
-        /// </summary>
-        /// <param name="tierList"></param>
-        /// <returns></returns>
-        private static StadiumTools.Tier[] CloneTierGooToArray(List<StadiumTools.TierGoo> tierGooList)
-        {
-            StadiumTools.Tier[] tierArray = new StadiumTools.Tier[tierGooList.Count];
-            for (int i = 0; i < tierGooList.Count; i++)
-            {
-                //Unwrap the TierGoo,
-                //Clone the unwrapped Tier
-                //Casts the cloned object to a Tier type
-                //and adds it to the array
-                tierArray[i] = (StadiumTools.Tier)tierGooList[i].Value.Clone();
-            }
-            return tierArray;
-        }
+        
 
 
     }

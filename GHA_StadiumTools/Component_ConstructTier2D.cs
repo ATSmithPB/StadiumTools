@@ -24,8 +24,9 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
             StadiumTools.Tier defaultTier = new StadiumTools.Tier();
-            StadiumTools.Tier.InitDefault(defaultTier);
+            StadiumTools.Tier.InitDefault(defaultTier, unit);
             pManager.AddGenericParameter("Spectator", "S", "A Spectator to inherit Spectator Parameters From", GH_ParamAccess.item);
             pManager.AddNumberParameter("Start X", "sX", "Horizontal start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartX);
             pManager.AddNumberParameter("Start Y", "sY", "Vertical start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartY);
@@ -68,10 +69,13 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            //Handle Errors
+            ST_ConstructTier2D.HandleErrors(DA, this);
+
             //Instance a new tier
             StadiumTools.Tier newTier = new StadiumTools.Tier();
 
-            //Set parameters from Data Access
+            //Set tier parameters from Data Access
             ST_ConstructTier2D.ConstructTierFromDA(DA, newTier);
 
             //GH_Goo<T> wrapper
@@ -97,6 +101,52 @@ namespace GHA_StadiumTools
         public override Guid ComponentGuid => new Guid("072677e1-616c-4028-ab7e-b9717e7699b1");
 
         //Methods
+        private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
+        {
+            bool start = false;
+            int rowCount = 0;
+            double doubleItem = 0.0;
+            StadiumTools.SuperRiser superItem = new StadiumTools.SuperRiser();
+
+            if (!DA.GetData<bool>(IN_Start, ref start)) { return; }
+
+            if (DA.GetData<double>(IN_Start_X, ref doubleItem))
+            {
+                if (!start && doubleItem < 0.0)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "If Tier Start = False, or Tier is index 0 in a Section. Start X must be non-negative and not equal to 0");
+                }
+            }
+            if (!start && DA.GetData<double>(IN_Start_Y, ref doubleItem))
+            {
+                if (doubleItem < 0.0)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "If Tier Start = False, or Tier is index 0 in a Section. Start Y must be non-negative and not equal to 0");
+                }
+            }
+            if (DA.GetData<int>(IN_Row_Count, ref rowCount))
+            {
+                if (rowCount < 3)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Row Count must be non-negative and greater than 2");
+                }
+            }
+            if (DA.GetData<StadiumTools.SuperRiser>(IN_SuperRiser, ref superItem))
+            {
+                if (superItem.Row > rowCount - 1)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Tier Row Count [{rowCount}] must exceed SuperRiser Row [{superItem.Row}]");
+                }
+            }
+            if (DA.GetData<double>(IN_Maximum_Rake_Angle, ref doubleItem))
+            {
+                if (doubleItem > 0.593412)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Warning: Maximum Rake Angle exceeds 34 degrees");
+                }
+            }
+        }
+    
         private static void ConstructTierFromDA(IGH_DataAccess DA, StadiumTools.Tier tier)
         {
             //Item Containers (Destinations)
@@ -112,10 +162,10 @@ namespace GHA_StadiumTools
             tier.SpectatorParameters = spectatorGooItem.Value;
 
             if (!DA.GetData(IN_Start_X, ref doubleItem)) { return; }
-            tier.StartX = doubleItem * tier.SpectatorParameters.Unit;
+            tier.StartX = doubleItem;
 
             if (!DA.GetData(IN_Start_Y, ref doubleItem)) { return; }
-            tier.StartY = doubleItem * tier.SpectatorParameters.Unit;
+            tier.StartY = doubleItem;
 
             if (!DA.GetData(IN_Start, ref boolItem)) { return; }
             tier.BuildFromPreviousTier = boolItem;
@@ -126,7 +176,7 @@ namespace GHA_StadiumTools
             tier.Spectators = new StadiumTools.Spectator[tier.RowCount];
 
             if (!DA.GetData(IN_Row_Width, ref doubleItem)) { return; }
-            tier.DefaultRowWidth = doubleItem * tier.SpectatorParameters.Unit;
+            tier.DefaultRowWidth = doubleItem;
             
             //Set all row widths to default value
             double[] rowWidths = new double[tier.RowCount];
@@ -136,7 +186,7 @@ namespace GHA_StadiumTools
             }
 
             if (!DA.GetData(IN_Rounding, ref doubleItem)) { return; }
-            tier.RoundTo = doubleItem * tier.SpectatorParameters.Unit;
+            tier.RoundTo = doubleItem;
 
             if (!DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem)) { return; }
             tier.MaxRakeAngle = doubleItem;

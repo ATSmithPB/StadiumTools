@@ -24,14 +24,15 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            StadiumTools.Spectator s = new StadiumTools.Spectator();
-            StadiumTools.Spectator.InitDefault(s);
+            double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
+            StadiumTools.Spectator defaultSpectator = new StadiumTools.Spectator();
+            StadiumTools.Spectator.InitDefault(defaultSpectator, unit);
             pManager.AddGenericParameter("Spectator", "Sp", "Spectator object to inerit parameters from", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Row", "R", "Row to replace with super riser", GH_ParamAccess.item, 10);
             pManager.AddIntegerParameter("Width", "sW", "Width of SuperRiser as a multiple of the default tier row width", GH_ParamAccess.item, 3);
-            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
-            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.01 * s.Unit);
-            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.01 * s.Unit);
+            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
+            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
+            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
         }
 
         //Set parameter indixes to names (for readability)
@@ -111,15 +112,14 @@ namespace GHA_StadiumTools
             double doubleItem = 0.0;
 
             //Set Spectator Params
-            if (!DA.GetData<StadiumTools.SpectatorGoo>(IN_Spectator, ref spectatorGooItem))
-                return;
-
+            if (!DA.GetData<StadiumTools.SpectatorGoo>(IN_Spectator, ref spectatorGooItem)) { return; }
             StadiumTools.Spectator spectatorItem = spectatorGooItem.Value;
-            superRiser.SpectatorParameters = spectatorItem;
-            superRiser.EyeX = spectatorItem.EyeX * spectatorItem.Unit;
-            superRiser.EyeY = spectatorItem.EyeY * spectatorItem.Unit;
-            superRiser.SEyeX = spectatorItem.SEyeX * spectatorItem.Unit;
-            superRiser.SEyeY = spectatorItem.EyeX * spectatorItem.Unit;
+            double unit;
+            superRiser.Unit = unit = spectatorItem.Unit;
+            superRiser.EyeX = spectatorItem.EyeX * unit;
+            superRiser.EyeY = spectatorItem.EyeY * unit;
+            superRiser.SEyeX = spectatorItem.SEyeX * unit;
+            superRiser.SEyeY = spectatorItem.EyeX * unit;
 
             //Set SuperRow
             if (!DA.GetData<int>(IN_Row, ref intItem))
