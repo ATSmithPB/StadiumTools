@@ -12,9 +12,9 @@ namespace StadiumTools
         //Properties
         public bool IsValid { get; set; } = true;
         /// <summary>
-        /// Coeffecient for model unit space of the tier (mm, m, in, ft) 
+        /// Coeffecient for model unit space (meter / Unit)
         /// </summary>
-        public double Unit;
+        public double Unit { get; set; } = UnitHandler.m;
         /// <summary>
         /// Horizontal offset of seated spectator eyes from row start 
         /// </summary>
@@ -31,6 +31,9 @@ namespace StadiumTools
         /// Vertical offset of seated spectator eyes from row floor
         /// </summary>
         public double SEyeY { get; set; }
+        /// <summary>
+        /// the index of the spectator's section within a plan
+        /// </summary>
         public int SectionIndex { get; set; }
         /// <summary>
         /// the index of the spectator's tier within their section
@@ -61,7 +64,7 @@ namespace StadiumTools
         /// </summary>
         public Vec2d SightLine { get; set; }
         /// <summary>
-        /// Vec2d representing the 2d X,Y components and Magnitude of a standing spectator's sightline to the P.O.F
+        /// Vec2d representing the 2d X,Y components and Magnitude of a standing spectator's sightline to the P.O.F 
         /// </summary>
         public Vec2d SightLineStanding { get; set; }
         /// <summary>
@@ -73,11 +76,11 @@ namespace StadiumTools
         /// </summary>
         public bool HasSightLineStanding { get; set; } = false;
         /// <summary>
-        /// The desired C-Value of the spectator. Specified upon creation of Tier object.
+        /// The desired C-Value of the spectator in mm. Specified upon creation of Tier object.
         /// </summary>
-        public double TargetCValue { get; set; } = 0.0;
+        public int TargetCValue { get; set; }
         /// <summary>
-        /// The actual C-Value of the spectator. Calculated upon creation of Section object.
+        /// The actual C-Value of the spectator in mm. Calculated upon creation of Section object.
         /// </summary>
         public double Cvalue { get; set; } = 0.0;
         /// <summary>
@@ -130,17 +133,16 @@ namespace StadiumTools
 
         //Methods
         /// <summary>
-        /// Init a spectator with default parameters
+        /// Init a spectator with default parameters based on a coeffecient (meter / unit)
         /// </summary>
-        public static void InitDefault(Spectator spectator)
+        public static void InitDefault(Spectator spectator, double unit)
         {
-            double unit;
-            spectator.Unit = unit = UnitHandler.m;
+            spectator.Unit = unit;
             spectator.EyeX = 0.15 * unit;
             spectator.EyeY = 1.2 * unit;
             spectator.SEyeX = 0.6 * unit;
             spectator.SEyeY = 1.4 * unit;
-            spectator.TargetCValue = 0.09 * unit;
+            spectator.TargetCValue = 90;
         }
 
         /// <summary>
@@ -160,36 +162,14 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// create a deep copy of a spectator
+        /// create a shallow copy clone of a spectator
         /// </summary>
         /// <returns></returns>
         public object Clone()
         {
-            Spectator spectatorClone = new Spectator
-            {
-                IsValid = IsValid,
-                Unit = Unit,
-                EyeX = EyeX,
-                EyeY = EyeY,
-                SEyeX = SEyeX,
-                SEyeY = SEyeY,
-                SectionIndex = SectionIndex,
-                TierIndex = TierIndex,
-                RowIndex = RowIndex,
-                Loc2d = Loc2d,
-                Loc2dStanding = Loc2dStanding,
-                POF = POF,
-                ForwardSpectatorLoc2d = ForwardSpectatorLoc2d,
-                SightLine = SightLine,
-                SightLineStanding = SightLineStanding,
-                HasSightLine = HasSightLine,
-                HasSightLineStanding = HasSightLineStanding,
-                TargetCValue = TargetCValue,
-                Cvalue = Cvalue,
-                Plane = Plane
-            };
-
-            return spectatorClone;
+            //Shallow Copy
+            Spectator clone = (Spectator)this.MemberwiseClone();
+            return clone;
         }
     }
 }

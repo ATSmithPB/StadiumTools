@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace StadiumTools
 {
     /// <summary>
     /// Represents a point in 3D space (x, y, z)
     /// </summary>
-    public struct Pt3d
+    public struct Pt3d : ICloneable
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -93,6 +94,13 @@ namespace StadiumTools
 
             return new Pt3d(projX, projY, projZ);
         }
+
+        public object Clone()
+        {
+            //Shallow copy
+            return (Pt3d)this.MemberwiseClone();
+        }
+
     }
 
     

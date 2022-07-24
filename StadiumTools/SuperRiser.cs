@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace StadiumTools
 {
-    public struct SuperRiser
+    public struct SuperRiser : ICloneable
     {
         //Properties
-        /// <summary>
-        /// A spectator object that defines the pectator parameters for generating the tier (Target C-Val, EyeX, EyeY, etc..)
-        /// </summary>
-        public Spectator SpectatorParameters { get; set; }
+        public double Unit { get; set; }
         /// <summary>
         /// Row number for inserting super riser
         /// </summary>
@@ -50,18 +48,23 @@ namespace StadiumTools
 
         public static void InitDefault(SuperRiser superRiser)
         {
-            Spectator defaultSpectatorParameters = new Spectator();
-            Spectator.InitDefault(defaultSpectatorParameters);
-            superRiser.SpectatorParameters = defaultSpectatorParameters;
+            superRiser.Unit = 1.0;
             superRiser.Row = 10;
             superRiser.Width = 3;
-            superRiser.GuardrailWidth = 0.1 * superRiser.SpectatorParameters.Unit;
-            superRiser.CurbHeight = 0.1 * superRiser.SpectatorParameters.Unit;
-            superRiser.CurbWidth = 0.1 * superRiser.SpectatorParameters.Unit;
-            superRiser.EyeX = 1.6 * superRiser.SpectatorParameters.Unit;
-            superRiser.EyeY = 1.2 * superRiser.SpectatorParameters.Unit;
-            superRiser.SEyeX = 1.8 * superRiser.SpectatorParameters.Unit;
-            superRiser.SEyeY = 1.4 * superRiser.SpectatorParameters.Unit;
+            superRiser.GuardrailWidth = 0.1 * superRiser.Unit;
+            superRiser.CurbHeight = 0.1 * superRiser.Unit;
+            superRiser.CurbWidth = 0.1 * superRiser.Unit;
+            superRiser.EyeX = 1.6 * superRiser.Unit;
+            superRiser.EyeY = 1.2 * superRiser.Unit;
+            superRiser.SEyeX = 1.8 * superRiser.Unit;
+            superRiser.SEyeY = 1.4 * superRiser.Unit;
+        }
+
+        //Methods
+
+        public object Clone()
+        {
+            return (SuperRiser)this.MemberwiseClone();
         }
     }
 }

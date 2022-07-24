@@ -263,7 +263,7 @@ namespace StadiumTools
         /// <returns>double</returns>
         private static double RiserHeightFromCVal(Tier tier, Pt2d ptB, int currentRow, bool standing)
         {
-            double n = 0.0;
+            double nextRiser = 0.0;
             double currentRowEyeX = tier.SpectatorParameters.EyeX;
             double currentRowEyeY = tier.SpectatorParameters.EyeY;
             double nextRowEyeX = currentRowEyeX;
@@ -274,7 +274,7 @@ namespace StadiumTools
             {
                 if (currentRow + 1 == tier.SuperRiser.Row)
                 {
-                    n -= tier.SuperRiser.CurbHeight;
+                    nextRiser -= tier.SuperRiser.CurbHeight;
                     ptB.X -= tier.SuperRiser.CurbWidth;
                     ptB.Y -= tier.SuperRiser.CurbHeight;
                     currentRowEyeX = tier.SpectatorParameters.SEyeX;
@@ -287,27 +287,36 @@ namespace StadiumTools
                     nextRowWidth += tier.SuperRiser.GuardrailWidth;
                     currentRowEyeX = tier.SuperRiser.EyeX;
                     currentRowEyeY = tier.SuperRiser.EyeY;
-                    n += 0.25;
+                    nextRiser += 0.25 * tier.SpectatorParameters.Unit;
                 }
             }
 
             double t = (nextRowWidth + currentRowEyeX) - nextRowEyeX;
-            double c = tier.SpectatorParameters.TargetCValue;
+            double targetCVal = ((double)tier.SpectatorParameters.TargetCValue / 1000) * tier.SpectatorParameters.Unit;
             double h = ptB.Y + currentRowEyeY;
             double d = (ptB.X - currentRowEyeX) + t;
 
             //Function of N, Triangle Proportionality Theroum 
-            double r = ((c + h) / (d - t)) * (d);
-            n += (r - nextRowEyeY - ptB.Y);
+            double r = ((targetCVal + h) / (d - t)) * (d);
+            nextRiser += (r - nextRowEyeY - ptB.Y);
 
             if (currentRow + 1 != tier.SuperRiser.Row && currentRow != tier.SuperRiser.Row)
             {
                 double nMax = (Tan(tier.MaxRakeAngle) * t);
-                n = n > nMax ? nMax : n;
+                nextRiser = nextRiser > nMax ? nMax : nextRiser;
             }
 
-            double nR = n;
-            return nR;
+            double nRoundedUp = nextRiser;
+
+            //round riser height up to next increment
+            if (tier.RoundTo > 0.0)
+            {
+                double dividend = nextRiser / tier.RoundTo;
+                int y = (int)Math.Ceiling(dividend);
+                nRoundedUp = y * tier.RoundTo;
+            }
+
+            return nRoundedUp;
         }
 
         /// <summary>
@@ -439,19 +448,17 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// create a deep copy of a section
+        /// create a deep copy clone of a section
         /// </summary>
         /// <returns></returns>
         public object Clone()
         {
-            Section sectionClone = new Section
+            //Deep copy
+            Section clone = (Section)this.MemberwiseClone();
             {
-                IsValid = IsValid,
-                POF = POF,
-                Tiers = Tiers,
-                Plane = Plane,
-            };
-            return sectionClone;
+                clone.Tiers = Tier.CloneArray(this.Tiers);
+            }
+            return clone;
         }
 
     }

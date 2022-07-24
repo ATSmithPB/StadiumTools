@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace StadiumTools
 {
     /// <summary>
     /// Represents a point in 2D space (x,y)
     /// </summary>
-    public struct Pt2d
+    public struct Pt2d : ICloneable
     {
         //Properties
         /// <summary>
@@ -39,12 +40,25 @@ namespace StadiumTools
             this.Y = y;
         }
 
-
         //Methods
         public Pt3d ToPt3d(Pln3d pln)
         {
             Pt3d pt3d = Pt3d.LocalCoordinates(this, pln);
             return pt3d;
         }
+
+        public static Pt2d[] CloneArray(Pt2d[] pts)
+        {
+            //Shallow copy
+            Pt2d[] ptsCloned = (Pt2d[]) pts.Clone();
+            return ptsCloned;
+        }
+        
+        public object Clone()
+        {
+            //Shallow copy
+            return (Pt2d)this.MemberwiseClone();
+        }
+
     }
 }

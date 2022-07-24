@@ -107,11 +107,11 @@ namespace StadiumTools
         /// <summary>
         /// Initializes a tier 2d instance with default values
         /// </summary>
-        public static void InitDefault(Tier tier)
+        public static void InitDefault(Tier tier, double unit)
         {
             //Instance a default spectator
             Spectator defaultSpectatorParameters = new Spectator();
-            Spectator.InitDefault(defaultSpectatorParameters);
+            Spectator.InitDefault(defaultSpectatorParameters, unit);
             tier.SpectatorParameters = defaultSpectatorParameters;
 
             //Instance a default SuperRiser
@@ -177,37 +177,33 @@ namespace StadiumTools
             return tierPtCount;
         }
 
+        public static Tier[] CloneArray(Tier[] tiers)
+        {
+            //Deep copy
+            Tier[] tiersCloned = new Tier[tiers.Length];
+            for (int i = 0; i < tiers.Length;)
+            {
+                tiersCloned[i] = (Tier)tiers[i].Clone();
+            }
+            return tiersCloned;
+        }
+
         /// <summary>
-        /// create a deep copy of a tier
+        /// create a deep copy clone of a tier
         /// </summary>
         /// <returns></returns>
         public object Clone()
         {
-            Tier tierClone = new Tier
+            //Deep Copy
+            Tier clone = (Tier)this.MemberwiseClone();
             {
-                IsValid = IsValid,
-                Plane = Plane,
-                SuperRiser = SuperRiser,
-                SuperHas = SuperHas,
-                Vomatory = Vomatory,
-                VomHas = VomHas,
-                BuildFromPreviousTier = BuildFromPreviousTier,
-                StartPt = StartPt,
-                SectionIndex = SectionIndex,
-                PlanIndex = PlanIndex,
-                StartX = StartX,
-                StartY = StartY,
-                RowCount = RowCount,
-                DefaultRowWidth = DefaultRowWidth,
-                RowWidths = RowWidths,
-                RiserHeights = RiserHeights,
-                RoundTo = RoundTo,
-                MaxRakeAngle = MaxRakeAngle,
-                Spectators = Spectators,
-                Points2dCount = Points2dCount,
-                Points2d = Points2d,
-            };
-            return tierClone;
+                clone.SpectatorParameters = (Spectator)this.SpectatorParameters.Clone();
+                clone.RowWidths = (double[])this.RowWidths.Clone();
+                clone.RiserHeights = (double[])this.RiserHeights.Clone();
+                clone.Spectators = (Spectator[])this.Spectators.Clone();
+                clone.Points2d = (Pt2d[])this.Points2d.Clone();
+            }
+            return clone;
         }
     
     }
