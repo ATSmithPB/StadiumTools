@@ -54,7 +54,7 @@ namespace StadiumTools
         /// <summary>
         /// Pt2d representing the location of the P.O.F (Point of focus). Inherited from section.
         /// </summary>
-        public Pt2d POF { get; set; }
+        public Pt2d POF { get; set; } = Pt2d.Origin;
         /// <summary>
         /// Pt2d representing the eyes of the spectator in front (for determing C-Value)
         /// </summary>
@@ -100,7 +100,6 @@ namespace StadiumTools
         /// <param name="rowN"></param>
         /// <param name="pt"></param>
         /// <param name="ptSt"></param>
-        /// <param name="pof"></param>
         /// <param name="sLine"></param>
         /// <param name="sLineSt"></param>
         /// <param name="forwardSpec"></param>
@@ -110,7 +109,6 @@ namespace StadiumTools
             int rowN, 
             Pt2d pt, 
             Pt2d ptSt, 
-            Pt2d pof, 
             Vec2d sLine, 
             Vec2d sLineSt, 
             Pt2d forwardSpec, 
@@ -122,7 +120,6 @@ namespace StadiumTools
             this.RowIndex = rowN;
             this.Loc2d = pt;
             this.Loc2dStanding = ptSt;
-            this.POF = pof;
             this.SightLine = sLine;
             this.SightLineStanding = sLineSt;
             this.ForwardSpectatorLoc2d = forwardSpec;

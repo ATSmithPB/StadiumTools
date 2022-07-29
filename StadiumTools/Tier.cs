@@ -11,6 +11,10 @@ namespace StadiumTools
         //Properties
         public bool IsValid { get; set; } = true;
         /// <summary>
+        /// True if the tier has been calculated within a section.
+        /// </summary>
+        public bool inSection { get; set; } = false;
+        /// <summary>
         /// The 3d plane of this tier, where (0,0,0) is also the Point of Focus.
         /// </summary>
         public Pln3d Plane { get; set; }

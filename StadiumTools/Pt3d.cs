@@ -83,18 +83,10 @@ namespace StadiumTools
             return new Pt3d(projX, projY, projZ);
         }
 
-        //Returns the point pt in local coordinates of the coordinate system parameter
-        public static Pt3d LocalCoordinates(Pt2d pt2d, Pln3d coordSystem)
-        {
-            Pt3d pt = new Pt3d(pt2d, 0.0);
-            Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
-            double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
-            double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
-            double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
-
-            return new Pt3d(projX, projY, projZ);
-        }
-
+        /// <summary>
+        /// clones a Pt3d (shallow copy)
+        /// </summary>
+        /// <returns></returns>
         public object Clone()
         {
             //Shallow copy

@@ -131,6 +131,7 @@ namespace StadiumTools
                 currentTier.StartPt = lastPt;
             }
             CalcRowPoints(currentTier);
+            currentTier.inSection = true;
         }
 
         /// <summary>
@@ -197,7 +198,7 @@ namespace StadiumTools
                         tier.Points2d[p] = currentPt;
                         p++;
 
-                        currentPt.Y -= 0.25;
+                        currentPt.Y -= 0.5 * tier.SpectatorParameters.Unit;
                         tier.Points2d[p] = currentPt;
                         p++;
                     }
@@ -233,11 +234,10 @@ namespace StadiumTools
             }
 
             Pln3d plane = tier.Plane;
-            Pt2d pointOfFocus = tier.Plane.OriginPt.ToPt2d();
             Pt2d specPt = new Pt2d(ptB.X - eyeX, ptB.Y + eyeY);
             Pt2d specPtSt = new Pt2d(ptB.X - eyeXStanding, ptB.Y + eyeYStanding);
-            Vec2d sLine = new Vec2d(specPt, pointOfFocus);
-            Vec2d sLineSt = new Vec2d(specPtSt, pointOfFocus);
+            Vec2d sLine = new Vec2d(specPt, Pt2d.Origin);
+            Vec2d sLineSt = new Vec2d(specPtSt, Pt2d.Origin);
             Pt2d forwardSpec;
 
             if (row == 0)
@@ -249,7 +249,7 @@ namespace StadiumTools
                 forwardSpec = tier.Spectators[row - 1].Loc2d;
             }
 
-            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, pointOfFocus, sLine, sLineSt, forwardSpec, plane);
+            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, sLine, sLineSt, forwardSpec, plane);
             tier.Spectators[row] = spectator;
         }
 
@@ -287,7 +287,7 @@ namespace StadiumTools
                     nextRowWidth += tier.SuperRiser.GuardrailWidth;
                     currentRowEyeX = tier.SuperRiser.EyeX;
                     currentRowEyeY = tier.SuperRiser.EyeY;
-                    nextRiser += 0.25 * tier.SpectatorParameters.Unit;
+                    nextRiser += 0.5 * tier.SpectatorParameters.Unit;
                 }
             }
 
