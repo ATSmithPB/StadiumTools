@@ -15,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
         public ST_DeonstructVomatory()
-            : base(nameof(ST_DeonstructVomatory), "dV", "Deonstruct a Vomatory into its parameters", "StadiumTools", "BowlTools")
+            : base(nameof(ST_DeonstructVomatory), "dV", "Deonstruct a Vomatory into its parameters", "StadiumTools", "2D Section")
         {
         }
 

@@ -15,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
         public ST_ConstructSpectator()
-            : base(nameof(ST_ConstructSpectator), "cSp", "Construct a Spectator from parameters", "StadiumTools", "BowlTools")
+            : base(nameof(ST_ConstructSpectator), "cSp", "Construct a Spectator from parameters", "StadiumTools", "2D Section")
         {
         }
 
@@ -31,9 +31,9 @@ namespace GHA_StadiumTools
             pManager.AddIntegerParameter("Target C-Value", "C", "Target spectator C-value in millimeters", GH_ParamAccess.item, defaultSpectator.TargetCValue);
             pManager.AddNumberParameter("Eye Horizontal", "eX", "Horizontal distance of spectator eyes from rear riser", GH_ParamAccess.item, defaultSpectator.EyeX);
             pManager.AddNumberParameter("Eye Verical", "eY", "Vertical distance of spectator eyes from floor", GH_ParamAccess.item, defaultSpectator.EyeY);
-            pManager.AddNumberParameter("Standing Eye Horizontal", "SteX", "Eye Horizontal for standing spectators", GH_ParamAccess.item, defaultSpectator.SEyeX);
-            pManager.AddNumberParameter("Standing Eye Vertical", "SteY", "Eye Vertical for standing spectators", GH_ParamAccess.item, defaultSpectator.SEyeY);
-            pManager.AddIntegerParameter("Units Override", "dU", "0 = Document Unit. 1 = mm. 2 = cm. 3 = m. 4 = in. 5 = ft. 6 = yrd", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("Standing Eye Horizontal", "SteX", "Optional Eye Horizontal for standing spectators", GH_ParamAccess.item, defaultSpectator.SEyeX);
+            pManager.AddNumberParameter("Standing Eye Vertical", "SteY", "Optional Eye Vertical for standing spectators", GH_ParamAccess.item, defaultSpectator.SEyeY);
+            pManager.AddIntegerParameter("Unit Override [in development]", "dU", "0 = Document Unit. 1 = mm. 2 = cm. 3 = m. 4 = in. 5 = ft. 6 = yrd", GH_ParamAccess.item, 0);
         }
 
         //Set parameter indixes to names (for readability)

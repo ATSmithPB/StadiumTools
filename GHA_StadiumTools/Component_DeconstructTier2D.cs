@@ -17,7 +17,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
         public ST_DeconstructTier()
-            : base(nameof(ST_DeconstructTier), "dT", "Deconstruct a Tier into it's respective data and geometry", "StadiumTools", "BowlTools")
+            : base(nameof(ST_DeconstructTier), "dT", "Deconstruct a Tier into it's respective data and geometry", "StadiumTools", "2D Section")
         {
         }
 
@@ -26,7 +26,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Tier", "T", "A Tier object to deconstruct", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Tier2D", "T", "A Tier object to deconstruct", GH_ParamAccess.item);
 
         }
 
@@ -46,10 +46,10 @@ namespace GHA_StadiumTools
         {
             pManager.AddGenericParameter("Spectators", "Sp", "The spectators objects seated in this tier", GH_ParamAccess.list);
             pManager.AddPointParameter("Points", "pts", "The points representing the top surface of the tier", GH_ParamAccess.list);
-            pManager.AddCurveParameter("Profile", "P", "a Polyline representing the top surface of the tier", GH_ParamAccess.item);
-            pManager.AddPlaneParameter("Plane", "P", "The reference plane of this tier (0,0 is the Point of Focus)", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Profile", "Pr", "a Polyline representing the top surface of the tier", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("Plane", "Pl", "The reference plane of this tier (0,0 is the Point of Focus)", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Section Index", "Si", "The index of this tier within its host section", GH_ParamAccess.item);
-            pManager.AddTextParameter("Debug", "d", "Text to help debug", GH_ParamAccess.list);
+            pManager.AddTextParameter("Pt2d", "2d", "String representation of Pt2d objects of the tier (for debugging)", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -59,6 +59,7 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            ST_DeconstructTier.HandleErrors(DA, this);
             ST_DeconstructTier.DeconstructTierFromDA(DA);
         }
 
@@ -131,6 +132,21 @@ namespace GHA_StadiumTools
             DA.SetDataList(OUT_Debug, stringList);
         }
 
-
+        /// <summary>
+        /// handles some possible invalid input values
+        /// </summary>
+        /// <param name="DA"></param>
+        /// <param name="thisComponent"></param>
+        private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
+        {
+            StadiumTools.TierGoo tierGooItem = new StadiumTools.TierGoo();
+            if (DA.GetData<StadiumTools.TierGoo>(IN_Tier, ref tierGooItem))
+            {
+                if (tierGooItem.Value.inSection == false)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Tier must be passed through a ConstructSection2D component before being deconstructed");
+                }
+            }
+        }
     }
 }

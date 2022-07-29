@@ -17,7 +17,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
         public ST_DeconstructSection2D()
-            : base(nameof(ST_DeconstructSection2D), "dS", "Deconstruct a 2D section into it's respective data and geometry", "StadiumTools", "BowlTools")
+            : base(nameof(ST_DeconstructSection2D), "dS", "Deconstruct a 2D section into it's respective data and geometry", "StadiumTools", "2D Section")
         {
         }
 
@@ -26,7 +26,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Section", "S", "A Section object to deconstruct", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Section2D", "S", "A Section object to deconstruct", GH_ParamAccess.item);
         }
 
         //Set parameter indixes to names (for readability)
@@ -39,7 +39,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Tiers", "T", "Section Tiers", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Tier2D", "T", "Section Tiers", GH_ParamAccess.list);
             pManager.AddPlaneParameter("Section Plane", "PlOF", "Plane of Section where 0,0 is Point of Focus", GH_ParamAccess.item);
         }
 

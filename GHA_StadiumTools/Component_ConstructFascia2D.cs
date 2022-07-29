@@ -9,13 +9,13 @@ namespace GHA_StadiumTools
     /// <summary>
     /// Create a custom GH component called ST_ConstructSuperRiser using the GH_Component as base. 
     /// </summary>
-    public class ST_ConstructVomatory : GH_Component
+    public class ST_ConstructFascia : GH_Component
     {
         /// <summary>
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
-        public ST_ConstructVomatory()
-            : base(nameof(ST_ConstructVomatory), "cV", "Construct a Vomatory from parameters", "StadiumTools", "2D Section")
+        public ST_ConstructFascia()
+            : base(nameof(ST_ConstructFascia), "cV", "Construct a Vomatory from parameters", "StadiumTools", "2D Section")
         {
         }
 
@@ -24,24 +24,22 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            StadiumTools.Vomatory defaultVomatory = new StadiumTools.Vomatory();
-            StadiumTools.Vomatory.InitDefault(defaultVomatory);
-            pManager.AddIntegerParameter("Start Row", "sR", "Start Row to replace with vomatory", GH_ParamAccess.item, defaultVomatory.Start);
-            pManager.AddIntegerParameter("Height (Rows)", "H", "Height of vomatory in number of rows(+ risers)", GH_ParamAccess.item, defaultVomatory.Height);
-            
+            pManager.AddCurveParameter("Polyline", "PL","A polyline that represents the 2D fascia you would like to add", GH_ParamAccess.item, defaultVomatory.Start);
+            pManager.AddPlaneParameter("Plane", "Pl", "The plane of the polyline. Plane origin will be attachment point to tier", GH_ParamAccess.item, defaultVomatory.Height);
+
         }
 
         //Set parameter indixes to names (for readability)
-        private static int IN_Start_Row = 0;
-        private static int IN_Height = 1;
-        private static int OUT_Vomatory = 0;
+        private static int IN_Polyline = 0;
+        private static int IN_Plane = 1;
+        private static int OUT_Fascia = 0;
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Vomatory", "V", "A Vomatory object", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Fascia", "F", "A Fascia object", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,9 +49,7 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            StadiumTools.Vomatory newVomatory = new StadiumTools.Vomatory();
-            ST_ConstructVomatory.ConstructVomatoryFromDA(DA, newVomatory);
-            DA.SetData(OUT_Vomatory, newVomatory);
+            ST_ConstructFascia.ConstructFasciaFromDA(DA);
         }
 
         /// <summary>
@@ -69,21 +65,26 @@ namespace GHA_StadiumTools
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("1f72f1d3-d687-4b4c-ab5f-fc7cdbc21500");
+        public override Guid ComponentGuid => new Guid("580a5fe9-5ef7-46e6-acfb-aa15b9f4efbc");
 
         //Methods
-        private static void ConstructVomatoryFromDA(IGH_DataAccess DA, StadiumTools.Vomatory vomatory)
+        private static void ConstructFasciaFromDA(IGH_DataAccess DA)
         {
+            StadiumTools.Fascia newFascia = new StadiumTools.Fascia();
+
             //Item Containers (Destinations)
-            int intItem = 0;
+            
+            Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
+            Rhino.Geometry.Polyline polyItem = new Rhino.Geometry.Polyline();
 
             //Set Start
-            if (!DA.GetData<int>(IN_Start_Row, ref intItem))
+            if (!DA.GetData<Rhino.Geometry.Polyline>(IN_Polyline, ref polyItem))
                 return;
-            vomatory.Start = intItem;
+            StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyItem.Count];
+             = StadiumTools.IO.Pt2dFromPolyline(polyItem);
 
             //Set Width
-            if (!DA.GetData<int>(IN_Height, ref intItem))
+            if (!DA.GetData<int>(IN_Plane, ref intItem))
                 return;
             vomatory.Height = intItem;
         }

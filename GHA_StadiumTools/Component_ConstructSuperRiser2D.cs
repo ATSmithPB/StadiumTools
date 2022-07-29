@@ -15,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
         public ST_ConstructSuperRiser2D()
-            : base(nameof(ST_ConstructSuperRiser2D), "cS", "Construct a SuperRiser from parameters", "StadiumTools", "BowlTools")
+            : base(nameof(ST_ConstructSuperRiser2D), "cS", "Construct a SuperRiser from parameters", "StadiumTools", "2D Section")
         {
         }
 
@@ -30,9 +30,9 @@ namespace GHA_StadiumTools
             pManager.AddGenericParameter("Spectator", "Sp", "Spectator object to inerit parameters from", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Row", "R", "Row to replace with super riser", GH_ParamAccess.item, 10);
             pManager.AddIntegerParameter("Width", "sW", "Width of SuperRiser as a multiple of the default tier row width", GH_ParamAccess.item, 3);
-            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
-            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
-            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.01 * defaultSpectator.Unit);
+            pManager.AddNumberParameter("Curb Width", "scX", "Optional width of curb before super riser", GH_ParamAccess.item, 0.1 * defaultSpectator.Unit);
+            pManager.AddNumberParameter("Curb Height", "ScY", "Optional height of curb before super riser", GH_ParamAccess.item, 0.1 * defaultSpectator.Unit);
+            pManager.AddNumberParameter("Guardrail Width", "gW", "Width of guardrail behind SuperRiser", GH_ParamAccess.item, 0.1 * defaultSpectator.Unit);
         }
 
         //Set parameter indixes to names (for readability)
@@ -90,7 +90,14 @@ namespace GHA_StadiumTools
             {
                 if (intItem < 1)
                 {
-                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Row must be non-negative and not equal to 0");
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Row must be an integer, non-negative, and not equal to 0");
+                }
+            }
+            if (DA.GetData<int>(IN_Width, ref intItem))
+            {
+                if (intItem < 1)
+                {
+                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Width must be an integer, non-negative, and not equal to 0");
                 }
             }
             //Guardrail Width must be > 0
@@ -116,10 +123,10 @@ namespace GHA_StadiumTools
             StadiumTools.Spectator spectatorItem = spectatorGooItem.Value;
             double unit;
             superRiser.Unit = unit = spectatorItem.Unit;
-            superRiser.EyeX = spectatorItem.EyeX * unit;
-            superRiser.EyeY = spectatorItem.EyeY * unit;
-            superRiser.SEyeX = spectatorItem.SEyeX * unit;
-            superRiser.SEyeY = spectatorItem.EyeX * unit;
+            superRiser.EyeX = spectatorItem.EyeX;
+            superRiser.EyeY = spectatorItem.EyeY;
+            superRiser.SEyeX = spectatorItem.SEyeX;
+            superRiser.SEyeY = spectatorItem.SEyeY;
 
             //Set SuperRow
             if (!DA.GetData<int>(IN_Row, ref intItem))

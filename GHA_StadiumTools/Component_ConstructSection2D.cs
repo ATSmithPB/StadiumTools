@@ -17,7 +17,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
         public ST_ConstructSection2D()
-            : base(nameof(ST_ConstructSection2D), "cS", "Construct a 2D section from multiple tiers", "StadiumTools", "BowlTools")
+            : base(nameof(ST_ConstructSection2D), "cS", "Construct a 2D section from multiple tiers", "StadiumTools", "2D Section")
         {
         }
 
@@ -26,8 +26,8 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Tiers", "T", "Seating Tiers that comprise a section", GH_ParamAccess.list);
-            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldYZ);
+            pManager.AddGenericParameter("Tier2D", "T", "2D Seating Tiers that comprise a section", GH_ParamAccess.list);
+            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
         }
 
         //Set parameter indixes to names (for readability)

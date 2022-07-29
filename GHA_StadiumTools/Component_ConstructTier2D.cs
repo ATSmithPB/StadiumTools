@@ -15,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new 2D thisNewTier. 
         /// </summary>
         public ST_ConstructTier2D()
-            : base(nameof(ST_ConstructTier2D), "cT", "Construct a 2D seating thisNewTier from parameters", "StadiumTools", "BowlTools")
+            : base(nameof(ST_ConstructTier2D), "cT", "Construct a 2D seating thisNewTier from parameters", "StadiumTools", "2D Section")
         {
         }
 
@@ -53,13 +53,15 @@ namespace GHA_StadiumTools
         private static int IN_SuperRiser = 8;
         private static int IN_Vomatory = 9;
         private static int OUT_Tier = 0;
+        private static int OUT_Stats = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Tier", "T", "A Tier object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Tier2D", "T", "A Tier object", GH_ParamAccess.item);
+            pManager.AddTextParameter("SuperRiser Stats", "SS", "debughelp", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -191,28 +193,29 @@ namespace GHA_StadiumTools
             if (!DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem)) { return; }
             tier.MaxRakeAngle = doubleItem;
 
+            //Construct super riser if a SuperRiser object is input
             DA.GetData(IN_SuperRiser, ref superItem);
-            tier.SuperRiser = superItem;
-
-            DA.GetData(IN_Vomatory, ref vomItem);
-            tier.Vomatory = vomItem;
-
-            if (tier.SuperRiser.Row > 0)
+            if (superItem.Row > 0)
             {
                 tier.SuperHas = true;
-            }
-
-            if (tier.SuperHas)
-            {
+                superItem.EyeX += tier.DefaultRowWidth * (superItem.Width - 1);
+                superItem.SEyeX += tier.DefaultRowWidth * (superItem.Width - 1);
+                tier.SuperRiser = (StadiumTools.SuperRiser)superItem.Clone();
                 rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
             }
 
+            //Construct vomatory if a Vomatory object is input
+            DA.GetData(IN_Vomatory, ref vomItem);
+            tier.Vomatory = vomItem;
+
             //Set Remaining parameters
-            tier.Plane = StadiumTools.Pln3d.XYPlane;
             tier.RowWidths = rowWidths; 
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
+
+            string stats = $"EyeX: {tier.SuperRiser.EyeX},SEyeX: {tier.SuperRiser.SEyeX},EyeY: {tier.SuperRiser.EyeY}, SEyeY: {tier.SuperRiser.SEyeY}";
+            DA.SetData(OUT_Stats, stats);
         }
     }
 }

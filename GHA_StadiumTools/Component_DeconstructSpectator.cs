@@ -17,7 +17,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
         public ST_DeconstructSpectator()
-            : base(nameof(ST_DeconstructSpectator), "dSp", "Deconstruct a Spectator into it's respective data and geometry", "StadiumTools", "BowlTools")
+            : base(nameof(ST_DeconstructSpectator), "dSp", "Deconstruct a Spectator into it's respective data and geometry", "StadiumTools", "2D Section")
         {
         }
 
