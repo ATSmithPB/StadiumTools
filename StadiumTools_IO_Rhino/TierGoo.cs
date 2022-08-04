@@ -49,7 +49,7 @@ namespace StadiumTools
             if (Value == null)
                 return "Null Tier";
             else
-                return $"StadiumTools Tier: R:{this.Value.RowCount} X:{this.Value.StartX} Y:{this.Value.StartY} EyeX: {this.Value.SpectatorParameters.EyeX}";
+                return $"Tier: R:{this.Value.RowCount} X:{this.Value.StartX} Y:{this.Value.StartY}";
         }
         public override string TypeName
         {
@@ -59,6 +59,28 @@ namespace StadiumTools
         {
             get { return ("Defines a single StadiumTools Tier"); }
         }
+
+        /// <summary>
+        /// Method to deep copy a list of TierGoo objects to an array of Tier objects.
+        /// </summary>
+        /// <param name="tierList"></param>
+        /// <returns></returns>
+        public static StadiumTools.Tier[] CloneListToArray(List<StadiumTools.TierGoo> tierGooList)
+        {
+            StadiumTools.Tier[] tierArray = new StadiumTools.Tier[tierGooList.Count];
+            for (int i = 0; i < tierGooList.Count; i++)
+            {
+                //Unwrap the TierGoo,
+                StadiumTools.Tier currentTier = tierGooList[i].Value;
+                //Clone the unwrapped Tier
+                object clone = currentTier.Clone();
+                //add it to the array
+                tierArray[i] = (StadiumTools.Tier)clone;
+            }
+            return tierArray;
+        }
+
+       
     }
     
 }

@@ -50,7 +50,7 @@ namespace StadiumTools
             if (Value == null)
                 return "Null Section";
             else
-                return "This is a StadiumTools Section";
+                return $"Section: T:{Value.Tiers.Length}";
         }
         public override string TypeName
         {

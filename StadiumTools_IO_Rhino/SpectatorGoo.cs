@@ -51,7 +51,7 @@ namespace StadiumTools
             if (Value == null)
                 return "Null Spectator";
             else
-                return $"StadiumTools Spectator: T: {Value.TargetCValue} C: {Value.Cvalue} X:{Value.EyeX} Y:{Value.EyeY} R: {Value.RowIndex}";
+                return $"Spectator: U:{Value.Unit} tC:{Value.TargetCValue} C:{System.Math.Round(Value.Cvalue, 2)} STR:[{Value.SectionIndex},{Value.TierIndex},{Value.RowIndex}] ";
         }
         public override string TypeName
         {

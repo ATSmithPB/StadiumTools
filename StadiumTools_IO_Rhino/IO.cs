@@ -25,6 +25,16 @@ namespace StadiumTools
             return pt;
         }
 
+        public static Pt2d[] Pt2dFromPolyline(Polyline polyline)
+        {
+            Pt2d[] pts = new Pt2d[polyline.Count];
+            for (int i = 0; i < pts.Length; i++)
+            {
+                pts[i] = Pt2dFromPoint3d(polyline[i]);
+            }
+            return pts;
+        }
+
         /// <summary>
         /// Returns a Pln3d object from a Rhino Plane
         /// </summary>
@@ -79,7 +89,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Returns a Point3d from a Pt3d object
+        /// Returns a Point3d from a given Pt3d object
         /// </summary>
         /// <param name="pt3d"></param>
         /// <returns></returns>
@@ -87,6 +97,32 @@ namespace StadiumTools
         {
             Point3d point3d = new Point3d(pt3d.X, pt3d.Y, pt3d.Z);
             return point3d;
+        }
+
+        /// <summary>
+        /// Returns a Point3d from a given Pt2d object
+        /// </summary>
+        /// <param name="pt3d"></param>
+        /// <returns>Point3d</returns>
+        public static Point3d Point3dFromPt2d(Pt2d pt2d)
+        {
+            Point3d point3d = new Point3d(pt2d.X, pt2d.Y, 0.0);
+            return point3d;
+        }
+
+        /// <summary>
+        /// Returns an array of Point3d objects from a list of Pt2d
+        /// </summary>
+        /// <param name="pts2d"></param>
+        /// <returns>Point3d[]</returns>
+        public static Point3d[] Point3dFromPt2d(Pt2d[] pts2d)
+        {
+            Point3d[] points3d = new Point3d[pts2d.Length]; 
+            for (int i = 0; i < pts2d.Length; i++)
+            {
+                points3d[i] = new Point3d(pts2d[i].X, pts2d[i].Y, 0.0);
+            }
+            return points3d;
         }
 
         /// <summary>
