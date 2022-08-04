@@ -37,11 +37,13 @@ namespace GHA_StadiumTools
             pManager.AddNumberParameter("Maximum Rake Angle", "mrA", "Maximum rake angle in Radians (Tan(riser/row))", GH_ParamAccess.item, defaultTier.MaxRakeAngle);
             pManager.AddGenericParameter("SuperRiser", "SR", "An optional SuperRiser object to inherit parameters from", GH_ParamAccess.item);
             pManager.AddGenericParameter("Vomatory", "V", "An optional Vomatory object to inherit parameters from", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Fascia", "F", "An optional Fascia object to apply to the beginning of the tier", GH_ParamAccess.item);
             pManager[8].Optional = true;
             pManager[9].Optional = true;
+            pManager[10].Optional = true;
         }
 
-        //Set parameter indixes to names (for readability)
+        //Set parameter indixes to names  (for readability)
         private static int IN_Spectator = 0;
         private static int IN_Start_X = 1;
         private static int IN_Start_Y = 2;
@@ -52,8 +54,8 @@ namespace GHA_StadiumTools
         private static int IN_Maximum_Rake_Angle = 7;
         private static int IN_SuperRiser = 8;
         private static int IN_Vomatory = 9;
+        private static int IN_Fascia = 10;
         private static int OUT_Tier = 0;
-        private static int OUT_Stats = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -61,7 +63,6 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Tier2D", "T", "A Tier object", GH_ParamAccess.item);
-            pManager.AddTextParameter("SuperRiser Stats", "SS", "debughelp", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -155,11 +156,13 @@ namespace GHA_StadiumTools
             StadiumTools.SpectatorGoo spectatorGooItem = new StadiumTools.SpectatorGoo();
             StadiumTools.SuperRiser superItem = new StadiumTools.SuperRiser();
             StadiumTools.Vomatory vomItem = new StadiumTools.Vomatory();
+            StadiumTools.Fascia fasciaItem = new StadiumTools.Fascia();
             int intItem = 0;
             bool boolItem = false;
             double doubleItem = 0.0;
             double[] doubleArrayItem = new double[0];
 
+            //Get & Set Tier parameters
             if(!DA.GetData(IN_Spectator, ref spectatorGooItem)) { return; }   
             tier.SpectatorParameters = spectatorGooItem.Value;
 
@@ -179,8 +182,14 @@ namespace GHA_StadiumTools
 
             if (!DA.GetData(IN_Row_Width, ref doubleItem)) { return; }
             tier.DefaultRowWidth = doubleItem;
-            
-            //Set all row widths to default value
+
+            if (DA.GetData(IN_Fascia, ref fasciaItem))
+            {
+                tier.FasciaHas = true;
+                tier.Fascia = fasciaItem;
+            }
+
+            //Initialize an array with all default row widths 
             double[] rowWidths = new double[tier.RowCount];
             for (int i = 0; i < rowWidths.Length; i++)
             {
@@ -193,7 +202,7 @@ namespace GHA_StadiumTools
             if (!DA.GetData(IN_Maximum_Rake_Angle, ref doubleItem)) { return; }
             tier.MaxRakeAngle = doubleItem;
 
-            //Construct super riser if a SuperRiser object is input
+            //Set SuperRiser properties if SuperRiser object is input
             DA.GetData(IN_SuperRiser, ref superItem);
             if (superItem.Row > 0)
             {
@@ -204,18 +213,17 @@ namespace GHA_StadiumTools
                 rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
             }
 
-            //Construct vomatory if a Vomatory object is input
+            //Set Vomatory property if input
             DA.GetData(IN_Vomatory, ref vomItem);
             tier.Vomatory = vomItem;
 
-            //Set Remaining parameters
+            //Set Fascia property if input
+
+            //Set Remaining properties
             tier.RowWidths = rowWidths; 
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
-
-            string stats = $"EyeX: {tier.SuperRiser.EyeX},SEyeX: {tier.SuperRiser.SEyeX},EyeY: {tier.SuperRiser.EyeY}, SEyeY: {tier.SuperRiser.SEyeY}";
-            DA.SetData(OUT_Stats, stats);
         }
     }
 }

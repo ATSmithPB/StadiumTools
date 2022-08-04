@@ -27,7 +27,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Tier2D", "T", "2D Seating Tiers that comprise a section", GH_ParamAccess.list);
-            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
+            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldZX);
         }
 
         //Set parameter indixes to names (for readability)
@@ -51,7 +51,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Construct a new section from Data Access
-            StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA);
+            StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA, this);
 
             //GH_Goo<T> wrapper
             StadiumTools.SectionGoo newSectionGoo = new StadiumTools.SectionGoo(newSection);
@@ -75,10 +75,10 @@ namespace GHA_StadiumTools
         /// </summary>
         public override Guid ComponentGuid => new Guid("fe579af2-ac4c-4829-b108-b41fc2a4c322");
 
-        //Methods
-        private static StadiumTools.Section ConstructSectionFromDA(IGH_DataAccess DA)
+        //Methods  
+        private static StadiumTools.Section ConstructSectionFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
-            //Item Containers
+            //Item Containers  
             Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
             List<StadiumTools.TierGoo> tierGooList = new List<StadiumTools.TierGoo>();
 
@@ -87,6 +87,10 @@ namespace GHA_StadiumTools
 
             //Retrieve Tier Array from TiersGoo List
             StadiumTools.Tier[] tierArray = StadiumTools.TierGoo.CloneListToArray(tierGooList);
+            if (tierArray.Length <= 0)
+            {
+                thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "tierArray is less than or equal to 0");
+            }
 
             //Get Plane3d
             DA.GetData<Rhino.Geometry.Plane>(IN_SectionPlane, ref planeItem);

@@ -15,7 +15,7 @@ namespace GHA_StadiumTools
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
         public ST_ConstructFascia()
-            : base(nameof(ST_ConstructFascia), "cV", "Construct a Vomatory from parameters", "StadiumTools", "2D Section")
+            : base(nameof(ST_ConstructFascia), "cV", "Construct a Tier Fascia from parameters", "StadiumTools", "2D Section")
         {
         }
 
@@ -24,9 +24,9 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("Polyline", "PL","A polyline that represents the 2D fascia you would like to add", GH_ParamAccess.item, defaultVomatory.Start);
-            pManager.AddPlaneParameter("Plane", "Pl", "The plane of the polyline. Plane origin will be attachment point to tier", GH_ParamAccess.item, defaultVomatory.Height);
-
+            pManager.AddCurveParameter("Polyline", "PL","A polyline that represents the 2D fascia you would like to add", GH_ParamAccess.item);
+            //pManager.AddPlaneParameter("Plane", "Pl", "The plane of the polyline. Plane origin will be attachment point to tier", GH_ParamAccess.item, defaultVomatory.Height);
+            pManager[0].Optional = true;
         }
 
         //Set parameter indixes to names (for readability)
@@ -40,6 +40,7 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Fascia", "F", "A Fascia object", GH_ParamAccess.item);
+            
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace GHA_StadiumTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructVomatory;
+        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructFascia;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
@@ -70,23 +71,28 @@ namespace GHA_StadiumTools
         //Methods
         private static void ConstructFasciaFromDA(IGH_DataAccess DA)
         {
-            StadiumTools.Fascia newFascia = new StadiumTools.Fascia();
+            //Initialize Default Polyline
+            double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
+            StadiumTools.Fascia defaultFascia = StadiumTools.Fascia.InitDefault(unit);
+            Rhino.Geometry.Point3d[] defaultPts = StadiumTools.IO.Point3dFromPt2d(defaultFascia.Points2d);
+            Rhino.Geometry.Polyline defaultPolyline = new Rhino.Geometry.Polyline(defaultPts);
 
             //Item Containers (Destinations)
-            
-            Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
             Rhino.Geometry.Polyline polyItem = new Rhino.Geometry.Polyline();
+            Rhino.Geometry.PolyCurve polyCrvItem = new Rhino.Geometry.PolyCurve();
 
-            //Set Start
-            if (!DA.GetData<Rhino.Geometry.Polyline>(IN_Polyline, ref polyItem))
-                return;
-            StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyItem.Count];
-             = StadiumTools.IO.Pt2dFromPolyline(polyItem);
-
-            //Set Width
-            if (!DA.GetData<int>(IN_Plane, ref intItem))
-                return;
-            vomatory.Height = intItem;
+            //Set Polyline
+            if (DA.GetData<Rhino.Geometry.Polyline>(IN_Polyline, ref polyItem))
+            {
+                StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyItem.Count];
+                pts = StadiumTools.IO.Pt2dFromPolyline(polyItem);
+                StadiumTools.Fascia newFascia = new StadiumTools.Fascia(pts, unit);
+                DA.SetData(OUT_Fascia, newFascia);
+            }
+            else
+            {
+                DA.SetData(OUT_Fascia, defaultFascia);
+            }
         }
 
     }

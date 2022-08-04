@@ -45,7 +45,7 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Spectators", "Sp", "The spectators objects seated in this tier", GH_ParamAccess.list);
-            pManager.AddPointParameter("Points", "pts", "The points representing the top surface of the tier", GH_ParamAccess.list);
+            pManager.AddPointParameter("Points", "pts", "The 3d points representing the top surface of the tier", GH_ParamAccess.list);
             pManager.AddCurveParameter("Profile", "Pr", "a Polyline representing the top surface of the tier", GH_ParamAccess.item);
             pManager.AddPlaneParameter("Plane", "Pl", "The reference plane of this tier (0,0 is the Point of Focus)", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Section Index", "Si", "The index of this tier within its host section", GH_ParamAccess.item);
