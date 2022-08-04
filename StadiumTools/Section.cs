@@ -143,8 +143,21 @@ namespace StadiumTools
             //Points increment
             int p = 0;
 
-            //Calc first tier point (PtA)
+            //Calc first tier  point (PtA)
             Pt2d prevPt = new Pt2d(tier.StartPt.X + tier.StartX, tier.StartPt.Y + tier.StartY);
+
+            //Add Fascia points if tier contains a Fascia parameter
+            if (tier.FasciaHas && tier.Fascia.Points2d.Length > 0)
+            {
+                int len = tier.Fascia.Points2d.Length - 1; //5   
+                for (int i = 0; i < len; i++)//runs 5 times
+                {
+                    tier.Points2d[p] = prevPt + tier.Fascia.Points2d[len - i]; //error
+                    p++;
+                }
+            }
+
+            //Add first (non-Fascia) point  to tier
             tier.Points2d[p] = prevPt;
             p++;
 
@@ -242,7 +255,16 @@ namespace StadiumTools
 
             if (row == 0)
             {
-                forwardSpec = tier.Points2d[0];
+                if (!tier.FasciaHas)
+                {
+                    forwardSpec = tier.Points2d[0];
+                }
+                else
+                {
+                    int len = tier.Fascia.Points2d.Length - 1;
+                    int b = tier.Fascia.Blocker;
+                    forwardSpec = tier.Points2d[len - b];
+                }
             }
             else
             {

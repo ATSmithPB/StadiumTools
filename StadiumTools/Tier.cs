@@ -39,6 +39,14 @@ namespace StadiumTools
         /// </summary>
         public bool VomHas { get; set; }
         /// <summary>
+        /// A Fascia object that defines an optional fascia/guardrail element at the beginning of each tier
+        /// </summary>
+        public Fascia Fascia { get; set; }
+        /// <summary>
+        /// True is tier contains a fascia
+        /// </summary>
+        public bool FasciaHas { get; set; }
+        /// <summary>
         /// True if tier reference point is the last point of the previous tier.
         /// </summary>
         public bool BuildFromPreviousTier { get; set; }
@@ -122,6 +130,9 @@ namespace StadiumTools
             SuperRiser defaultSuperRiserParameters = new SuperRiser();
             SuperRiser.InitDefault(defaultSuperRiserParameters);
 
+            //Instance a default Fascia
+            Fascia defaultFascia = Fascia.InitDefault(unit);
+
             tier.Plane = Pln3d.XYPlane;
             tier.BuildFromPreviousTier = true;
             tier.StartX = 5.0 * tier.SpectatorParameters.Unit;
@@ -149,6 +160,8 @@ namespace StadiumTools
             tier.RowWidths = rowWidths;
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.RoundTo = 0.001 * tier.SpectatorParameters.Unit;
+            tier.Fascia = defaultFascia;
+            tier.FasciaHas = true;
             tier.Points2dCount = GetTierPtCount(tier);
             tier.Points2d = new Pt2d[tier.Points2dCount];
             tier.MaxRakeAngle = .593412; //radians
@@ -177,6 +190,10 @@ namespace StadiumTools
                         tierPtCount += 1;
                     }
                 }
+            }
+            if (tier.FasciaHas)
+            {
+                tierPtCount += tier.Fascia.Points2d.Length - 1;
             }
             return tierPtCount;
         }

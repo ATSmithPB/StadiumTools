@@ -4,7 +4,7 @@ using System;
 namespace StadiumTools
 {
     /// <summary>
-    /// Represents a point in 2D space (x,y)
+    /// Represents pts point in 2D space (x,y)
     /// </summary>
     public struct Pt2d : ICloneable
     {
@@ -20,7 +20,7 @@ namespace StadiumTools
 
         //Constructors
         /// <summary>
-        /// Construct a Pt2d from an existing Pt2d object
+        /// Construct pts Pt2d from an existing Pt2d object
         /// </summary>
         /// <param name="pt"></param>
         public Pt2d(Pt2d pt)
@@ -30,7 +30,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Construct a Pt2d from its component coordinates
+        /// Construct pts Pt2d from its component coordinates
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -43,25 +43,23 @@ namespace StadiumTools
         //Delegate
         public static Pt2d Origin => new Pt2d(0.0, 0.0);
 
+        //Operator Override
+        public static Pt2d operator * (Pt2d a, double b)
+        {
+            return new Pt2d(a.X * b, a.Y * b);
+        }
+
+        public static Pt2d operator + (Pt2d a, Pt2d b)
+        {
+            return new Pt2d(a.X + b.X, a.Y + b.Y);
+        }
+
         //Methods
         public Pt3d ToPt3d(Pln3d pln)
         {
-            Pt3d pt3d = LocalCoordinates(this, pln);
+            Pt3d pt3d = Pt3d.PointOnPlane(pln, this);
             return pt3d;
         }
-
-        //Returns the point pt in local coordinates of the coordinate system parameter
-        public static Pt3d LocalCoordinates(Pt2d pt2d, Pln3d coordSystem)
-        {
-            Pt3d pt = new Pt3d(pt2d, 0.0);
-            Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
-            double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
-            double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
-            double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
-
-            return new Pt3d(projX, projY, projZ);
-        }
-
 
         public static Pt2d[] CloneArray(Pt2d[] pts)
         {
@@ -74,6 +72,16 @@ namespace StadiumTools
         {
             //Shallow copy
             return (Pt2d)this.MemberwiseClone();
+        }
+
+        public static Pt2d[] Scale(Pt2d[] pts, double factor)
+        {
+            Pt2d[] ptsScaled = new Pt2d[pts.Length];
+            for (int i = 0; i < pts.Length; i++)
+            {
+                ptsScaled[i] = pts[i] * factor;
+            }
+            return ptsScaled;
         }
 
     }

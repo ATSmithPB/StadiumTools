@@ -53,7 +53,7 @@
     <Compile Include="Spectator.cs" />
     <Compile Include="SuperRiser.cs" />
     <Compile Include="Tier.cs" />
-    <Compile Include="TierFascia.cs" />
+    <Compile Include="Fascia.cs" />
     <Compile Include="Transform3d.cs" />
     <Compile Include="UnitHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

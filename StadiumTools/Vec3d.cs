@@ -54,18 +54,31 @@ namespace StadiumTools
         public static Vec3d ZAxis => new Vec3d(0.0, 0.0, 1.0);
 
         //Operator Overloads
+        /// <summary>
+        /// * returns dot product
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static double operator * (Vec3d a, Vec3d b)
         {
             return DotProduct(a, b);
         }
 
+        public static Vec3d operator * (double f, Vec3d v)
+        {
+            v.Scale(f);
+            return v;
+        }
+
         public static Vec3d operator + (Vec3d a, Vec3d b)
         {
-            Vec3d result = new Vec3d();
-            result.X = a.X + b.X;
-            result.Y = a.Y + b.Y;
-            result.Z = a.Z + b.Z;
-            return result;
+            return Add(a, b);
+        }
+        
+        public static Vec3d operator - (Vec3d a, Vec3d b)
+        {
+            return Subtract(a, b);
         }
 
         //Methods
@@ -110,6 +123,29 @@ namespace StadiumTools
         }
 
         /// <summary>
+        /// Scale all components of a vector such that its magnitude is equal to 1
+        /// </summary>
+        private void Normalize()
+        {
+            this.X = this.X / this.M;
+            this.Y = this.Y / this.M;
+            this.Z = this.Z / this.M;
+            this.M = 1.0;
+        }
+
+        /// <summary>
+        /// Uniformly scale all three components of a vector
+        /// </summary>
+        /// <param name="f"></param>
+        public void Scale(double f)
+        {
+            this.X *= f;
+            this.Y *= f;
+            this.Z *= f;
+            this.M *= f;
+        }
+
+        /// <summary>
         /// Returns the numeric dot product of two vectors
         /// </summary>
         /// <param name="u"></param>
@@ -120,40 +156,31 @@ namespace StadiumTools
             return (u.X * v.X) + (u.Y * v.Y) + (u.Z * v.Z);
         }
 
-        
-        ///// <summary>
-        ///// Returns the vector vec in local components of the coordinate system parameter
-        ///// </summary>
-        ///// <param name="pt"></param>
-        ///// <param name="coordSystem"></param>
-        ///// <returns></returns>
-        //public static Pt3d LocalComponents(Vec3d vec, Pln3d coordSystem)
-        //{
-        //    Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
-        //    double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
-        //    double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
-        //    double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
+        /// <summary>
+        /// returns the sum of two vectors 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Vec3d Add(Vec3d a, Vec3d b)
+        {
+            Vec3d result = new Vec3d(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+            result.M = a.M + b.M;
+            return result;
+        }
 
-        //    return new Pt3d(projX, projY, projZ);
-        //}
-
-        ///// <summary>
-        ///// Returns the vector vec in local components of the coordinate system parameter
-        ///// </summary>
-        ///// <param name="pt2d"></param>
-        ///// <param name="coordSystem"></param>
-        ///// <returns></returns>
-        //public static Pt3d LocalComponents(Vec2d vec, Pln3d coordSystem)
-        //{
-        //    Pt3d pt = new Pt3d(pt2d, 0.0);
-        //    Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
-        //    double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
-        //    double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
-        //    double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
-
-        //    return new Pt3d(projX, projY, projZ);
-        //}
-
+        /// <summary>
+        /// returns the result of subtracting one vector from another
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Vec3d Subtract(Vec3d a, Vec3d b)
+        {
+            Vec3d result = new Vec3d(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+            result.M = a.M - b.M;
+            return result;
+        }
 
     }
 }

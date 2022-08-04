@@ -38,6 +38,16 @@ namespace StadiumTools
             this.Z = z;
         }
 
+        /// <summary>
+        /// Construct a Pt3d from a Pt2d and a Plane
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <param name="pln"></param>
+        public Pt3d(Pt2d pt, Pln3d pln)
+        {
+            this = PointOnPlane(pln, pt);
+        }
+
         //Delegates
         /// <summary>
         /// Creates Point with Default Origin components (0.0, 0.0, 0.0)
@@ -45,13 +55,26 @@ namespace StadiumTools
         public static Pt3d Origin => new Pt3d(0.0, 0.0, 0.0);
         
         //Operator Overrides
+        /// <summary>
+        /// Subtracts one point from another
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static Pt3d operator - (Pt3d a, Pt3d b)
         {
-            double x = a.X - b.X;
-            double y = a.Y - b.Y;
-            double z = a.Z - b.Z;
+            return Subtract(a, b);
+        }
 
-            return new Pt3d(x, y, z);
+        /// <summary>
+        /// Returns the sum of a Pt3d and Vec3d
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Pt3d operator + (Pt3d a, Vec3d b)
+        {
+            return Add(a, b);
         }
 
         //Methods
@@ -72,13 +95,67 @@ namespace StadiumTools
             return vec3d;
         }
 
+        /// <summary>
+        /// Returns a Pt3d in global coordinates that represents the location of three components in a local coordinate system 
+        /// </summary>
+        /// <param name="localC"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <returns>Pt3d</returns>
+        public static Pt3d PointOnPlane(Pln3d localC, double x, double y, double z)
+        {
+            Vec3d pos = (x * localC.Xaxis) + (y * localC.Yaxis) + (z * localC.Zaxis);
+            Pt3d p = localC.OriginPt + pos;
+            return p;
+        }
+
+        /// <summary>
+        /// Returns a Pt3d in global coordinates that represents the location of three components in a local coordinate system
+        /// </summary>
+        /// <param name="localC"></param>
+        /// <param name="pt"></param>
+        /// <returns>Pt3d</returns>
+        public static Pt3d PointOnPlane(Pln3d localC, Pt3d pt)
+        {
+            Vec3d pos = (pt.X * localC.Xaxis) + (pt.Y * localC.Yaxis) + (pt.Y * localC.Zaxis);
+            Pt3d result = localC.OriginPt + pos;
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a Pt3d in global coordinates that represents the location of three components in a local coordinate system
+        /// </summary>
+        /// <param name="localC"></param>
+        /// <param name="pt"></param>
+        /// <returns>Pt3d</returns>
+        public static Pt3d PointOnPlane(Pln3d localC, Pt2d pt2d)
+        {
+            Pt3d pt = new Pt3d(pt2d, 0.0);
+            Vec3d pos = (pt.X * localC.Xaxis) + (pt.Y * localC.Yaxis) + (pt.Z * localC.Zaxis);
+            Pt3d result = localC.OriginPt + pos;
+            return result;
+        }
+
         //Returns the point pt in local coordinates of the coordinate system parameter
         public static Pt3d LocalCoordinates(Pt3d pt, Pln3d coordSystem)
         {
             Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
-            double projX = Vec3d.DotProduct(posVec, coordSystem.Xaxis); //* in Rhinocommon means dot product
-            double projY = Vec3d.DotProduct(posVec, coordSystem.Yaxis);
-            double projZ = Vec3d.DotProduct(posVec, coordSystem.Zaxis);
+            double projX = posVec * coordSystem.Xaxis;
+            double projY = posVec * coordSystem.Yaxis;
+            double projZ = posVec * coordSystem.Zaxis;
+
+            return new Pt3d(projX, projY, projZ);
+        }
+
+        //Returns the point pt in local coordinates of the coordinate system parameter
+        public static Pt3d LocalCoordinates(Pt2d pt2d, Pln3d coordSystem)
+        {
+            Pt3d pt = new Pt3d(pt2d, 0.0);
+            Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
+            double projX = posVec * coordSystem.Xaxis;
+            double projY = posVec * coordSystem.Yaxis;
+            double projZ = posVec * coordSystem.Zaxis;
 
             return new Pt3d(projX, projY, projZ);
         }
@@ -91,6 +168,22 @@ namespace StadiumTools
         {
             //Shallow copy
             return (Pt3d)this.MemberwiseClone();
+        }
+
+        /// <summary>
+        /// returns the sum of a 3d vector and a 3d point
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Pt3d Add(Pt3d p, Vec3d v)
+        {
+            return new Pt3d(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
+        }
+
+        public static Pt3d Subtract(Pt3d a, Pt3d b)
+        {
+            return new Pt3d(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         }
 
     }
