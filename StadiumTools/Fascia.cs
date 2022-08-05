@@ -41,7 +41,7 @@ namespace StadiumTools
         public Fascia(Pt2d[] points, double unit)
         {
             this.Unit = unit;
-            this.RefPt = points[0] * unit;
+            this.RefPt = points[0];
             this.Points2d = Pt2d.Scale(points, unit);
             this.Blocker = 0;
         }
