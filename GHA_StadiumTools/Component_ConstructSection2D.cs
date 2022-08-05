@@ -27,7 +27,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Tier2D", "T", "2D Seating Tiers that comprise a section", GH_ParamAccess.list);
-            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldZX);
+            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
         }
 
         //Set parameter indixes to names (for readability)

@@ -25,13 +25,17 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddCurveParameter("Polyline", "PL","A polyline that represents the 2D fascia you would like to add", GH_ParamAccess.item);
-            //pManager.AddPlaneParameter("Plane", "Pl", "The plane of the polyline. Plane origin will be attachment point to tier", GH_ParamAccess.item, defaultVomatory.Height);
+            pManager.AddPlaneParameter("Plane", "Pl", "The plane of the polyline. Plane origin will be attachment point to tier", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
+            pManager.AddIntegerParameter("View Blocker", "B", "Optional index of point of fascia to use for calculating the C-Value of the first spectator in a tier.", GH_ParamAccess.item, 0);
             pManager[0].Optional = true;
+            pManager[1].Optional = true;
+            pManager[2].Optional = true;
         }
 
         //Set parameter indixes to names (for readability)
         private static int IN_Polyline = 0;
         private static int IN_Plane = 1;
+        private static int IN_View_Blocker = 2;
         private static int OUT_Fascia = 0;
 
         /// <summary>
@@ -71,28 +75,64 @@ namespace GHA_StadiumTools
         //Methods
         private static void ConstructFasciaFromDA(IGH_DataAccess DA)
         {
-            //Initialize Default Polyline
             double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
-            StadiumTools.Fascia defaultFascia = StadiumTools.Fascia.InitDefault(unit);
-            Rhino.Geometry.Point3d[] defaultPts = StadiumTools.IO.Point3dFromPt2d(defaultFascia.Points2d);
-            Rhino.Geometry.Polyline defaultPolyline = new Rhino.Geometry.Polyline(defaultPts);
 
-            //Item Containers (Destinations)
-            Rhino.Geometry.Polyline polyItem = new Rhino.Geometry.Polyline();
-            Rhino.Geometry.PolyCurve polyCrvItem = new Rhino.Geometry.PolyCurve();
+            //Item Container (Destination)
+            Rhino.Geometry.Curve curve = null;
+            Rhino.Geometry.Polyline polyLineItem = new Rhino.Geometry.Polyline();
 
-            //Set Polyline
-            if (DA.GetData<Rhino.Geometry.Polyline>(IN_Polyline, ref polyItem))
+            //Get & Set Polyline
+            if (DA.GetData(IN_Polyline, ref curve))
             {
-                StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyItem.Count];
-                pts = StadiumTools.IO.Pt2dFromPolyline(polyItem);
-                StadiumTools.Fascia newFascia = new StadiumTools.Fascia(pts, unit);
+                if (!curve.TryGetPolyline(out polyLineItem))
+                {
+                    throw new ArgumentException("Only polylines are allowed as inputs");
+                }
+
+                //Item Container (Destination)
+                Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
+                DA.GetData<Rhino.Geometry.Plane>(IN_Plane, ref planeItem);
+                int intItem = 0;
+
+                //Convert PolyCurve to Polyline
+                //Rhino.Geometry.Polyline polyLineItem = PolyCurveToPolyline(polyCurveItem);
+
+                //Transform Polyline from input Plane to World XY  
+                polyLineItem.Transform(Rhino.Geometry.Transform.PlaneToPlane(planeItem, Rhino.Geometry.Plane.WorldXY));
+
+                //Convert PolyLine to Pt2d Array
+                StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyLineItem.Count];
+                pts = StadiumTools.IO.Pt2dFromPolyline(polyLineItem);
+
+                DA.GetData<int>(IN_View_Blocker, ref intItem);
+
+                StadiumTools.Fascia newFascia = new StadiumTools.Fascia(pts, intItem, unit);
+
                 DA.SetData(OUT_Fascia, newFascia);
             }
             else
             {
+                StadiumTools.Fascia defaultFascia = StadiumTools.Fascia.InitDefault(unit);
+
                 DA.SetData(OUT_Fascia, defaultFascia);
             }
+        }
+
+        /// <summary>
+        /// Returns a Polyline approximation of a PolyCurve object
+        /// </summary>
+        /// <param name="polyCurveItem"></param>
+        /// <returns></returns>
+        private static Rhino.Geometry.Polyline PolyCurveToPolyline(Rhino.Geometry.PolyCurve polyCurveItem)
+        {
+            Rhino.Geometry.Polyline result = new Rhino.Geometry.Polyline();
+            result.Add(polyCurveItem.SegmentCurve(0).PointAtStart);
+            
+            for (int i = 0; i < polyCurveItem.SegmentCount; i ++)
+            {
+                result.Add(polyCurveItem.SegmentCurve(i).PointAtEnd);
+            }
+            return result;
         }
 
     }
