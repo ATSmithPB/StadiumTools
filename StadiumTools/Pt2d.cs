@@ -84,5 +84,28 @@ namespace StadiumTools
             return ptsScaled;
         }
 
+        /// <summary>
+        /// Returns a collection of 2D points that represent the corners of a rectangle aligned to a default XY planr
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="sizeX"></param>
+        /// <param name="sizeY"></param>
+        /// <returns></returns>
+        public static Pt2d[] RectangleCentered(Pt2d center, double sizeX, double sizeY)
+        {
+            Pt2d[] result = new Pt2d[4];
+            double halfX = sizeX / 2;
+            double halfY = sizeY / 2;
+            result[0].X = -halfX;
+            result[0].Y = -halfY;
+            result[1].X = halfX;
+            result[1].Y = -halfY;
+            result[2].X = halfX;
+            result[2].Y = halfY;
+            result[3].X = -halfX;
+            result[3].Y = halfY;
+            return result;
+        }
+
     }
 }

@@ -186,6 +186,24 @@ namespace StadiumTools
             return new Pt3d(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         }
 
+        /// <summary>
+        /// Returns a collection of 3d points that represent the corners of a rectangle aligned to a 3d plane 
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="sizeX"></param>
+        /// <param name="sizeY"></param>
+        /// <returns></returns>
+        public static Pt3d[] RectangleCentered(Pln3d plane, double sizeX, double sizeY)
+        {
+            Pt3d[] result = new Pt3d[4];
+            Pt2d[] pts2d = Pt2d.RectangleCentered(Pt2d.Origin, sizeX, sizeY);
+            for (int i = 0; i < 4; i++)
+            {
+                result[i] = pts2d[i].ToPt3d(plane);
+            }
+            return result;
+        }
+
     }
 
     

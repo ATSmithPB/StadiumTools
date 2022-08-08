@@ -45,7 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arc.cs" />
+    <Compile Include="Domain.cs" />
+    <Compile Include="ICurve.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="PlaySurface.cs" />
+    <Compile Include="Pln2d.cs" />
     <Compile Include="Pln3d.cs" />
     <Compile Include="Pt2d.cs" />
     <Compile Include="Pt3d.cs" />
