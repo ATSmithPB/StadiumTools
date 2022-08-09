@@ -25,7 +25,7 @@ namespace StadiumTools
 
         //Constructors
         /// <summary>
-        /// Construct a Vec3d object from 3 its three components (x,y,z)
+        /// Constructs a Vec3d object from 3 its three components (x,y,z)
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -36,6 +36,19 @@ namespace StadiumTools
             this.Y = y;
             this.Z = z;
             this.M = Magnitude(x, y, z);
+        }
+
+        /// <summary>
+        /// Constructs a Vec3d object from a Vec2d object and a z component
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        public Vec3d(Vec2d v, double z)
+        {
+            this.X = v.X;
+            this.Y = v.Y;
+            this.Z = z;
+            this.M = Magnitude(v.X, v.Y, z);
         }
 
         //Delegates

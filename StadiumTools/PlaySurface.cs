@@ -136,8 +136,8 @@ namespace StadiumTools
                     markings = MarkingsOlympicTrack(plane, unit, lod);
                     break;
                 default:
-                    boundary = BoundaryCustom(plane, unit);
-                    markings = MarkingsCustom(plane, unit, lod);
+                    boundary = BoundarySoccer(plane, unit);
+                    markings = MarkingsSoccer(plane, unit, lod);
                     break;
             }
         }
@@ -146,169 +146,211 @@ namespace StadiumTools
         private static ICurve[] BoundarySoccer(Pln3d plane, double unit)
         {
             ICurve[] boundary = new ICurve[4];
-            Line.RectangleCentered(plane, 105.0 * unit, 68.0 * unit);
+            Line[] lines = Line.RectangleCentered(plane, 105.0 * unit, 68.0 * unit);
+            Array.Copy(lines, boundary, 4);
             return boundary;
         }
 
         private static ICurve[] BoundaryFootball(Pln3d plane, double unit)
         {
             ICurve[] boundary = new ICurve[4];
-            Line.RectangleCentered(plane, 109.727996 * unit, 48.767998 * unit);
+            Line[] lines = Line.RectangleCentered(plane, 109.727996 * unit, 48.767998 * unit);
+            Array.Copy(lines, boundary, 4);
             return boundary;
         }
 
         private static ICurve[] BoundaryBaseball(Pln3d plane, double unit)
         {
             Pt2d[] boundaryPts = new Pt2d[6];
-            boundaryPts[0] = new Pt2d(-11.106291, -14.529324);
-            boundaryPts[1] = new Pt2d(70.261524, -76.727308);
-            boundaryPts[2] = new Pt2d(112.504649, -34.484184);
-            boundaryPts[3] = new Pt2d(112.504649, 34.484184);
-            boundaryPts[4] = new Pt2d(70.261524, 76.727308);
-            boundaryPts[5] = new Pt2d(-11.106291, 14.529324);
+            boundaryPts[0] = new Pt2d(-11.106291 * unit, -14.529324 * unit);
+            boundaryPts[1] = new Pt2d(70.261524 * unit, -76.727308 * unit);
+            boundaryPts[2] = new Pt2d(112.504649 * unit, -34.484184 * unit);
+            boundaryPts[3] = new Pt2d(112.504649 * unit, 34.484184 * unit);
+            boundaryPts[4] = new Pt2d(70.261524 * unit, 76.727308 * unit);
+            boundaryPts[5] = new Pt2d(-11.106291 * unit, 14.529324 * unit);
 
-            Pt2d infieldArcCenter = new Pt2d(78.020465, 0);
-            Arc infieldArc = new Arc(new Pln3d(infieldArcCenter. ), 18.288, new Domain(0.797147, 2.356194);
-            Arc outfieldArc = new Arc(Pln3d.XYPlane, 48.768, new Domain(0.0, 1.0);
+            Pt2d outfieldArcCen = new Pt2d(78.020465 * unit, 0);
+            Pln2d outfieldArcPln = new Pln2d(outfieldArcCen, boundaryPts[2]);
+            Arc outfieldArc = new Arc(outfieldArcPln, 48.768 * unit, Math.PI / 2);
 
+            Pln2d infieldArcPln = new Pln2d(Pt2d.Origin, boundaryPts[5]);
+            Arc infieldArc = new Arc(infieldArcPln, 18.288 * unit, 1.836279);
 
-            ICurve[] boundary = new ICurve[6];
-            boundary[0] = new Line(-11.106, 14.529);
+            ICurve[] boundaryCrvs = new ICurve[6];
+            boundaryCrvs[0] = new Line(boundaryPts[0], boundaryPts[1]);
+            boundaryCrvs[1] = new Line(boundaryPts[1], boundaryPts[2]);
+            boundaryCrvs[2] = outfieldArc; 
+            boundaryCrvs[3] = new Line(boundaryPts[3], boundaryPts[4]);
+            boundaryCrvs[4] = new Line(boundaryPts[4], boundaryPts[5]);
+            boundaryCrvs[5] = infieldArc;
 
-            return boundary;
+            return boundaryCrvs;
         }
 
         private static ICurve[] BoundaryCricket(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[1];
+            new Ellipse3d(plane, 150 * unit, 137 * unit);
+            return boundary;
         }
 
         private static ICurve[] BoundaryBasketball(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[4];
-            Line.RectangleCentered(plane, 28.651199 * unit, 15.239999 * unit);
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            Line[] lines = Line.RectangleCentered(plane, 28.651199 * unit, 15.239999 * unit);
+            Array.Copy(lines, boundary, 4);
+            return boundary;
         }
 
         private static ICurve[] BoundaryTennis(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            Line.RectangleCentered(plane, 23.774399 * unit, 10.972799 * unit);
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            Line[] lines = Line.RectangleCentered(plane, 23.774399 * unit, 10.972799 * unit);
+            Array.Copy(lines, boundary, 4);
+            return boundary;
         }
         private static ICurve[] BoundaryIceHockey(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            Line.RectangleCentered(plane, 60.959998 * unit, 25.907999 * unit);
-            //needs to be filleted
-            return soccerBoundary;
+            double cornerRadius = 8.5344 * unit;
+
+            Pt2d[] boundaryPts = Pt2d.RectangleCenteredChamfered(Pt2d.Origin, 60.959998 * unit, 25.907999 * unit, cornerRadius);
+            Pt2d[] arcCenters = Pt2d.RectangleCentered(Pt2d.Origin, 43.891198, 8.839199);
+            Line[] lines = new Line[4];
+            Arc[] arcs = new Arc[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                int a = (i * 2) + 1;
+                int b = (i + 2) + i;
+                if (b == 8) { b = 1; }
+
+                lines[i] = new Line(boundaryPts[a], boundaryPts[b]);
+                Pln2d arcPln = new Pln2d(arcCenters[i], boundaryPts[i * 2]);
+                arcs[i] = new Arc(arcPln, cornerRadius, Math.PI / 2);
+            }
+
+            ICurve[] boundaryCrvs = new ICurve[8];
+            boundaryCrvs[0] = arcs[0];
+            boundaryCrvs[1] = lines[0];
+            boundaryCrvs[2] = arcs[1];
+            boundaryCrvs[3] = lines[1];
+            boundaryCrvs[4] = arcs[2];
+            boundaryCrvs[5] = lines[2];
+            boundaryCrvs[6] = arcs[3];
+            boundaryCrvs[7] = lines[3];
+
+            return boundaryCrvs;
         }
 
         private static ICurve[] BoundaryFieldHockey(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            Line.RectangleCentered(plane, 91.4 * unit, 55.0 * unit);
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            Line[] lines = Line.RectangleCentered(plane, 91.4 * unit, 55.0 * unit);
+            Array.Copy(lines, boundary, 4);
+            return boundary;
         }
 
         private static ICurve[] BoundaryRugby(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            Line.RectangleCentered(plane, 144 * unit, 70 * unit);
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            Line[] lines = Line.RectangleCentered(plane, 144 * unit, 70 * unit);
+            Array.Copy(lines, boundary, 4);
+            return boundary;
         }
 
         private static ICurve[] BoundaryFutsal(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            Line[] lines = Line.RectangleCentered(plane, 42 * unit, 25 * unit);
+            Array.Copy(lines, boundary, 4);
+            return boundary;
         }
 
         private static ICurve[] BoundaryOlympicTrack(Pln3d plane, double unit)
         {
-            ICurve[] soccerBoundary = new ICurve[10];
-            return soccerBoundary;
+            ICurve[] boundary = new ICurve[4];
+            double length = 84.41;
+            double width = 92.5;
+            Pt2d[] boundaryPts = Pt2d.RectangleCentered(Pt2d.Origin, length, width);
+            Line line0 = new Line(boundaryPts[0], boundaryPts[1]);
+            Line line1 = new Line(boundaryPts[2], boundaryPts[3]);
+
+            Pt2d arc0Cen = new Pt2d(length / 2, 0.0);
+            Pt2d arc1Cen = new Pt2d(-length / 2, 0.0);
+            Pln2d arc0Pln = new Pln2d(arc0Cen, boundaryPts[1]);
+            Pln2d arc1Pln = new Pln2d(arc1Cen, boundaryPts[3]);
+            Arc arc0 = new Arc(arc0Pln, width / 2, Math.PI);
+            Arc arc1 = new Arc(arc0Pln, width / 2, Math.PI);
+
+            return boundary;
         }
 
-        private static ICurve[] BoundaryCustom(Pln3d plane, double unit)
-        {
-            ICurve[] soccerBoundary = new ICurve[10];
-            return soccerBoundary;
-        }
 
         //Markings
         private static ICurve[] MarkingsSoccer(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsFootball(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsBaseball(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsCricket(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsBasketball(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsTennis(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsIceHockey(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsFieldHockey(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsRugby(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsFutsal(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
 
         private static ICurve[] MarkingsOlympicTrack(Pln3d plane, double unit, LOD lod)
         {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
+            ICurve[] markings = new ICurve[1];
+            return markings;
         }
-
-        private static ICurve[] MarkingsCustom(Pln3d plane, double unit, LOD lod)
-        {
-            ICurve[] soccerMarkings = new ICurve[10];
-            return soccerMarkings;
-        }
-
     }
 }

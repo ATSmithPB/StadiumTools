@@ -23,7 +23,7 @@ namespace StadiumTools
         /// <summary>
         /// True if plane components are valid.
         /// </summary>
-        public bool isValid { get; set; }
+        public bool IsValid { get; set; }
         /// <summary>
         /// Pt3d representing the origin point of the Plane
         /// </summary>
@@ -63,7 +63,7 @@ namespace StadiumTools
         /// <param name="z"></param>
         public Pln3d(Pt3d origin, Vec3d x, Vec3d y, Vec3d z)
         {
-            this.isValid = false;
+            this.IsValid = false;
             this.OriginPt = origin;
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
@@ -71,9 +71,23 @@ namespace StadiumTools
             this.Xaxis = x;
             this.Yaxis = y;
             this.Zaxis = z;
-            
-            IsValid(this);
+            GetValidity(this);
         }
+
+        public Pln3d(Pln2d plane)
+        {
+            this.IsValid = false;
+            Pt3d origin = new Pt3d(plane.OriginPt, 0.0);
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            this.Xaxis = new Vec3d(plane.Xaxis, 0.0);
+            this.Yaxis = new Vec3d(plane.Yaxis, 0.0);
+            this.Zaxis = Vec3d.ZAxis;
+            GetValidity(this);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -86,7 +100,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private static bool IsValid(Pln3d p)
+        private static bool GetValidity(Pln3d p)
         {
             bool isValid = true;
 

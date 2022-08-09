@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Arc.cs" />
     <Compile Include="Domain.cs" />
+    <Compile Include="Ellipse2d.cs" />
+    <Compile Include="Ellipse3d.cs" />
     <Compile Include="ICurve.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="PlaySurface.cs" />

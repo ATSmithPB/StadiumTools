@@ -25,6 +25,14 @@ namespace StadiumTools
         public Domain Domain { get; set; }
 
         //Constructors
+        public Arc(Pln2d plane, double radius, double angle)
+        {
+            Plane = new Pln3d(plane);
+            Radius = radius;
+            Domain = new Domain(0.0, angle);
+            IsValid = ValidateDomain(angle);
+        }
+
         public Arc(Pln3d plane, double radius, double angle)
         {
             Plane = plane;

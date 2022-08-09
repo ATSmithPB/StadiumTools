@@ -93,9 +93,10 @@ namespace StadiumTools
         /// <returns></returns>
         public static Pt2d[] RectangleCentered(Pt2d center, double sizeX, double sizeY)
         {
-            Pt2d[] result = new Pt2d[4];
             double halfX = sizeX / 2;
             double halfY = sizeY / 2;
+
+            Pt2d[] result = new Pt2d[4];
             result[0].X = -halfX;
             result[0].Y = -halfY;
             result[1].X = halfX;
@@ -104,7 +105,29 @@ namespace StadiumTools
             result[2].Y = halfY;
             result[3].X = -halfX;
             result[3].Y = halfY;
+            
             return result;
+        }
+
+        public static Pt2d[] RectangleCenteredChamfered(Pt2d center, double sizeX, double sizeY, double radius)
+        {
+            double halfX = sizeX / 2;
+            double halfXR = halfX - radius;
+            double halfY = sizeY / 2;
+            double halfYR = halfY - radius;
+
+            Pt2d[] boundaryPts = new Pt2d[8];
+            boundaryPts[0] = new Pt2d(-halfX, -halfYR);
+            boundaryPts[1] = new Pt2d(-halfXR, -halfY);
+            boundaryPts[2] = new Pt2d(halfXR, -halfY);
+            boundaryPts[3] = new Pt2d(halfX, -halfYR);
+            boundaryPts[4] = new Pt2d(halfX, halfYR);
+            boundaryPts[5] = new Pt2d(halfXR, halfY);
+            boundaryPts[6] = new Pt2d(-halfXR, halfY);
+            boundaryPts[7] = new Pt2d(-halfX, halfYR);
+            
+
+            return boundaryPts;
         }
 
     }

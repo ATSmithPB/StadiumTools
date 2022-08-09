@@ -96,7 +96,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Unitizes an existing 2d vector by reference
+        /// Scales a vector such that its length = 1.0 (by reference)
         /// </summary>
         /// <param name="v"></param>
         private static void Normalize(ref Vec2d v)
@@ -107,11 +107,11 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Returns a new normalized version of a 2d vector 
+        /// Returns a scaled vector of the same direction with its length = 1.0
         /// </summary>
         /// <param name="v"></param>
         /// <returns>Vec2d</returns>
-        private static Vec2d Normalize(Vec2d v)
+        public static Vec2d Normalize(Vec2d v)
         {
             Vec2d vN = new Vec2d();
             vN.X = v.X / v.M;
@@ -120,10 +120,36 @@ namespace StadiumTools
             return vN;
         }
 
-        //public Vec3d ToPt3d(Pln3d pln)
-        //{
-        //    Vec3d vec3d = Vec3d.LocalComponents(this, pln);
-        //    return vec3d;
-        //}
+        /// <summary>
+        /// returns a 2D vector that is rotate3d 90 degrees CCW with the same origin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vec2d CCW90(Vec2d v)
+        {
+            return new Vec2d(-v.Y, v.X);
+        }
+
+        /// <summary>
+        /// returns a 2D vector that is rotate3d 90 degrees CW with the same origin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vec2d CW90(Vec2d v)
+        {
+            return new Vec2d(v.Y, -v.X);
+        }
+
+        /// <summary>
+        /// Returns a Vec3d from a Vec2d and a z component
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        /// <returns>Vec3d</returns>
+        public static Vec3d ToVec3d(Vec2d v, double z)
+        {
+            Vec3d result = new Vec3d(v, z);
+            return result;
+        }
     }
 }

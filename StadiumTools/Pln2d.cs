@@ -51,6 +51,26 @@ namespace StadiumTools
             this.Yaxis = y;
             IsValid(this);
         }
+        
+        /// <summary>
+        /// Constructs a Pln2d from an origin Pt2d and 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public Pln2d(Pt2d origin, Pt2d pointOnXAxis)
+        {
+            this.isValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+
+            Vec2d xVec = new Vec2d(origin, pointOnXAxis);
+            
+            this.Xaxis = Vec2d.Normalize(xVec);
+            this.Yaxis = Vec2d.CCW90(this.Xaxis);
+            IsValid(this);
+        }
 
         //Delegates
         /// <summary>
@@ -77,5 +97,10 @@ namespace StadiumTools
             return pt2d;
         }
 
+        public Pln3d ToPln3d(Pln2d pln)
+        {
+            Pln3d pln3d = new Pln3d(pln);
+            return pln3d;
+        }
     }
 }
