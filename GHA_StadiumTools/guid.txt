@@ -9,8 +9,8 @@ c5060562-1cc0-4a35-9454-570182885cd4 : ST_DeconstructTier2D
 1f72f1d3-d687-4b4c-ab5f-fc7cdbc21500 : ST_ConstructVomatory
 d97a242d-7ec4-461d-9934-fed350a41dd9 : ST_DeconstructVomatory
 580a5fe9-5ef7-46e6-acfb-aa15b9f4efbc : ST_ConstructFascia
-ecf154c4-c77d-4f91-a76f-e955b11108f6
-7baed942-3f4d-4ed9-a2b7-b08b0581ca61
+ecf154c4-c77d-4f91-a76f-e955b11108f6 : ST_ConstructPlaySurface
+7baed942-3f4d-4ed9-a2b7-b08b0581ca61 : ST_DeconstructPlaySurface
 1b366a05-6d82-43a0-afbc-f8ac47227263
 2beee9f4-5e1f-4372-a51c-6670962523b6
 248eabbc-6964-4195-91e9-a594a6c5309c
