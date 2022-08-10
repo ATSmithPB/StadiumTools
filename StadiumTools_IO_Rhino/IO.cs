@@ -47,7 +47,7 @@ namespace StadiumTools
             Vec3d yAxis = Vec3dFromVector3d(plane.YAxis);
             Vec3d zAxis = Vec3dFromVector3d(plane.ZAxis);
             Pln3d pln = new Pln3d(pOrigin, xAxis, yAxis, zAxis);
-            pln.isValid = true;
+            pln.IsValid = true;
             return pln;
         }
 
@@ -132,8 +132,12 @@ namespace StadiumTools
         /// <returns></returns>
         public static Vec3d Vec3dFromVector3d(Vector3d vector3d)
         {
-            Vec3d vec = new Vec3d(vector3d.X, vector3d.Y, vector3d.Z);
-            return vec;
+            return new Vec3d(vector3d.X, vector3d.Y, vector3d.Z);
+        }
+         
+        public static Vec2d Vec2dFromVector3d(Vector3d vector3d)
+        {
+            return new Vec2d(vector3d.X, vector3d.Y);
         }
 
         /// <summary>
@@ -282,6 +286,27 @@ namespace StadiumTools
                 }
             }
             return rcVecs;
+        }
+
+        public static PolyCurve PolyCurveFromICurve(ICurve[] iCrvs)
+        {
+            PolyCurve result = new PolyCurve();
+            //FINISH
+            return result
+        }
+
+        public static Curve[] CurveArrayFromICurveArray(ICurve[] iCrvs)
+        {
+            Curve[] result = new Curve[iCrvs.Length];
+            //FINISH
+            return result
+        }
+
+        public static Curve CurveFromICurve(ICurve icrv)
+        {
+            Curve result = new Curve();
+
+            return result;
         }
     }
 }
