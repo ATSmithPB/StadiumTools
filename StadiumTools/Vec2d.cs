@@ -72,6 +72,13 @@ namespace StadiumTools
             this.M = Magnitude(this.X, this.Y);
         }
 
+        public Vec2d(Vec3d v)
+        {
+            this.X = v.X;
+            this.Y = v.Y;
+            this.M = Magnitude(this.X, this.Y);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -150,6 +157,30 @@ namespace StadiumTools
         {
             Vec3d result = new Vec3d(v, z);
             return result;
+        }
+
+        /// <summary>
+        /// returns the angle between two vectors 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static double Angle(Vec2d a, Vec2d b)
+        {
+            Vec2d aN = Normalize(a);
+            Vec2d bN = Normalize(b);
+
+            double d = a.X * b.X + a.Y * b.Y;
+            if (d > 1.0)
+                d = 1.0;
+            if (d < -1.0)
+                d = -1.0;
+            return Acos(d);
+        }
+        
+        public static double Reflex(Vec2d a, Vec2d b)
+        {
+            return (2* PI) - Angle(a, b);
         }
     }
 }

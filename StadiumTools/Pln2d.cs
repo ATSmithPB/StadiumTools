@@ -72,10 +72,31 @@ namespace StadiumTools
             IsValid(this);
         }
 
-        //Delegates
         /// <summary>
-        /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
+        /// Construct a Pln2d from the components of a Pln3d
         /// </summary>
+        /// <param name="plane"></param>
+        public Pln2d(Pln3d plane)
+        {
+            this.isValid = false;
+
+            Pt2d origin = plane.OriginPt.ToPt2d();
+
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+
+            Vec2d xVec = new Vec2d(plane.Xaxis);
+
+            this.Xaxis = Vec2d.Normalize(xVec);
+            this.Yaxis = Vec2d.CCW90(this.Xaxis);
+            IsValid(this);
+        }
+
+        //Delegates
+            /// <summary>
+            /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
+            /// </summary>
         public static Pln2d XYPlane => new Pln2d(Pt2d.Origin, Vec2d.XAxis, Vec2d.YAxis);
 
         //Methods

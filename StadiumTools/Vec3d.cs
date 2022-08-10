@@ -187,7 +187,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        /// <returns></returns>
+        /// <returns>Vec3d</returns>
         public static Vec3d Subtract(Vec3d a, Vec3d b)
         {
             Vec3d result = new Vec3d(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
@@ -195,5 +195,14 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// returns a new Vec2d with matching X and Y components as a Vec3d 
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns>Vec2d</returns>
+        public static Vec2d ToVec2d(Vec3d v)
+        {
+            return new Vec2d(v);
+        }
     }
 }

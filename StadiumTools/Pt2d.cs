@@ -109,6 +109,24 @@ namespace StadiumTools
             return result;
         }
 
+        public static Pt2d[] RectangleCentered(Pln2d center, double sizeX, double sizeY)
+        {
+            double halfX = sizeX / 2;
+            double halfY = sizeY / 2;
+
+            Pt2d[] result = new Pt2d[4];
+            result[0].X = -halfX + center.OriginX * center.Xaxis.X;
+            result[0].Y = -halfY + center.OriginY * center.Yaxis.Y;
+            result[1].X = halfX + center.OriginX * center.Xaxis.X;
+            result[1].Y = -halfY + center.OriginY * center.Xaxis.Y;
+            result[2].X = halfX + center.OriginX * center.Xaxis.X;
+            result[2].Y = halfY + center.OriginY * center.Xaxis.Y;
+            result[3].X = -halfX + center.OriginX * center.Xaxis.X;
+            result[3].Y = halfY + center.OriginY * center.Xaxis.Y;
+
+            return result;
+        }
+
         public static Pt2d[] RectangleCenteredChamfered(Pt2d center, double sizeX, double sizeY, double radius)
         {
             double halfX = sizeX / 2;

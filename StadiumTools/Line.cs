@@ -32,6 +32,17 @@ namespace StadiumTools
         }
 
         //Methods
+        public static Line[] RectangleCentered(Pln2d plane, double sizeX, double sizeY)
+        {
+            Line[] result = new Line[4];
+            Pt2d[] pts = Pt2d.RectangleCentered(plane, sizeX, sizeY);
+            result[0] = new Line(pts[0], pts[1]);
+            result[0] = new Line(pts[1], pts[2]);
+            result[0] = new Line(pts[2], pts[3]);
+            result[0] = new Line(pts[3], pts[0]);
+            return result;
+        }
+
         public static Line[] RectangleCentered(Pln3d plane, double sizeX, double sizeY)
         {
             Line[] result = new Line[4];
