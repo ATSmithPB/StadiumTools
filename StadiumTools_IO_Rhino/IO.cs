@@ -292,21 +292,88 @@ namespace StadiumTools
         {
             PolyCurve result = new PolyCurve();
             //FINISH
-            return result
+            return result;
         }
 
         public static Curve[] CurveArrayFromICurveArray(ICurve[] iCrvs)
         {
             Curve[] result = new Curve[iCrvs.Length];
-            //FINISH
-            return result
+            for (int i = 0; i < iCrvs.Length; i++)
+            {
+                result[i] = CurveFromICurve(iCrvs[i]);
+            }
+            return result;
         }
 
         public static Curve CurveFromICurve(ICurve icrv)
         {
-            Curve result = new Curve();
+            string typeName = icrv.GetType().Name;
+            switch (typeName)
+            {
+                case "Line":
+                    return CurveFromLine((StadiumTools.Line)icrv);
+                case "Arc":
+                    return CurveFromArc((StadiumTools.Arc)icrv);
+                case "Ellipse2d":
+                    return CurveFromEllipse2d((StadiumTools.Ellipse2d)icrv);
+                default:
+                    throw new System.Exception($"ICurve type [{icrv.GetType().Name}] not available for conversion to Rhino.Geometry.Curve");
+            }
+        }
 
+        public static Curve CurveFromEllipse2d(StadiumTools.Ellipse2d stEllipse)
+        {
+            Rhino.Geometry.Ellipse rcEllipse = EllipseFromEllipse2d(stEllipse);
+            NurbsCurve nurbsEllipse = rcEllipse.ToNurbsCurve();
+            Curve result = nurbsEllipse;
             return result;
+        }
+
+        public static Curve CurveFromArc(StadiumTools.Arc stArc)
+        { 
+            Rhino.Geometry.Arc rcArc = RCArcFromArc(stArc);
+            ArcCurve arcCrv = new ArcCurve(rcArc);
+            Curve result = arcCrv;
+            return result;
+        }
+
+        public static Curve CurveFromLine(StadiumTools.Line stLine)
+        {
+            Rhino.Geometry.Line rcLine = RCLineFromLine(stLine);
+            LineCurve lineCrv = new LineCurve(rcLine);
+            Curve result = lineCrv;
+            return result;
+        }
+
+        public static Interval IntervalFromDomain(Domain dom)
+        {
+            return new Rhino.Geometry.Interval(dom.T0, dom.T1);
+        }
+
+        public static Rhino.Geometry.Arc RCArcFromArc(StadiumTools.Arc stArc)
+        {
+            Interval angleIntervalRadians = IntervalFromDomain(stArc.Domain);
+            Plane plane = PlaneFromPln3d(stArc.Plane);
+            Circle circle = new Circle(plane, stArc.Radius);
+            return new Rhino.Geometry.Arc(circle, angleIntervalRadians );
+        }
+
+        public static Rhino.Geometry.Line RCLineFromLine(StadiumTools.Line stLine)
+        {
+            double x0 = stLine.Start.X;
+            double y0 = stLine.Start.Y;
+            double z0 = stLine.Start.Z;
+            double x1 = stLine.End.X;
+            double y1 = stLine.End.Y;
+            double z1 = stLine.End.Z;
+            return new Rhino.Geometry.Line(x0, y0, z0, x1, y1, z1);
+        }
+
+        public static Rhino.Geometry.Ellipse EllipseFromEllipse2d(Ellipse2d stEllipse)
+        {
+            Pln3d pln3d = new Pln3d(stEllipse.Center);
+            Plane plane = PlaneFromPln3d(pln3d);
+            return new Rhino.Geometry.Ellipse(plane, stEllipse.RadiusX, stEllipse.RadiusY);
         }
     }
 }
