@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace StadiumTools
 {
     //Properties
-    internal struct Line : ICurve
+    public struct Line : ICurve
     {
         /// <summary>
         /// Start point of line

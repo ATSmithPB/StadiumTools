@@ -8,6 +8,5 @@ namespace StadiumTools
 {
     public interface ICurve
     {
-        
     }
 }

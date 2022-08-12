@@ -210,6 +210,7 @@ namespace StadiumTools
             boundaryCrvs[4] = new Line(boundaryPts[4], boundaryPts[5]);
             boundaryCrvs[5] = infieldArc;
 
+
             return boundaryCrvs;
         }
 
@@ -394,5 +395,6 @@ namespace StadiumTools
         {
             return (SuperRiser)this.MemberwiseClone();
         }
+
     }
 }

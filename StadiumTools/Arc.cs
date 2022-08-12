@@ -4,7 +4,7 @@ using static System.Math;
 
 namespace StadiumTools
 {
-    public struct Arc : ICurve, ICloneable
+    public struct Arc : ICloneable, ICurve
     { 
         //Properties
         /// <summary>
