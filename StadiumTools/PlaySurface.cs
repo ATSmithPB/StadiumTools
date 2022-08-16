@@ -217,7 +217,7 @@ namespace StadiumTools
         private static ICurve[] BoundaryCricket(Pln2d plane, double unit)
         {
             ICurve[] boundary = new ICurve[1];
-            new Ellipse2d(plane, 150 * unit, 137 * unit);
+            boundary[0] = new Ellipse2d(plane, 150 * unit, 137 * unit);
             return boundary;
         }
 
@@ -295,19 +295,27 @@ namespace StadiumTools
 
         private static ICurve[] BoundaryOlympicTrack(Pln2d plane, double unit)
         {
-            ICurve[] boundary = new ICurve[4];
-            double length = 84.41;
-            double width = 92.5;
+            ICurve[] boundary = new ICurve[5];
+            double length = 84.41 * unit;
+            double width = 92.5 * unit;
             Pt2d[] boundaryPts = Pt2d.RectangleCentered(Pt2d.Origin, length, width);
-            Line line0 = new Line(boundaryPts[0], boundaryPts[1]);
-            Line line1 = new Line(boundaryPts[2], boundaryPts[3]);
+            Pt2d startPt = new Pt2d(boundaryPts[0].X, boundaryPts[0].Y + 7.737789 * unit);
+            Line line0 = new Line(startPt, boundaryPts[0]);
+            Line line1 = new Line(boundaryPts[0], boundaryPts[1]);
+            Line line2 = new Line(boundaryPts[2], boundaryPts[3]);
 
             Pt2d arc0Cen = new Pt2d(length / 2, 0.0);
             Pt2d arc1Cen = new Pt2d(-length / 2, 0.0);
             Pln2d arc0Pln = new Pln2d(arc0Cen, boundaryPts[1]);
             Pln2d arc1Pln = new Pln2d(arc1Cen, boundaryPts[3]);
             Arc arc0 = new Arc(arc0Pln, width / 2, Math.PI);
-            Arc arc1 = new Arc(arc0Pln, width / 2, Math.PI);
+            Arc arc1 = new Arc(arc0Pln, width / 2, 2.554756);
+
+            boundary[0] = line0;
+            boundary[1] = line1;
+            boundary[2] = arc0;
+            boundary[3] = line2;
+            boundary[4] = arc1;
 
             return boundary;
         }
@@ -388,6 +396,21 @@ namespace StadiumTools
         {
             string typeNames = string.Join("@", Enum.GetNames(typeof(Type)));
             string typeNamesMultiLine = typeNames.Replace("@", System.Environment.NewLine);
+            return typeNamesMultiLine;
+        }
+
+        public static string TypeEnumNumberedAsString()
+        {
+            string[] typeNames = Enum.GetNames(typeof(Type));
+            string[] typeNamesNumbered = new string[typeNames.Length];
+
+            for (int i = 0; i < typeNames.Length; i++)
+            {
+                typeNamesNumbered[i] = $"{i}-{typeNames[i]}";
+            }
+            typeNamesNumbered[0].Insert(0, "@");
+            string typeNamesUniline = string.Join("@", typeNamesNumbered);
+            string typeNamesMultiLine = typeNamesUniline.Replace("@", System.Environment.NewLine);
             return typeNamesMultiLine;
         }
 
