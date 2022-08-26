@@ -271,7 +271,7 @@ namespace StadiumTools
                 forwardSpec = tier.Spectators[row - 1].Loc2d;
             }
 
-            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, sLine, sLineSt, forwardSpec, plane);
+            Spectator spectator = new Spectator(tier.SectionIndex, row, specPt, specPtSt, sLine, sLineSt, forwardSpec, plane, tier.SpecSeperation);
             tier.Spectators[row] = spectator;
         }
 

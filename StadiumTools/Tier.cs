@@ -33,7 +33,7 @@ namespace StadiumTools
         /// <summary>
         /// A Vomatory object that defines the optional vomitory parameters for the tier (Vomatory Start, Vomatory Width, etc...)
         /// </summary>
-        public Vomatory Vomatory { get; set; }
+        public Vomatory VomatoryParameters { get; set; }
         /// <summary>
         /// True if tier contains a vomitory
         /// </summary>
@@ -106,7 +106,15 @@ namespace StadiumTools
         /// Pt2d objects that represents the top outline geometry of the tier profile
         /// </summary>
         public Pt2d[] Points2d { get; set; }
-
+        /// <summary>
+        /// Width of aisles (For Plan/3D)
+        /// </summary>
+        public double AisleWidth { get; set; }
+        /// <summary>
+        /// Distance between spectators seated side-by-side, adjacent, in the same row
+        /// </summary>
+        public double SpecSeperation { get; set; }
+ 
         //Constructors
         /// <summary>
         /// Initializes a new default Tier
@@ -139,6 +147,7 @@ namespace StadiumTools
             tier.StartY = 1.0 * tier.SpectatorParameters.Unit;
             tier.RowCount = 25;
             tier.DefaultRowWidth = 0.8 * tier.SpectatorParameters.Unit;
+            tier.AisleWidth = 0.8 * tier.SpectatorParameters.Unit;
 
             // Init all row widths to default value
             double[] rowWidths = new double[tier.RowCount];
@@ -166,6 +175,7 @@ namespace StadiumTools
             tier.Points2d = new Pt2d[tier.Points2dCount];
             tier.MaxRakeAngle = .593412; //radians
             tier.Spectators = new Spectator[tier.RowCount];
+            tier.SpecSeperation = 0.4 * tier.SpectatorParameters.Unit;
         }
 
         /// <summary>

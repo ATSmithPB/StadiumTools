@@ -125,7 +125,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="v"></param>
         /// <returns>Vec2d</returns>
-        private static Vec3d Normalize(Vec3d v)
+        public static Vec3d Normalize(Vec3d v)
         {
             Vec3d vN = new Vec3d();
             vN.X = v.X / v.M;
@@ -138,7 +138,7 @@ namespace StadiumTools
         /// <summary>
         /// Scale all components of a vector such that its magnitude is equal to 1
         /// </summary>
-        private void Normalize()
+        public void Normalize()
         {
             this.X = this.X / this.M;
             this.Y = this.Y / this.M;
@@ -203,6 +203,30 @@ namespace StadiumTools
         public static Vec2d ToVec2d(Vec3d v)
         {
             return new Vec2d(v);
+        }
+
+        /// <summary>
+        /// returns the angle between two 3d vectors in radians
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>Vec3d</returns>
+        public static double Angle(Vec3d a, Vec3d b)
+        {
+            Vec3d aN = Normalize(a);
+            Vec3d bN = Normalize(b);
+
+            double d = (a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z);
+            if (d > 1.0)
+                d = 1.0;
+            if (d < -1.0)
+                d = -1.0;
+            return Acos(d);
+        }
+
+        public static double Reflex(Vec3d a, Vec3d b)
+        {
+            return (2 * PI) - Angle(a, b);
         }
     }
 }

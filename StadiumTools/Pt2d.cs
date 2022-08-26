@@ -13,7 +13,7 @@ namespace StadiumTools
         /// Horizontal distance from origin
         /// </summary>
         public double X { get; set; }
-        /// <summary>
+        /// <summary>       
         /// Vertical distance from origin
         /// </summary>
         public double Y { get; set; }
@@ -40,18 +40,23 @@ namespace StadiumTools
             this.Y = y;
         }
 
-        //Delegate
+        //Delegates
         public static Pt2d Origin => new Pt2d(0.0, 0.0);
 
-        //Operator Override
+        //Operator Overrides
         public static Pt2d operator * (Pt2d a, double b)
         {
-            return new Pt2d(a.X * b, a.Y * b);
+            return Multiply(a, b);
         }
 
-        public static Pt2d operator + (Pt2d a, Pt2d b)
+        public static Pt2d operator + (Pt2d p, Vec2d v)
         {
-            return new Pt2d(a.X + b.X, a.Y + b.Y);
+            return Add(p, v);
+        }
+
+        public static Pt2d operator +(Pt2d p, Pt2d b)
+        {
+            return Add(p, b);
         }
 
         //Methods
@@ -115,14 +120,11 @@ namespace StadiumTools
             double halfY = sizeY / 2;
 
             Pt2d[] result = new Pt2d[4];
-            result[0].X = -halfX + center.OriginX * center.Xaxis.X;
-            result[0].Y = -halfY + center.OriginY * center.Yaxis.Y;
-            result[1].X = halfX + center.OriginX * center.Xaxis.X;
-            result[1].Y = -halfY + center.OriginY * center.Xaxis.Y;
-            result[2].X = halfX + center.OriginX * center.Xaxis.X;
-            result[2].Y = halfY + center.OriginY * center.Xaxis.Y;
-            result[3].X = -halfX + center.OriginX * center.Xaxis.X;
-            result[3].Y = halfY + center.OriginY * center.Xaxis.Y;
+
+            result[0] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * -halfY);
+            result[1] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * -halfY);
+            result[2] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * halfY);
+            result[3] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * halfY);
 
             return result;
         }
@@ -143,10 +145,79 @@ namespace StadiumTools
             boundaryPts[5] = new Pt2d(halfXR, halfY);
             boundaryPts[6] = new Pt2d(-halfXR, halfY);
             boundaryPts[7] = new Pt2d(-halfX, halfYR);
-            
 
             return boundaryPts;
         }
 
+        public static Pt2d[] RectangleCenteredChamfered(Pln2d center, double sizeX, double sizeY, double radius)
+        {
+            double halfX = sizeX / 2;
+            double halfXR = halfX - radius;
+            double halfY = sizeY / 2;
+            double halfYR = halfY - radius;
+
+            Pt2d[] boundaryPts = new Pt2d[8];
+            boundaryPts[0] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * -halfYR);
+            boundaryPts[1] = center.OriginPt + (center.Xaxis * -halfXR) + (center.Yaxis * -halfY);
+            boundaryPts[2] = center.OriginPt + (center.Xaxis * halfXR) + (center.Yaxis * -halfY);
+            boundaryPts[3] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * -halfYR);
+            boundaryPts[4] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * halfYR);
+            boundaryPts[5] = center.OriginPt + (center.Xaxis * halfXR) + (center.Yaxis * halfY);
+            boundaryPts[6] = center.OriginPt + (center.Xaxis * -halfXR) + (center.Yaxis * halfY);
+            boundaryPts[7] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * halfYR);
+
+            return boundaryPts;
+        }
+
+        /// <summary>
+        /// returns the distance between two points
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static double Distance(Pt2d a, Pt2d b)
+        {
+            return Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
+        }
+
+        /// <summary>
+        /// returns the angle between two points relative to a center point
+        /// </summary>
+        /// <param name="centerPt"></param>
+        /// <param name="startPt"></param>
+        /// <param name="endPt"></param>
+        /// <returns></returns>
+        public static double Angle(Pt2d centerPt, Pt2d startPt, Pt2d endPt)
+        {
+            Vec2d start = new Vec2d(centerPt, startPt);
+            Vec2d end = new Vec2d(centerPt, endPt);
+            return Vec2d.Angle(start, end);
+        }
+
+        /// <summary>
+        /// returns a new Pt2d with the sum of two Pt2d coordinates
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Pt2d Add(Pt2d a, Pt2d b)
+        {
+            return new Pt2d(a.X + b.X, a.Y + b.Y);
+        }
+
+        public static Pt2d Add(Pt2d a, Vec2d v)
+        {
+            return new Pt2d(a.X + v.X, a.Y + v.Y);
+        }
+
+        public static Pt2d Multiply(Pt2d a, Pt2d b)
+        {
+            return new Pt2d(a.X * b.X, a.Y * b.Y);
+        }
+
+        public static Pt2d Multiply(Pt2d a, double b)
+        {
+            return new Pt2d(a.X * b, a.Y * b);
+        }
     }
 }

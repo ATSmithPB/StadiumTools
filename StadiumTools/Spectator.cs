@@ -87,6 +87,10 @@ namespace StadiumTools
         /// The 3d Plane of this spectators tier if hosted
         /// </summary>
         public Pln3d Plane { get; set; }
+        /// <summary>
+        /// The distance between this spectator and the spectator(s) seated side-by-side, adjacent, on the same row. 
+        /// </summary>
+        public double Seperation { get; set; }
 
         //Constructors 
         public Spectator()
@@ -112,7 +116,8 @@ namespace StadiumTools
             Vec2d sLine, 
             Vec2d sLineSt, 
             Pt2d forwardSpec, 
-            Pln3d plane
+            Pln3d plane,
+            double seperation
             )
 
         {
@@ -124,6 +129,7 @@ namespace StadiumTools
             this.SightLineStanding = sLineSt;
             this.ForwardSpectatorLoc2d = forwardSpec;
             this.Plane = plane;
+            this.Seperation = seperation;
 
             CalcSpectatorCValue(this);
         }

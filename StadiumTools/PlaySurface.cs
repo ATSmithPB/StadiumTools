@@ -187,20 +187,19 @@ namespace StadiumTools
 
         private static ICurve[] BoundaryBaseball(Pln2d plane, double unit)
         {
-            Pt2d[] boundaryPts = new Pt2d[6];
-            boundaryPts[0] = new Pt2d(-11.106291 * unit, -14.529324 * unit);
-            boundaryPts[1] = new Pt2d(70.261524 * unit, -76.727308 * unit);
-            boundaryPts[2] = new Pt2d(112.504649 * unit, -34.484184 * unit);
-            boundaryPts[3] = new Pt2d(112.504649 * unit, 34.484184 * unit);
-            boundaryPts[4] = new Pt2d(70.261524 * unit, 76.727308 * unit);
-            boundaryPts[5] = new Pt2d(-11.106291 * unit, 14.529324 * unit);
+            Pt2d[] boundaryPts = new Pt2d[8];
+            
+            boundaryPts[0] = plane.OriginPt + (plane.Xaxis * -11.106291 * unit) + (plane.Yaxis * -14.529324 * unit);
+            boundaryPts[1] = plane.OriginPt + (plane.Xaxis * 70.261524 * unit) + (plane.Yaxis * -76.727308 * unit);
+            boundaryPts[2] = plane.OriginPt + (plane.Xaxis * 112.504649 * unit) + (plane.Yaxis * -34.484184 * unit);
+            boundaryPts[3] = plane.OriginPt + (plane.Xaxis * 112.504649 * unit) + (plane.Yaxis * 34.484184 * unit);
+            boundaryPts[4] = plane.OriginPt + (plane.Xaxis * 70.261524 * unit) + (plane.Yaxis * 76.727308 * unit);
+            boundaryPts[5] = plane.OriginPt + (plane.Xaxis * -11.106291 * unit) + (plane.Yaxis * 14.529324 * unit);
+            boundaryPts[6] = plane.OriginPt + (plane.Xaxis * 78.020465 * unit);
+            boundaryPts[7] = plane.OriginPt;
 
-            Pt2d outfieldArcCen = new Pt2d(78.020465 * unit, 0);
-            Pln2d outfieldArcPln = new Pln2d(outfieldArcCen, boundaryPts[2]);
-            Arc outfieldArc = new Arc(outfieldArcPln, 48.768 * unit, Math.PI / 2);
-
-            Pln2d infieldArcPln = new Pln2d(Pt2d.Origin, boundaryPts[5]);
-            Arc infieldArc = new Arc(infieldArcPln, 18.288 * unit, 1.836279);
+            Arc outfieldArc = new Arc(boundaryPts[6], boundaryPts[2], boundaryPts[3]);            
+            Arc infieldArc = new Arc(boundaryPts[7], boundaryPts[5], boundaryPts[0]);
 
             ICurve[] boundaryCrvs = new ICurve[6];
             boundaryCrvs[0] = new Line(boundaryPts[0], boundaryPts[1]);
@@ -209,7 +208,6 @@ namespace StadiumTools
             boundaryCrvs[3] = new Line(boundaryPts[3], boundaryPts[4]);
             boundaryCrvs[4] = new Line(boundaryPts[4], boundaryPts[5]);
             boundaryCrvs[5] = infieldArc;
-
 
             return boundaryCrvs;
         }
@@ -240,8 +238,8 @@ namespace StadiumTools
         {
             double cornerRadius = 8.5344 * unit;
 
-            Pt2d[] boundaryPts = Pt2d.RectangleCenteredChamfered(Pt2d.Origin, 60.959998 * unit, 25.907999 * unit, cornerRadius);
-            Pt2d[] arcCenters = Pt2d.RectangleCentered(Pt2d.Origin, 43.891198, 8.839199);
+            Pt2d[] boundaryPts = Pt2d.RectangleCenteredChamfered(plane, 60.959998 * unit, 25.907999 * unit, cornerRadius);
+            Pt2d[] arcCenters = Pt2d.RectangleCentered(plane, 43.891198 * unit, 8.839199 * unit);
             Line[] lines = new Line[4];
             Arc[] arcs = new Arc[4];
 
@@ -249,7 +247,7 @@ namespace StadiumTools
             {
                 int a = (i * 2) + 1;
                 int b = (i + 2) + i;
-                if (b == 8) { b = 1; }
+                if (b == 8) { b = 0; }
 
                 lines[i] = new Line(boundaryPts[a], boundaryPts[b]);
                 Pln2d arcPln = new Pln2d(arcCenters[i], boundaryPts[i * 2]);
@@ -298,18 +296,18 @@ namespace StadiumTools
             ICurve[] boundary = new ICurve[5];
             double length = 84.41 * unit;
             double width = 92.5 * unit;
-            Pt2d[] boundaryPts = Pt2d.RectangleCentered(Pt2d.Origin, length, width);
-            Pt2d startPt = new Pt2d(boundaryPts[0].X, boundaryPts[0].Y + 7.737789 * unit);
+            Pt2d[] boundaryPts = Pt2d.RectangleCentered(plane, length, width);
+            boundaryPts[0] = boundaryPts[0] + (plane.Xaxis * -25.61 * unit);
+            Pt2d startPt = boundaryPts[0] + (plane.Yaxis * 7.737788949 * unit);
+            Pt2d arc0Cen = plane.OriginPt + (plane.Xaxis * (length / 2));
+            Pt2d arc1Cen = plane.OriginPt + (plane.Xaxis * (-length / 2));
+
             Line line0 = new Line(startPt, boundaryPts[0]);
             Line line1 = new Line(boundaryPts[0], boundaryPts[1]);
             Line line2 = new Line(boundaryPts[2], boundaryPts[3]);
 
-            Pt2d arc0Cen = new Pt2d(length / 2, 0.0);
-            Pt2d arc1Cen = new Pt2d(-length / 2, 0.0);
-            Pln2d arc0Pln = new Pln2d(arc0Cen, boundaryPts[1]);
-            Pln2d arc1Pln = new Pln2d(arc1Cen, boundaryPts[3]);
-            Arc arc0 = new Arc(arc0Pln, width / 2, Math.PI);
-            Arc arc1 = new Arc(arc0Pln, width / 2, 2.554756);
+            Arc arc0 = new Arc(arc0Cen, boundaryPts[1], boundaryPts[2]);
+            Arc arc1 = new Arc(arc1Cen, boundaryPts[3], startPt);
 
             boundary[0] = line0;
             boundary[1] = line1;
@@ -319,7 +317,6 @@ namespace StadiumTools
 
             return boundary;
         }
-
 
         //Markings
         private static ICurve[] MarkingsSoccer(Pln2d plane, double unit, LOD lod)
@@ -408,15 +405,18 @@ namespace StadiumTools
             {
                 typeNamesNumbered[i] = $"{i}-{typeNames[i]}";
             }
-            typeNamesNumbered[0].Insert(0, "@");
             string typeNamesUniline = string.Join("@", typeNamesNumbered);
             string typeNamesMultiLine = typeNamesUniline.Replace("@", System.Environment.NewLine);
             return typeNamesMultiLine;
         }
 
+        /// <summary>
+        /// shallow copy a PlaySurface
+        /// </summary>
+        /// <returns></returns>
         public object Clone()
         {
-            return (SuperRiser)this.MemberwiseClone();
+            return (PlaySurface)this.MemberwiseClone();
         }
 
     }

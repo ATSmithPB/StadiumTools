@@ -12,7 +12,7 @@ namespace StadiumTools
         /// <summary>
         /// True if plane components are valid.
         /// </summary>
-        public bool isValid { get; set; }
+        public bool IsValid { get; set; }
         /// <summary>
         /// Pt3d representing the origin point of the Plane
         /// </summary>
@@ -43,13 +43,13 @@ namespace StadiumTools
         /// <param name="y"></param>
         public Pln2d(Pt2d origin, Vec2d x, Vec2d y)
         {
-            this.isValid = false;
+            this.IsValid = false;
             this.OriginPt = origin;
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
             this.Xaxis = x;
             this.Yaxis = y;
-            IsValid(this);
+            SetValid(this);
         }
         
         /// <summary>
@@ -60,7 +60,7 @@ namespace StadiumTools
         /// <param name="y"></param>
         public Pln2d(Pt2d origin, Pt2d pointOnXAxis)
         {
-            this.isValid = false;
+            this.IsValid = false;
             this.OriginPt = origin;
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
@@ -69,7 +69,7 @@ namespace StadiumTools
             
             this.Xaxis = Vec2d.Normalize(xVec);
             this.Yaxis = Vec2d.CCW90(this.Xaxis);
-            IsValid(this);
+            SetValid(this);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace StadiumTools
         /// <param name="plane"></param>
         public Pln2d(Pln3d plane)
         {
-            this.isValid = false;
+            this.IsValid = false;
 
             Pt2d origin = plane.OriginPt.ToPt2d();
 
@@ -90,7 +90,7 @@ namespace StadiumTools
 
             this.Xaxis = Vec2d.Normalize(xVec);
             this.Yaxis = Vec2d.CCW90(this.Xaxis);
-            IsValid(this);
+            SetValid(this);
         }
 
         //Delegates
@@ -105,7 +105,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private static bool IsValid(Pln2d p)
+        private static bool SetValid(Pln2d p)
         {
             bool isValid = true;
 

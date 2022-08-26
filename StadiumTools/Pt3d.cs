@@ -196,7 +196,7 @@ namespace StadiumTools
         public static Pt3d[] RectangleCentered(Pln3d plane, double sizeX, double sizeY)
         {
             Pt3d[] result = new Pt3d[4];
-            Pt2d[] pts2d = Pt2d.RectangleCentered(Pt2d.Origin, sizeX, sizeY);
+            Pt2d[] pts2d = Pt2d.RectangleCentered(plane.OriginPt.ToPt2d(), sizeX, sizeY);
             for (int i = 0; i < 4; i++)
             {
                 result[i] = pts2d[i].ToPt3d(plane);

@@ -89,6 +89,12 @@ namespace StadiumTools
         /// </summary>
         public static Vec2d YAxis => new Vec2d(0.0, 1.0);
 
+        //Operator Overloads
+        public static Vec2d operator * (Vec2d v, double d)
+        {
+            return Scale(v, d);
+        }
+
         //Methods
         /// <summary>
         /// Calculates the length of a Vec2d
@@ -159,6 +165,11 @@ namespace StadiumTools
             return result;
         }
 
+        public static Vec2d Scale(Vec2d v, double d)
+        {
+            return new Vec2d(v.X * d, v.Y * d); 
+        }
+
         /// <summary>
         /// returns the angle between two vectors 
         /// </summary>
@@ -170,16 +181,30 @@ namespace StadiumTools
             Vec2d aN = Normalize(a);
             Vec2d bN = Normalize(b);
 
-            double d = a.X * b.X + a.Y * b.Y;
+            double d = (aN.X * bN.X) + (aN.Y * bN.Y);
             if (d > 1.0)
                 d = 1.0;
             if (d < -1.0)
                 d = -1.0;
             return Acos(d);
         }
-        
+
+        public static double Angle(Pt2d origin, Pt2d start, Pt2d end)
+        {
+            Vec2d a = new Vec2d(origin, start);
+            Vec2d b = new Vec2d(origin, end);
+            return Angle(a, b);
+        }
+
         public static double Reflex(Vec2d a, Vec2d b)
         {
+            return (2* PI) - Angle(a, b);
+        }
+
+        public static double Reflex(Pt2d origin, Pt2d start, Pt2d end)
+        {
+            Vec2d a = new Vec2d(origin, start);
+            Vec2d b = new Vec2d(origin, end);
             return (2* PI) - Angle(a, b);
         }
     }

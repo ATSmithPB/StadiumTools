@@ -57,6 +57,23 @@ namespace StadiumTools
             IsValid = ValidateDomain(this.Domain.Length);
         }
 
+        public Arc(Pln2d plane, double radius, double domainStart, double domainEnd)
+        {
+            Plane = plane.ToPln3d(Pln2d.XYPlane);
+            Radius = radius;
+            Domain = new Domain(domainStart, domainEnd);
+            IsValid = ValidateDomain(this.Domain.Length);
+        }
+
+        public Arc(Pt2d center, Pt2d start, Pt2d end)
+        {
+            Plane = new Pln3d(new Pln2d(center, start));
+            Radius = Pt2d.Distance(center, start);
+            double angleRadians = Pt2d.Angle(center, start, end);
+            Domain = new Domain(0.0, angleRadians);
+            IsValid = ValidateDomain(this.Domain.Length);
+        }
+
         //Methods
         public object Clone()
         {
@@ -72,7 +89,7 @@ namespace StadiumTools
         public static bool ValidateDomain(double domain)
         {
             bool result = false;
-            if (domain < 2 * Math.PI && domain > -2 * Math.PI)
+            if (domain <= 2 * Math.PI && domain >= -2 * Math.PI)
             {
                 result = true;
             }
