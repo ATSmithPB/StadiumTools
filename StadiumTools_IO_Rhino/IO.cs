@@ -18,7 +18,7 @@ namespace StadiumTools
         /// Returns a Pt2d object from a Rhino Point3d
         /// </summary>
         /// <param name="point3d"></param>
-        /// <returns></returns>
+        /// <returns>Pt2d</returns>
         public static Pt2d Pt2dFromPoint3d(Point3d point3d)
         {
             Pt2d pt = new Pt2d(point3d.X, point3d.Y);
@@ -50,12 +50,27 @@ namespace StadiumTools
             pln.IsValid = true;
             return pln;
         }
+        
+        /// <summary>
+        /// Construct a Pln2d from the components of a Plane
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <returns>Pln2d</returns>
+        public static Pln2d Pln2dFromPlane(Plane plane)
+        {
+            Pt2d pOrigin = Pt2dFromPoint3d(plane.Origin);
+            Vec2d xAxis = Vec2dFromVector3d(plane.XAxis);
+            Vec2d yAxis = Vec2dFromVector3d(plane.YAxis);
+            Pln2d pln = new Pln2d(pOrigin, xAxis, yAxis);
+            pln.IsValid = true;
+            return pln;
+        }
 
         /// <summary>
         /// Returns a Plane from a Pln3d object
         /// </summary>
         /// <param name="pln"></param>
-        /// <returns></returns>
+        /// <returns>Plane</returns>
         public static Plane PlaneFromPln3d(Pln3d pln)
         {
             Point3d pOrigin = Point3dFromPt3d(pln.OriginPt);
@@ -69,7 +84,7 @@ namespace StadiumTools
         /// Returns a Pt3d object that represents the origin of a Rhino Plane
         /// </summary>
         /// <param name="plane"></param>
-        /// <returns></returns>
+        /// <returns>Pt3d</returns>
         public static Pt3d Pt3dFromPlane(Plane plane)
         {
             Pt3d pt = new Pt3d();
@@ -92,7 +107,7 @@ namespace StadiumTools
         /// Returns a Point3d from a given Pt3d object
         /// </summary>
         /// <param name="pt3d"></param>
-        /// <returns></returns>
+        /// <returns>Point3d</returns>
         public static Point3d Point3dFromPt3d(Pt3d pt3d)
         {
             Point3d point3d = new Point3d(pt3d.X, pt3d.Y, pt3d.Z);
@@ -227,20 +242,6 @@ namespace StadiumTools
             return rcInt;
         }
 
-        //public static DataTree<int> DataTreeFromArray(Tier[] tiers)
-        //{
-        //    DataTree<int> rcInt = new DataTree<int>();
-        //    for (int i = 0; i < tiers.Length; i++)
-        //    {
-                
-        //        GH_Path path = new GH_Path(i);
-        //        int item = tiers[i];
-        //        rcInt.Add(item, path);
-                
-        //    }
-        //    return rcInt;
-        //}
-
         public static Polyline PolylineFromTier(Tier tier)
         {
             Polyline polyline = new Polyline();
@@ -288,11 +289,15 @@ namespace StadiumTools
             return rcVecs;
         }
 
-        public static PolyCurve PolyCurveFromICurve(ICurve[] iCrvs)
+        public static PolyCurve PolyCurveFromICurveArray(ICurve[] iCrvs)
         {
             PolyCurve result = new PolyCurve();
-            //FINISH
+            for (int i = 0; i < iCrvs.Length; i++)
+            {
+                result.Append(CurveFromICurve(iCrvs[i]));
+            }
             return result;
+
         }
 
         public static Curve[] CurveArrayFromICurveArray(ICurve[] iCrvs)
@@ -301,6 +306,16 @@ namespace StadiumTools
             for (int i = 0; i < iCrvs.Length; i++)
             {
                 result[i] = CurveFromICurve(iCrvs[i]);
+            }
+            return result;
+        }
+
+        public static List<Curve> CurveListFromICurveArray(ICurve[] iCrvs)
+        {
+            List<Curve> result = new List<Curve>();
+            for (int i = 0; i < iCrvs.Length; i++)
+            {
+                result.Add(CurveFromICurve(iCrvs[i]));
             }
             return result;
         }
@@ -321,6 +336,11 @@ namespace StadiumTools
             }
         }
 
+        /// <summary>
+        /// construct a NURBS cuvre from an ellipse
+        /// </summary>
+        /// <param name="stEllipse"></param>
+        /// <returns></returns>
         public static Curve CurveFromEllipse2d(StadiumTools.Ellipse2d stEllipse)
         {
             Rhino.Geometry.Ellipse rcEllipse = EllipseFromEllipse2d(stEllipse);
@@ -345,6 +365,11 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// construct a Rhino Interval based on a StadiumTools Domain
+        /// </summary>
+        /// <param name="dom"></param>
+        /// <returns></returns>
         public static Interval IntervalFromDomain(Domain dom)
         {
             return new Rhino.Geometry.Interval(dom.T0, dom.T1);
@@ -355,7 +380,7 @@ namespace StadiumTools
             Interval angleIntervalRadians = IntervalFromDomain(stArc.Domain);
             Plane plane = PlaneFromPln3d(stArc.Plane);
             Circle circle = new Circle(plane, stArc.Radius);
-            return new Rhino.Geometry.Arc(circle, angleIntervalRadians );
+            return new Rhino.Geometry.Arc(circle, angleIntervalRadians);
         }
 
         public static Rhino.Geometry.Line RCLineFromLine(StadiumTools.Line stLine)

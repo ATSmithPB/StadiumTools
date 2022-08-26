@@ -51,7 +51,7 @@ namespace StadiumTools
             if (Value.IsValid == false)
                 return "Null Spectator";
             else
-                return $"PlaySurface: T:{Value.SportType} N:[{Value.North.X},{Value.North.Y}], O:[{Value.Plane.OriginX},{Value.Plane.OriginY}]";
+                return $"PlaySurface: T:{Value.SportType} N:[{Value.North.X},{Value.North.Y}], P:[{Value.Plane.OriginX},{Value.Plane.OriginY}]";
         }
         public override string TypeName
         {
