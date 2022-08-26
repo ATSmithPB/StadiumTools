@@ -28,33 +28,38 @@ namespace GHA_StadiumTools
             StadiumTools.Tier defaultTier = new StadiumTools.Tier();
             StadiumTools.Tier.InitDefault(defaultTier, unit);
             pManager.AddGenericParameter("Spectator", "S", "A Spectator to inherit Spectator Parameters From", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Seperation", "Ss", "Distance between spectators seated on the same row (side-by-side)", GH_ParamAccess.item, defaultTier.SpecSeperation);
             pManager.AddNumberParameter("Start X", "sX", "Horizontal start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartX);
             pManager.AddNumberParameter("Start Y", "sY", "Vertical start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartY);
             pManager.AddBooleanParameter("Start", "St", "True if Tier Start is the end of the previous tier. False to use Section POF", GH_ParamAccess.item, defaultTier.BuildFromPreviousTier);
             pManager.AddIntegerParameter("Row Count", "rC", "Number of rows", GH_ParamAccess.item, defaultTier.RowCount);
             pManager.AddNumberParameter("Row Width", "rW", "Row width", GH_ParamAccess.item, defaultTier.DefaultRowWidth);
+            pManager.AddNumberParameter("Aisle Width", "aW", "Minimum Width of Aisles in this Tier", GH_ParamAccess.item, defaultTier.AisleWidth);
             pManager.AddNumberParameter("Rounding", "r", "Increment to round riser heights up to", GH_ParamAccess.item, defaultTier.RoundTo);
             pManager.AddNumberParameter("Maximum Rake Angle", "mrA", "Maximum rake angle in Radians (Tan(riser/row))", GH_ParamAccess.item, defaultTier.MaxRakeAngle);
             pManager.AddGenericParameter("SuperRiser", "SR", "An optional SuperRiser object to inherit parameters from", GH_ParamAccess.item);
             pManager.AddGenericParameter("Vomatory", "V", "An optional Vomatory object to inherit parameters from", GH_ParamAccess.item);
             pManager.AddGenericParameter("Fascia", "F", "An optional Fascia object to apply to the beginning of the tier", GH_ParamAccess.item);
-            pManager[8].Optional = true;
-            pManager[9].Optional = true;
+            
             pManager[10].Optional = true;
+            pManager[11].Optional = true;
+            pManager[12].Optional = true;
         }
 
         //Set parameter indixes to names  (for readability)
         private static int IN_Spectator = 0;
-        private static int IN_Start_X = 1;
-        private static int IN_Start_Y = 2;
-        private static int IN_Start = 3;
-        private static int IN_Row_Count = 4;
-        private static int IN_Row_Width = 5;
-        private static int IN_Rounding = 6;
-        private static int IN_Maximum_Rake_Angle = 7;
-        private static int IN_SuperRiser = 8;
-        private static int IN_Vomatory = 9;
-        private static int IN_Fascia = 10;
+        private static int IN_Seperation = 1;
+        private static int IN_Start_X = 2;
+        private static int IN_Start_Y = 3;
+        private static int IN_Start = 4;
+        private static int IN_Row_Count = 5;
+        private static int IN_Row_Width = 6;
+        private static int IN_Aisle_Width = 7;
+        private static int IN_Rounding = 8;
+        private static int IN_Maximum_Rake_Angle = 9;
+        private static int IN_SuperRiser = 10;
+        private static int IN_Vomatory = 11;
+        private static int IN_Fascia = 12;
         private static int OUT_Tier = 0;
 
         /// <summary>
@@ -166,6 +171,9 @@ namespace GHA_StadiumTools
             if(!DA.GetData(IN_Spectator, ref spectatorGooItem)) { return; }   
             tier.SpectatorParameters = spectatorGooItem.Value;
 
+            if (!DA.GetData(IN_Seperation, ref doubleItem)) { return; }
+            tier.SpecSeperation = doubleItem;
+
             if (!DA.GetData(IN_Start_X, ref doubleItem)) { return; }
             tier.StartX = doubleItem;
 
@@ -182,6 +190,9 @@ namespace GHA_StadiumTools
 
             if (!DA.GetData(IN_Row_Width, ref doubleItem)) { return; }
             tier.DefaultRowWidth = doubleItem;
+
+            if (!DA.GetData(IN_Aisle_Width, ref doubleItem)) { return; }
+            tier.AisleWidth = doubleItem;
 
             if (DA.GetData(IN_Fascia, ref fasciaItem))
             {
@@ -215,7 +226,7 @@ namespace GHA_StadiumTools
 
             //Set Vomatory property if input
             DA.GetData(IN_Vomatory, ref vomItem);
-            tier.Vomatory = vomItem;
+            tier.VomatoryParameters = vomItem;
 
             //Set Fascia property if input
 

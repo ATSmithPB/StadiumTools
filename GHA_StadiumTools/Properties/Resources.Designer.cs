@@ -73,6 +73,16 @@ namespace GHA_StadiumTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructPlan {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructPlan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ST_ConstructPlaySurface {
             get {
                 object obj = ResourceManager.GetObject("ST_ConstructPlaySurface", resourceCulture);
@@ -126,6 +136,16 @@ namespace GHA_StadiumTools.Properties {
         internal static System.Drawing.Bitmap ST_ConstructVomatory {
             get {
                 object obj = ResourceManager.GetObject("ST_ConstructVomatory", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_debug {
+            get {
+                object obj = ResourceManager.GetObject("ST_debug", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

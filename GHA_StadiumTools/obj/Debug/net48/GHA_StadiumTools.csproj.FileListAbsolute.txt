@@ -14,3 +14,7 @@ C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhi
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\StadiumTools_IO_Rhino.pdb
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.Properties.Resources.resources
 C:\Users\ATSmi\source\repos\GHA_StadiumTools\obj\Debug\net48\GHA_StadiumTools.csproj.GenerateResource.cache
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\GH_IO.dll
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\RhinoCommon.dll
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\GH_IO.xml
+C:\Users\ATSmi\source\repos\GHA_StadiumTools\bin\Debug\net48\RhinoCommon.xml

@@ -121,6 +121,9 @@
   <data name="ST_ConstructFascia" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_ConstructFascia.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ST_ConstructPlan" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructPlan.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ST_ConstructPlaySurface" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_ConstructPlaySurface.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -138,6 +141,9 @@
   </data>
   <data name="ST_ConstructVomatory" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_ConstructVomatory.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_debug" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_debug.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ST_DeConstructSection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_DeConstructSection.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

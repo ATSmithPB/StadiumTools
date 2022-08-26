@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pEwkLmdPbRGJFs0D2MyHaKGAX7koEsAfGCo0VPwHajoavTrCKjoaKj3D0Qe5CNRln0SxppoXRGhn8kyZ3iRT8w==",
+  "dgSpecHash": "yojifdGw3I+AUX6Q/jbiPfj6yaQpPlC0h7tk/m31F7ey6fNjYVzbkRZT/QhhZqSCygHBlqI5ARDFvfQPUbgFqg==",
   "success": true,
   "projectFilePath": "C:\\Users\\ATSmi\\source\\repos\\GHA_StadiumTools\\GHA_StadiumTools.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\ATSmi\\.nuget\\packages\\grasshopper\\7.20.22193.9001\\grasshopper.7.20.22193.9001.nupkg.sha512",
-    "C:\\Users\\ATSmi\\.nuget\\packages\\rhinocommon\\7.20.22193.9001\\rhinocommon.7.20.22193.9001.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

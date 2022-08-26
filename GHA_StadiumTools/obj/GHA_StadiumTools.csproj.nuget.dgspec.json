@@ -39,14 +39,7 @@
       "frameworks": {
         "net48": {
           "targetAlias": "net48",
-          "dependencies": {
-            "Grasshopper": {
-              "include": "Compile, Build",
-              "target": "Package",
-              "version": "[7.20.22193.9001, )"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
