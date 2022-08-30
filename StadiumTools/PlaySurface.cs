@@ -322,12 +322,26 @@ namespace StadiumTools
         private static ICurve[] MarkingsSoccer(Pln2d plane, double unit, LOD lod)
         {
             ICurve[] markings = new ICurve[1];
+            Pt2d[] markingPts = new Pt2d[2];
+
+            markingPts[0] = plane.OriginPt + (plane.Yaxis * -34.0 * unit);
+            markingPts[1] = plane.OriginPt + (plane.Yaxis * 34.0 * unit);
+
+            markings[0] = new Line(markingPts[0], markingPts[1]);
+
             return markings;
         }
 
         private static ICurve[] MarkingsFootball(Pln2d plane, double unit, LOD lod)
         {
             ICurve[] markings = new ICurve[1];
+            Pt2d[] markingPts = new Pt2d[2];
+
+            markingPts[0] = plane.OriginPt + (plane.Yaxis * (-48.767998/2 * unit));
+            markingPts[1] = plane.OriginPt + (plane.Yaxis * (48.767998/2 * unit));
+
+            markings[0] = new Line(markingPts[0], markingPts[1]);
+
             return markings;
         }
 
@@ -396,6 +410,10 @@ namespace StadiumTools
             return typeNamesMultiLine;
         }
 
+        /// <summary>
+        ///  returns a numbered multiline string representaton of the Type Enum
+        /// </summary>
+        /// <returns></returns>
         public static string TypeEnumNumberedAsString()
         {
             string[] typeNames = Enum.GetNames(typeof(Type));

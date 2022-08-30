@@ -50,7 +50,7 @@
     <Compile Include="Ellipse2d.cs" />
     <Compile Include="ICurve.cs" />
     <Compile Include="Line.cs" />
-    <Compile Include="Plan.cs" />
+    <Compile Include="BowlPlan.cs" />
     <Compile Include="PlaySurface.cs" />
     <Compile Include="Pln2d.cs" />
     <Compile Include="Pln3d.cs" />
