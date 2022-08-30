@@ -74,8 +74,7 @@ namespace GHA_StadiumTools
             }
             
             DA.SetData(OUT_PlaySurface, newPlaySurfaceGoo);
-            DA.SetData(OUT_Boundary, boundary);
-            
+            DA.SetData(OUT_Boundary, boundary);   
         }
 
         /// <summary>
