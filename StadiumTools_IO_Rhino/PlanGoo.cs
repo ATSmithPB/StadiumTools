@@ -14,14 +14,14 @@ namespace StadiumTools
     /// <summary>
     /// Tier Goo wrapper class, makes sure Tier can be used in Grasshopper.  
     /// </summary>
-    public class PlanGoo : GH_Goo<Plan>
+    public class BowlPlanGoo : GH_Goo<BowlPlan>
     {
         //Constructors
-        public PlanGoo()
+        public BowlPlanGoo()
         {
-            this.Value = new Plan();
+            this.Value = new BowlPlan();
         }
-        public PlanGoo(Plan plan)
+        public BowlPlanGoo(BowlPlan plan)
         {
             this.Value = plan;
         }
@@ -30,9 +30,9 @@ namespace StadiumTools
         {
             return Duplicate();
         }
-        public PlanGoo DuplicateTierGoo()
+        public BowlPlanGoo DuplicateTierGoo()
         {
-            return new PlanGoo(Value == null ? new Plan() : (StadiumTools.Plan)Value.Clone());
+            return new BowlPlanGoo(Value == null ? new BowlPlan() : (StadiumTools.BowlPlan)Value.Clone());
         }
 
         public override bool IsValid
@@ -49,7 +49,7 @@ namespace StadiumTools
             if (Value == null)
                 return "Null Plan";
             else
-                return $"Plan: PS:{this.Value.PlaySurfaceParameters.SportType.ToString()} O:{this.Value.DefaultSightlineOffset} Y:{this.Value.PlanStyle.ToString()}";
+                return $"Plan: PS:{this.Value.PlaySurfaceParameters.SportType.ToString()} O:{this.Value.BowlOffsets} Y:{this.Value.BowlStyle.ToString()}";
         }
         public override string TypeName
         {
@@ -79,7 +79,6 @@ namespace StadiumTools
             }
             return tierArray;
         }
-
 
     }
 
