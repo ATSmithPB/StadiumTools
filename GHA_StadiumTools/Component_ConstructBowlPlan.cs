@@ -68,7 +68,7 @@ namespace GHA_StadiumTools
             StadiumTools.BowlPlan newPlan = ST_ConstructBowlPlan.ConstructPlanFromDA(DA, this);
 
             //GH_Goo<T> wrapper
-            StadiumTools.BowlPlanGoo newPlanGoo = new StadiumTools.BowlPlanGoo(newPlan);
+            var newPlanGoo = new StadiumTools.BowlPlanGoo(newPlan);
 
             //Output Goo
             DA.SetData(OUT_Plan, newPlanGoo);
@@ -93,18 +93,16 @@ namespace GHA_StadiumTools
         private static StadiumTools.BowlPlan ConstructPlanFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
             //Item Containers  
-            StadiumTools.PlaySurfaceGoo playSurfaceGooItem = new StadiumTools.PlaySurfaceGoo();
-            StadiumTools.BowlPlan newPlan = new StadiumTools.BowlPlan();
+            var playSurfaceGooItem = new StadiumTools.PlaySurfaceGoo();
+            var newPlan = new StadiumTools.BowlPlan();
             int intItem = 0;
-            List<double> bowlOffsets = new List<double>();
-            List<double> bowlRadaii = new List<double>();
-            List<double> cornerRadaii = new List<double>();
-            List<int> cornerBayCount = new List<int>();
-            List<bool> centerGridlines = new List<bool>();
-            List<double> bayWidths = new List<double>();
+            var bowlOffsets = new List<double>();
+            var bowlRadaii = new List<double>();
+            var cornerRadaii = new List<double>();
+            var cornerBayCount = new List<int>();
+            var centerGridlines = new List<bool>();
+            var bayWidths = new List<double>();
             
-            
-
             //Get PlaySurface
             DA.GetData<StadiumTools.PlaySurfaceGoo>(IN_PlaySurface, ref playSurfaceGooItem);
             newPlan.PlaySurfaceParameters = playSurfaceGooItem.Value;
@@ -166,6 +164,5 @@ namespace GHA_StadiumTools
             }
             return result;
         }
-
     }
 }

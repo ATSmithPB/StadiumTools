@@ -24,7 +24,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            StadiumTools.Vomatory defaultVomatory = new StadiumTools.Vomatory();
+            var defaultVomatory = new StadiumTools.Vomatory();
             StadiumTools.Vomatory.InitDefault(defaultVomatory);
             pManager.AddIntegerParameter("Start Row", "sR", "Start Row to replace with vomatory", GH_ParamAccess.item, defaultVomatory.Start);
             pManager.AddIntegerParameter("Height (Rows)", "H", "Height of vomatory in number of rows(+ risers)", GH_ParamAccess.item, defaultVomatory.Height);
@@ -51,7 +51,7 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            StadiumTools.Vomatory newVomatory = new StadiumTools.Vomatory();
+            var newVomatory = new StadiumTools.Vomatory();
             ST_ConstructVomatory.ConstructVomatoryFromDA(DA, newVomatory);
             DA.SetData(OUT_Vomatory, newVomatory);
         }

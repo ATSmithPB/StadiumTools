@@ -57,12 +57,12 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            StadiumTools.PlaySurface playSurface = new StadiumTools.PlaySurface();
+            var playSurface = new StadiumTools.PlaySurface();
             
             ST_ConstructPlaySurface.HandleErrors(DA, this);
             ST_ConstructPlaySurface.ConstructPlaySurfaceFromDA(DA, ref playSurface);
 
-            StadiumTools.PlaySurfaceGoo newPlaySurfaceGoo = new StadiumTools.PlaySurfaceGoo(playSurface);
+            var newPlaySurfaceGoo = new StadiumTools.PlaySurfaceGoo(playSurface);
             Rhino.Geometry.PolyCurve boundary = StadiumTools.IO.PolyCurveFromICurveArray(playSurface.Boundary);
             boundary.MakeClosed(Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
             int markingCount = playSurface.Markings.Length;
@@ -96,7 +96,7 @@ namespace GHA_StadiumTools
         private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
         {
             int intItem = 0;
-            Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
+            var planeItem = new Rhino.Geometry.Plane();
 
             //Row number must be => 1
             if (DA.GetData<int>(IN_Type, ref intItem))
@@ -120,8 +120,8 @@ namespace GHA_StadiumTools
         {
             //Containers (Destination)
             int intItem = 0;
-            Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
-            Rhino.Geometry.Vector3d vectorItem = new Rhino.Geometry.Vector3d();
+            var planeItem = new Rhino.Geometry.Plane();
+            var vectorItem = new Rhino.Geometry.Vector3d();
 
             //Set PlaySurface Params
             if (!DA.GetData<int>(IN_Type, ref intItem)) { return; }

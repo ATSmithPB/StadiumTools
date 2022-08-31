@@ -25,7 +25,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
-            StadiumTools.Spectator defaultSpectator = new StadiumTools.Spectator();
+            var defaultSpectator = new StadiumTools.Spectator();
             StadiumTools.Spectator.InitDefault(defaultSpectator, unit);
             pManager.AddGenericParameter("Spectator", "Sp", "Spectator object to inerit parameters from", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Row", "R", "Row to replace with super riser", GH_ParamAccess.item, 10);
@@ -113,8 +113,8 @@ namespace GHA_StadiumTools
 
         private static void ConstructSuperRiserFromDA(IGH_DataAccess DA)
         {
-            StadiumTools.SuperRiser superRiser = new StadiumTools.SuperRiser();
-            StadiumTools.SpectatorGoo spectatorGooItem = new StadiumTools.SpectatorGoo();
+            var superRiser = new StadiumTools.SuperRiser();
+            var spectatorGooItem = new StadiumTools.SpectatorGoo();
             int intItem = 0;
             double doubleItem = 0.0;
 

@@ -79,7 +79,7 @@ namespace GHA_StadiumTools
 
             //Item Container (Destination)
             Rhino.Geometry.Curve curve = null;
-            Rhino.Geometry.Polyline polyLineItem = new Rhino.Geometry.Polyline();
+            var polyLineItem = new Rhino.Geometry.Polyline();
 
             //Get & Set Polyline
             if (DA.GetData(IN_Polyline, ref curve))
@@ -90,23 +90,20 @@ namespace GHA_StadiumTools
                 }
 
                 //Item Container (Destination)
-                Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
+                var planeItem = new Rhino.Geometry.Plane();
                 DA.GetData<Rhino.Geometry.Plane>(IN_Plane, ref planeItem);
                 int intItem = 0;
-
-                //Convert PolyCurve to Polyline
-                //Rhino.Geometry.Polyline polyLineItem = PolyCurveToPolyline(polyCurveItem);
 
                 //Transform Polyline from input Plane to World XY  
                 polyLineItem.Transform(Rhino.Geometry.Transform.PlaneToPlane(planeItem, Rhino.Geometry.Plane.WorldXY));
 
                 //Convert PolyLine to Pt2d Array
-                StadiumTools.Pt2d[] pts = new StadiumTools.Pt2d[polyLineItem.Count];
+                var pts = new StadiumTools.Pt2d[polyLineItem.Count];
                 pts = StadiumTools.IO.Pt2dFromPolyline(polyLineItem);
 
                 DA.GetData<int>(IN_View_Blocker, ref intItem);
 
-                StadiumTools.Fascia newFascia = new StadiumTools.Fascia(pts, intItem, unit);
+                var newFascia = new StadiumTools.Fascia(pts, intItem, unit);
 
                 DA.SetData(OUT_Fascia, newFascia);
             }
@@ -125,7 +122,7 @@ namespace GHA_StadiumTools
         /// <returns></returns>
         private static Rhino.Geometry.Polyline PolyCurveToPolyline(Rhino.Geometry.PolyCurve polyCurveItem)
         {
-            Rhino.Geometry.Polyline result = new Rhino.Geometry.Polyline();
+            var result = new Rhino.Geometry.Polyline();
             result.Add(polyCurveItem.SegmentCurve(0).PointAtStart);
             
             for (int i = 0; i < polyCurveItem.SegmentCount; i ++)

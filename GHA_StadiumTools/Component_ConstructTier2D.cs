@@ -114,7 +114,7 @@ namespace GHA_StadiumTools
             bool start = false;
             int rowCount = 0;
             double doubleItem = 0.0;
-            StadiumTools.SuperRiser superItem = new StadiumTools.SuperRiser();
+            var superItem = new StadiumTools.SuperRiser();
 
             if (!DA.GetData<bool>(IN_Start, ref start)) { return; }
 
@@ -158,10 +158,10 @@ namespace GHA_StadiumTools
         private static void ConstructTierFromDA(IGH_DataAccess DA, StadiumTools.Tier tier)
         {
             //Item Containers (Destinations)
-            StadiumTools.SpectatorGoo spectatorGooItem = new StadiumTools.SpectatorGoo();
-            StadiumTools.SuperRiser superItem = new StadiumTools.SuperRiser();
-            StadiumTools.Vomatory vomItem = new StadiumTools.Vomatory();
-            StadiumTools.Fascia fasciaItem = new StadiumTools.Fascia();
+            var spectatorGooItem = new StadiumTools.SpectatorGoo();
+            var superItem = new StadiumTools.SuperRiser();
+            var vomItem = new StadiumTools.Vomatory();
+            var fasciaItem = new StadiumTools.Fascia();
             int intItem = 0;
             bool boolItem = false;
             double doubleItem = 0.0;

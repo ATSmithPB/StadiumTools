@@ -26,7 +26,7 @@ namespace GHA_StadiumTools
         {
             //Get Unit coeffecient for default values
             double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
-            StadiumTools.Spectator defaultSpectator = new StadiumTools.Spectator();
+            var defaultSpectator = new StadiumTools.Spectator();
             StadiumTools.Spectator.InitDefault(defaultSpectator, unit);
             pManager.AddIntegerParameter("Target C-Value", "C", "Target spectator C-value in millimeters", GH_ParamAccess.item, defaultSpectator.TargetCValue);
             pManager.AddNumberParameter("Eye Horizontal", "eX", "Horizontal distance of spectator eyes from rear riser", GH_ParamAccess.item, defaultSpectator.EyeX);
@@ -67,14 +67,14 @@ namespace GHA_StadiumTools
             ST_ConstructSpectator.HandleErrors(DA, this, unitSystemName);
 
             //Instance a new Spectator
-            StadiumTools.Spectator newSpectator = new StadiumTools.Spectator();
+            var newSpectator = new StadiumTools.Spectator();
             newSpectator.Unit = 1.0;
 
             //Set parameters from Data Access
             ST_ConstructSpectator.ConstructSpectatorFromDA(DA, newSpectator, unitSystemName);
 
             //GH_Goo<T> wrapper
-            StadiumTools.SpectatorGoo newSpectatorGoo = new StadiumTools.SpectatorGoo(newSpectator);
+            var newSpectatorGoo = new StadiumTools.SpectatorGoo(newSpectator);
 
             //Output Goo
             DA.SetData(OUT_Spectator, newSpectatorGoo);

@@ -27,7 +27,7 @@ namespace GHA_StadiumTools
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Tier2D", "T", "2D Seating Tiers that comprise a section", GH_ParamAccess.list);
-            pManager.AddPlaneParameter("Section Plane", "sP", "3D plane of section. Origin should be Point-Of-Focus", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
+            pManager.AddPlaneParameter("Plane", "Pl", "3D plane to preview Section. Plane Origin will be used as the Point-Of-Focus for calculating C-Values", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
         }
 
         //Set parameter indixes to names (for readability)
@@ -54,7 +54,7 @@ namespace GHA_StadiumTools
             StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA, this);
 
             //GH_Goo<T> wrapper
-            StadiumTools.SectionGoo newSectionGoo = new StadiumTools.SectionGoo(newSection);
+            var newSectionGoo = new StadiumTools.SectionGoo(newSection);
 
             //Output Goo
             DA.SetData(OUT_Section, newSectionGoo);
@@ -79,8 +79,8 @@ namespace GHA_StadiumTools
         private static StadiumTools.Section ConstructSectionFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
             //Item Containers  
-            Rhino.Geometry.Plane planeItem = new Rhino.Geometry.Plane();
-            List<StadiumTools.TierGoo> tierGooList = new List<StadiumTools.TierGoo>();
+            var planeItem = new Rhino.Geometry.Plane();
+            var tierGooList = new List<StadiumTools.TierGoo>();
 
             //Get TiersGoo
             DA.GetDataList<StadiumTools.TierGoo>(IN_Tiers, tierGooList);
@@ -97,12 +97,8 @@ namespace GHA_StadiumTools
             StadiumTools.Pln3d pln = StadiumTools.IO.Pln3dFromPlane(planeItem);
 
             //Construct a new section
-            StadiumTools.Section newSection = new StadiumTools.Section(tierArray, pln);
+            var newSection = new StadiumTools.Section(tierArray, pln);
             return newSection;
         }
-
-        
-
-
     }
 }

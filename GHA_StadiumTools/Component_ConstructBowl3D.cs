@@ -11,13 +11,13 @@ namespace GHA_StadiumTools
     /// <summary>
     /// Create a custom GH component called ST_ConstructSection2D using the GH_Component as base. 
     /// </summary>
-    public class ST_DeconstructSection2D : GH_Component
+    public class ST_ConstructBowl3D : GH_Component
     {
         /// <summary>
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
-        public ST_DeconstructSection2D()
-            : base(nameof(ST_DeconstructSection2D), "dS", "Deconstruct a 2D section into it's respective data and geometry", "StadiumTools", "2D Section")
+        public ST_ConstructBowl3D()
+            : base(nameof(ST_ConstructBowl3D), "cB", "Construct a 3D seating bowl from a BowlPlan and a Section", "StadiumTools", "3D")
         {
         }
 
@@ -26,21 +26,23 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Section2D", "S", "A Section object to deconstruct", GH_ParamAccess.item);
+            pManager.AddGenericParameter("BowlPlan", "BP", "a valid 2D StadiumTools BowlPlan object", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Section", "S", "a valid 2D StadiumTools Section object", GH_ParamAccess.item);
         }
 
         //Set parameter indixes to names (for readability)
-        private static int IN_Section = 0;
-        private static int OUT_Tiers = 0;
-        private static int OUT_Section_Plane = 1;
+        private static int IN_BowlPlan = 0;
+        private static int IN_Section = 1;
+        private static int OUT_Bowl3D = 0;
+        private static int OUT_Mesh = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Tier2D", "T", "Section Tiers", GH_ParamAccess.list);
-            pManager.AddPlaneParameter("Section Plane", "PlOF", "Plane of Section where 0,0 is Point of Focus", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Bowl3D", "B3D", "A Bowl3D object", GH_ParamAccess.item);
+            pManager.AddMeshParameter("Mesh", "M", "A mesh representation of the resulting Bowl3D", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -50,7 +52,14 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            ST_DeconstructSection2D.DeconstructSectionFromDA(DA);
+            //Construct a new section from Data Access
+            StadiumTools.Bowl3d newBowl3d = ST_ConstructBowl3D.ConstructBowl3dFromDA(DA, this);
+
+            //GH_Goo<T> wrapper
+            var newBowl3dGoo = new StadiumTools.Bowl3dGoo(newBowl3d);
+
+            //Output Goo
+            DA.SetData(OUT_Bowl3D, newBowl3dGoo);
         }
 
         /// <summary>
@@ -59,43 +68,36 @@ namespace GHA_StadiumTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Resources.ST_DeConstructSection;
+        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructBowl3D;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("83d42ddf-835d-4b3d-8aa0-e4bb640807b0");
+        public override Guid ComponentGuid => new Guid("248eabbc-6964-4195-91e9-a594a6c5309c");
 
-        //Methods
-        private static void DeconstructSectionFromDA(IGH_DataAccess DA)
+        //Methods  
+        private static StadiumTools.Bowl3d ConstructBowl3dFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
-            //Item Containers (Destinations)
+            //Item Containers
+            var bowlPlanGooItem = new StadiumTools.BowlPlanGoo();
             var sectionGooItem = new StadiumTools.SectionGoo();
-            
-            //Get Input Section Object
-            if (!DA.GetData<StadiumTools.SectionGoo>(IN_Section, ref sectionGooItem))
-                return;
 
-            //Unwrap Section Goo
-            StadiumTools.Section sectionItem = sectionGooItem.Value;
+            //Get Goos
+            DA.GetData<StadiumTools.BowlPlanGoo>(IN_BowlPlan, ref bowlPlanGooItem);
+            DA.GetData<StadiumTools.SectionGoo>(IN_Section, ref sectionGooItem);
 
-            //Wrap Tier Goo
-            var tierGooList = new List<StadiumTools.TierGoo>();
-            for (int i = 0; i < sectionItem.Tiers.Length; i++)
-            {
-                tierGooList.Add(new StadiumTools.TierGoo(sectionItem.Tiers[i]));
-            }
+            var bowlPlanItem = bowlPlanGooItem.Value;
+            var sectionItem = sectionGooItem.Value;
 
-            //Deconstruct Section object and ouput data
-            //Set Tiers
-            DA.SetDataList(OUT_Tiers, tierGooList);
+            //Construct a new Bowl3d
+            var newBowl3d = new StadiumTools.Bowl3d(sectionItem, bowlPlanItem);
 
-            //Set PlanePOF
-            Rhino.Geometry.Plane sectionPlane = StadiumTools.IO.PlaneFromPln3d(sectionItem.Plane);
-            DA.SetData(OUT_Section_Plane, sectionPlane);
+            return newBowl3d;
         }
+
+
 
 
     }

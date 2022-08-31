@@ -90,7 +90,7 @@ namespace GHA_StadiumTools
         public static void DeconstructSpectatorFromDA(IGH_DataAccess DA)
         {
             //Item Containers
-            StadiumTools.SpectatorGoo specGooItem = new StadiumTools.SpectatorGoo();
+            var specGooItem = new StadiumTools.SpectatorGoo();
 
             //Get Input Spectator
             if (!DA.GetData<StadiumTools.SpectatorGoo>(IN_Spectator, ref specGooItem))
@@ -100,8 +100,8 @@ namespace GHA_StadiumTools
             StadiumTools.Spectator specItem = specGooItem.Value;
 
             //Section plane of spectator
-            StadiumTools.Pln3d specPln3d = new StadiumTools.Pln3d();
-            Rhino.Geometry.Plane specPlane = new Rhino.Geometry.Plane();
+            var specPln3d = new StadiumTools.Pln3d();
+            var specPlane = new Rhino.Geometry.Plane();
             specPln3d = specItem.Plane;
             specPlane = StadiumTools.IO.PlaneFromPln3d(specPln3d);
 
@@ -110,7 +110,7 @@ namespace GHA_StadiumTools
             DA.SetData(OUT_Eye_Point, eyePt);
 
             //Set Seated SightLine
-            Rhino.Geometry.Line sightLine = new Rhino.Geometry.Line(eyePt, specPlane.Origin);
+            var sightLine = new Rhino.Geometry.Line(eyePt, specPlane.Origin);
             DA.SetData(OUT_SightLine, sightLine);
 
             //Set Standing Eye Point
@@ -140,7 +140,5 @@ namespace GHA_StadiumTools
             DA.SetData(OUT_Blocker, StadiumTools.IO.Point3dFromPt3d(specItem.ForwardSpectatorLoc2d.ToPt3d(specPln3d)));
 
         }
-
-
     }
 }

@@ -82,7 +82,7 @@ namespace GHA_StadiumTools
         public static void DeconstructTierFromDA(IGH_DataAccess DA)
         {
             //Item Containers
-            StadiumTools.TierGoo tierGooItem = new StadiumTools.TierGoo();
+            var tierGooItem = new StadiumTools.TierGoo();
 
             //Get Input Tier Object
             if (!DA.GetData<StadiumTools.TierGoo>(IN_Tier, ref tierGooItem)) { return; }
@@ -90,7 +90,7 @@ namespace GHA_StadiumTools
             //Uwrap TierGoo
             StadiumTools.Tier tierItem = tierGooItem.Value;
 
-            List<string> stringList = new List<string>();
+            var stringList = new List<string>();
             for (int i = 0; i < tierItem.Points2dCount; i++)
             {
                 string strx = tierItem.Points2d[i].X.ToString();
@@ -102,7 +102,7 @@ namespace GHA_StadiumTools
             if (tierItem.Spectators.Length > 0)
             {
                 //Wrap Speectators in Goo
-                List<StadiumTools.SpectatorGoo> spectatorGooList = new List<StadiumTools.SpectatorGoo>();
+                var spectatorGooList = new List<StadiumTools.SpectatorGoo>();
                 for (int i = 0; i < tierItem.Spectators.Length; i++)
                 {
                     spectatorGooList.Add(new StadiumTools.SpectatorGoo(tierItem.Spectators[i]));
