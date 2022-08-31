@@ -51,7 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlanGoo.cs" />
+    <Compile Include="Bowl3dGoo.cs" />
+    <Compile Include="BowlPlanGoo.cs" />
     <Compile Include="PlaySurfaceGoo.cs" />
     <Compile Include="SectionGoo.cs" />
     <Compile Include="SpectatorGoo.cs" />

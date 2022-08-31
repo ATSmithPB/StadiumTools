@@ -32,7 +32,7 @@ namespace StadiumTools
         {
             return Duplicate();
         }
-        public PlaySurfaceGoo DuplicateTierGoo()
+        public PlaySurfaceGoo DuplicatePlaySurfaceGoo()
         {
             return new PlaySurfaceGoo(Value.IsValid == false ? new PlaySurface() : (StadiumTools.PlaySurface)Value.Clone());
         }

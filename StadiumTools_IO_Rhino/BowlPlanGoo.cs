@@ -10,30 +10,29 @@ using Grasshopper.Kernel.Types;
 
 namespace StadiumTools
 {
+
     /// <summary>
-    /// Section Goo wrapper class, makes sure Section can be used in Grasshopper.
+    /// Tier Goo wrapper class, makes sure Tier can be used in Grasshopper.  
     /// </summary>
-    public class SectionGoo : GH_Goo<Section>
+    public class BowlPlanGoo : GH_Goo<BowlPlan>
     {
         //Constructors
-        public SectionGoo()
+        public BowlPlanGoo()
         {
-            this.Value = new Section();
+            this.Value = new BowlPlan();
         }
-        public SectionGoo(Section section)
+        public BowlPlanGoo(BowlPlan plan)
         {
-            if (section == null)
-                section = new Section();
-            this.Value = section;
+            this.Value = plan;
         }
 
         public override IGH_Goo Duplicate()
         {
             return Duplicate();
         }
-        public SectionGoo DuplicateSectionGoo()
+        public BowlPlanGoo DuplicatePlanGoo()
         {
-            return new SectionGoo(Value == null ? new Section() : (StadiumTools.Section)Value.Clone());
+            return new BowlPlanGoo(Value == null ? new BowlPlan() : (StadiumTools.BowlPlan)Value.Clone());
         }
 
         public override bool IsValid
@@ -48,18 +47,19 @@ namespace StadiumTools
         public override string ToString()
         {
             if (Value == null)
-                return "Null Section";
+                return "Null BowlPlan";
             else
-                return $"Section: T:{Value.Tiers.Length}";
+                return $"BowlPlan: PS:{this.Value.PlaySurfaceParameters.SportType.ToString()} O:{this.Value.BowlOffsets} Y:{this.Value.BowlStyle.ToString()}";
         }
         public override string TypeName
         {
-            get { return ("Section"); }
+            get { return ("BowlPlan"); }
         }
         public override string TypeDescription
         {
-            get { return ("Defines a single StadiumTools Section"); }
+            get { return ("Defines a single StadiumTools BowlPlan"); }
         }
+
     }
 
 }

@@ -32,7 +32,7 @@ namespace StadiumTools
         {
             return Duplicate();
         }
-        public SpectatorGoo DuplicateTierGoo()
+        public SpectatorGoo DuplicateSpectatorGoo()
         {
             return new SpectatorGoo(Value == null ? new Spectator() : (StadiumTools.Spectator)Value.Clone());
         }

@@ -10,30 +10,29 @@ using Grasshopper.Kernel.Types;
 
 namespace StadiumTools
 {
+
     /// <summary>
-    /// Section Goo wrapper class, makes sure Section can be used in Grasshopper.
+    /// Tier Goo wrapper class, makes sure Tier can be used in Grasshopper.  
     /// </summary>
-    public class SectionGoo : GH_Goo<Section>
+    public class Bowl3dGoo : GH_Goo<Bowl3d>
     {
         //Constructors
-        public SectionGoo()
+        public Bowl3dGoo()
         {
-            this.Value = new Section();
+            this.Value = new Bowl3d();
         }
-        public SectionGoo(Section section)
+        public Bowl3dGoo(Bowl3d bowl3d)
         {
-            if (section == null)
-                section = new Section();
-            this.Value = section;
+            this.Value = bowl3d;
         }
 
         public override IGH_Goo Duplicate()
         {
             return Duplicate();
         }
-        public SectionGoo DuplicateSectionGoo()
+        public Bowl3dGoo DuplicateBowl3dGoo()
         {
-            return new SectionGoo(Value == null ? new Section() : (StadiumTools.Section)Value.Clone());
+            return new Bowl3dGoo(Value == null ? new Bowl3d() : (StadiumTools.Bowl3d)Value.Clone());
         }
 
         public override bool IsValid
@@ -48,18 +47,21 @@ namespace StadiumTools
         public override string ToString()
         {
             if (Value == null)
-                return "Null Section";
+                return "Null Bowl3d";
             else
-                return $"Section: T:{Value.Tiers.Length}";
+                return $"Bowl3d: PS:{this.Value.BowlPlan.PlaySurfaceParameters.SportType.ToString()}";
         }
         public override string TypeName
         {
-            get { return ("Section"); }
+            get { return ("Bowl3d"); }
         }
         public override string TypeDescription
         {
-            get { return ("Defines a single StadiumTools Section"); }
+            get { return ("Defines a single StadiumTools Bowl3d"); }
         }
+
+        
+
     }
 
 }
