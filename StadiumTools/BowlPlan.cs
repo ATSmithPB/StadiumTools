@@ -74,6 +74,7 @@ namespace StadiumTools
             Orthagonal = 1,
             NoCorners = 2,
             Circular = 3,
+            Elliptical = 4
         }
 
         //Constructors
@@ -82,21 +83,70 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Construct a Plan based around a PlaySurface
+        /// Construct a BowlPlan based around a PlaySurface and global parameters
         /// </summary>
         /// <param name="playSurface"></param>
         /// <param name="planStyle"></param>
         /// <param name="defaultBayWidth"></param>
         /// <param name="defaultSightlineOffset"></param>
         /// <param name="cornerBayCount"></param>
-        public BowlPlan(PlaySurface playSurface, Style bowlStyle, double bowlOffset)
+        public BowlPlan(PlaySurface playSurface, 
+                        Style bowlStyle, 
+                        double bowlOffset,
+                        double bowlRadaii,
+                        double cornerRadaii,
+                        bool centerGridline,
+                        double bayWidths,
+                        int cornerBayCount
+                       )
         {
             this.PlaySurfaceParameters = playSurface;
             this.Unit = playSurface.Unit;
             this.BowlStyle = bowlStyle;
-            int bowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle);
-            this.BowlEdgeCount = bowlEdgeCount;
-            this.BowlOffsets = Populate(new double[bowlEdgeCount], bowlOffset);
+            int boundaryCount = playSurface.Boundary.Length;
+            this.BowlOffsets = ArrayValue(bowlOffset, boundaryCount);
+            this.BowlRadaii = ArrayValue(bowlRadaii, boundaryCount);
+            this.CornerRadaii = ArrayValue(cornerRadaii, boundaryCount);
+            this.CenterGridline = ArrayValue(centerGridline, boundaryCount);
+            this.BayWidths = ArrayValue(bayWidths, boundaryCount);
+            this.CornerBayCount = ArrayValue(cornerBayCount, boundaryCount);
+            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, cornerRadaii); 
+            this.IsValid = true;
+        }
+
+        /// <summary>
+        /// Construct a BowlPlan based around a PlaySurface and arrays of unique parameters. Array length must equal PlaySurface.Boundary.Length 
+        /// </summary>
+        /// <param name="playSurface"></param>
+        /// <param name="bowlStyle"></param>
+        /// <param name="bowlOffset"></param>
+        /// <param name="bowlRadaii"></param>
+        /// <param name="cornerRadaii"></param>
+        /// <param name="centerGridline"></param>
+        /// <param name="bayWidths"></param>
+        /// <param name="cornerBayCount"></param>
+        public BowlPlan(PlaySurface playSurface,
+                        Style bowlStyle,
+                        double[] bowlOffset,
+                        double[] bowlRadaii,
+                        double[] cornerRadaii,
+                        bool[] centerGridline,
+                        double[] bayWidths,
+                        int[] cornerBayCount
+                       )
+        {
+            this.PlaySurfaceParameters = playSurface;
+            this.Unit = playSurface.Unit;
+            this.BowlStyle = bowlStyle;
+            int boundaryCount = playSurface.Boundary.Length;
+            this.BowlEdgeCount = boundaryCount;
+            this.BowlOffsets = ValidateLength(bowlOffset, "BowlOffsets", boundaryCount);
+            this.BowlRadaii = ValidateLength(bowlRadaii, "BowlRadaii", boundaryCount);
+            this.CornerRadaii = ValidateLength(cornerRadaii, "CornerRadaii", boundaryCount);
+            this.CenterGridline = ValidateLength(centerGridline, "CenterGridline", boundaryCount);
+            this.BayWidths = ValidateLength(bayWidths, "BayWidths", boundaryCount);
+            this.CornerBayCount = ValidateLength(cornerBayCount, "CornerBayCount", boundaryCount);
+            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, cornerRadaii);
             this.IsValid = true;
         }
 
@@ -168,19 +218,76 @@ namespace StadiumTools
             return typeNamesMultiLine;
         }
 
-        public static double[] Populate(double[] array, double value)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T[] ArrayValue<T>(T value, int length)
         {
-            foreach (int i in array)
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
             {
-                array[i] = value;
+                result[i] = value;
             }
-            return array;
+            return result;
         }
 
-        public static int CalcBowlEdgeCount(PlaySurface playSurface, Style bowlStyle)
+        /// <summary>
+        /// returns a new argument exception of an array of values does not equal a specified length
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="valueName"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static T[] ValidateLength<T>(T[] value, string valueName, int length)
+        {
+            if (value.Length != length)
+            {
+                throw new ArgumentException($"{valueName} length [{value.Length}] must be equal to PlaySurface.Boundary.Length {length}");
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        public static int CalcBowlEdgeCount(PlaySurface playSurface, Style bowlStyle, double[] cornerRadaii)
         {
             int bowlEdgeCount = 0;
+            int boundaryCount = playSurface.Boundary.Length;
 
+            switch ((int)bowlStyle)
+            {
+                case ((int)Style.Radial) :
+                    {
+                        bowlEdgeCount = boundaryCount;
+                        break;
+                    }
+                case ((int)Style.Orthagonal):
+                    {
+                        bowlEdgeCount = boundaryCount;
+                        break;
+                    }
+                case ((int)Style.NoCorners):
+                    {
+                        bowlEdgeCount = boundaryCount;
+                        break;
+                    }
+                case ((int)Style.Circular):
+                    {
+                        bowlEdgeCount = 1;
+                        break;
+                    }
+                case ((int)Style.Elliptical):
+                    {
+                        bowlEdgeCount = 1;
+                        break;
+                    }
+            }
 
             return bowlEdgeCount;
         }
