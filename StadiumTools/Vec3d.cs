@@ -51,6 +51,26 @@ namespace StadiumTools
             this.M = Magnitude(v.X, v.Y, z);
         }
 
+        /// <summary>
+        /// Constructs a Vec3d with the same XYZ components as a Pt3d
+        /// </summary>
+        /// <param name="pt3d"></param>
+        public Vec3d(Pt3d pt3d)
+        {
+            this.X = pt3d.X;
+            this.Y = pt3d.Y;
+            this.Z = pt3d.Z;
+            this.M = Magnitude(pt3d.X, pt3d.Y, pt3d.Z);
+        }
+
+        public Vec3d(Pt3d start, Pt3d end)
+        {
+            this.X = end.X - start.X;
+            this.Y = end.Y - start.Y;
+            this.Z = end.Z - start.Z;
+            this.M = Magnitude(this.X, this.Y, this.Z);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -102,7 +122,7 @@ namespace StadiumTools
         /// <param name="b"></param>
         /// <param name="c"></param>
         /// <returns>double</returns>
-        private static double Magnitude(double a, double b, double c)
+        public static double Magnitude(double a, double b, double c)
         {
             double x = Abs(Sqrt((a * a) + (b * b) + (c * c)));
             return x;

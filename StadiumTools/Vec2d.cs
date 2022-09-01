@@ -62,6 +62,17 @@ namespace StadiumTools
         }
 
         /// <summary>
+        /// Construct a 2d vector from the XY components of a Pt2d
+        /// </summary>
+        /// <param name="pt2d"></param>
+        public Vec2d(Pt2d pt2d)
+        {
+            this.X = pt2d.X;
+            this.Y = pt2d.Y;
+            this.M = Magnitude(pt2d.X, pt2d.Y);
+        }
+
+        /// <summary>
         /// Construct a 2d vector from a Spectator object
         /// </summary>
         /// <param name="spec"></param>
@@ -207,5 +218,7 @@ namespace StadiumTools
             Vec2d b = new Vec2d(origin, end);
             return (2* PI) - Angle(a, b);
         }
+
+
     }
 }

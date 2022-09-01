@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using Rhino.Geometry;
 
 namespace StadiumTools
 {
@@ -30,7 +31,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Construct pts Pt2d from its component coordinates
+        /// Construct Pt2d from its component coordinates
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -38,6 +39,16 @@ namespace StadiumTools
         {
             this.X = x;
             this.Y = y;
+        }
+
+        /// <summary>
+        /// Construct Pt2d from XY components of a Pt3d
+        /// </summary>
+        /// <param name="pt3d"></param>
+        public Pt2d(Pt3d pt3d)
+        {
+            this.X = pt3d.X;
+            this.Y = pt3d.Y;
         }
 
         //Delegates
@@ -57,6 +68,11 @@ namespace StadiumTools
         public static Pt2d operator +(Pt2d p, Pt2d b)
         {
             return Add(p, b);
+        }
+
+        public static Pt2d operator -(Pt2d p, Pt2d b)
+        {
+            return Subtract(p, b);
         }
 
         //Methods
@@ -79,6 +95,12 @@ namespace StadiumTools
             return (Pt2d)this.MemberwiseClone();
         }
 
+        /// <summary>
+        /// scale a collection of points about their origin
+        /// </summary>
+        /// <param name="pts"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
         public static Pt2d[] Scale(Pt2d[] pts, double factor)
         {
             Pt2d[] ptsScaled = new Pt2d[pts.Length];
@@ -219,5 +241,56 @@ namespace StadiumTools
         {
             return new Pt2d(a.X * b, a.Y * b);
         }
+
+        public static Pt2d Subtract(Pt2d a, Pt2d b)
+        {
+            return new Pt2d(a.X - b.X, a.Y - b.Y);
+        }
+
+        /// <summary>
+        /// calculates point between two points at a parameter
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static Pt2d Tween2(Pt2d a, Pt2d b, double t)
+        {
+            Vec2d AB = new Vec2d(b - a);
+            Vec2d AC = AB * (AB.M * t);
+            Pt2d c = a + AC;
+
+            return c;
+        }
+
+        /// <summary>
+        /// calculates the midpoint between two Pt3d objects
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Pt2d Midpoint(Pt2d a, Pt2d b)
+        {
+            return new Pt2d((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        }
+
+        public static Pt2d Rotate(Pt2d pt, double angleRadians)
+        {
+            double cos0 = Math.Cos(angleRadians);
+            double sin0 = Math.Sin(angleRadians);
+            double x = (cos0 * pt.X - sin0 * pt.Y);
+            double y = (sin0 * pt.X + cos0 * pt.Y);
+            return new Pt2d(x, y);
+        }
+
+        public static Pt2d Rotate(Pt2d pt, Pt2d cen, double angleRadians)
+        {
+            double cos0 = Math.Cos(angleRadians);
+            double sin0 = Math.Sin(angleRadians);
+            double x = (cos0 * (pt.X - cen.X) - sin0 * (pt.Y - cen.Y) + cen.X);
+            double y = (sin0 * (pt.X - cen.X) + cos0 * (pt.Y - cen.Y) + cen.Y);
+            return new Pt2d(x, y);
+        }
+
     }
 }

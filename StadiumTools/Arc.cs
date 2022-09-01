@@ -95,5 +95,38 @@ namespace StadiumTools
             }
             return result;
         }
+
+        /// <summary>
+        /// returns the Pt3d midpoint of an arc
+        /// </summary>
+        /// <returns>Pt3d</returns>
+        Pt3d ICurve.Midpoint()
+        {
+            Domain halfDomain = new Domain(this.Domain.T0, this.Domain.T1 / 2);
+            //return new Arc(this.Plane, this.Radius, halfDomain);
+            return Pt3d.Origin;
+        }
+
+        /// <summary>
+        /// returns a Pt3d along an arc at a specified parameter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns>Pt3d</returns>
+        Pt3d ICurve.PointOn(double parameter)
+        {
+            //return Pt3d.Tween2(this.Start, this.End, parameter);
+            return Pt3d.Origin;
+        }
+
+        /// <summary>
+        /// calculates the length of an arc
+        /// </summary>
+        /// <returns>double</returns>
+        double ICurve.Length()
+        {
+            return Math.Abs(Domain.Length * this.Radius);
+        }
     }
+
 }
+

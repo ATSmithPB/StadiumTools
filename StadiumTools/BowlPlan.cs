@@ -63,6 +63,10 @@ namespace StadiumTools
         /// </summary>
         public int[] SectionCount { get; set; }
         /// <summary>
+        /// Curves that represent the front edge of the bowl
+        /// </summary>
+        public ICurve[] BowlEdges { get; set; }
+        /// <summary>
         /// Section Planes of the plan
         /// </summary>
         public Pln3d[][] SectionPlanes { get; set; }
@@ -110,7 +114,7 @@ namespace StadiumTools
             this.CenterGridline = ArrayValue(centerGridline, boundaryCount);
             this.BayWidths = ArrayValue(bayWidths, boundaryCount);
             this.CornerBayCount = ArrayValue(cornerBayCount, boundaryCount);
-            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, cornerRadaii); 
+            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, this.CornerRadaii); 
             this.IsValid = true;
         }
 
@@ -146,7 +150,7 @@ namespace StadiumTools
             this.CenterGridline = ValidateLength(centerGridline, "CenterGridline", boundaryCount);
             this.BayWidths = ValidateLength(bayWidths, "BayWidths", boundaryCount);
             this.CornerBayCount = ValidateLength(cornerBayCount, "CornerBayCount", boundaryCount);
-            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, cornerRadaii);
+            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, this.CornerRadaii);
             this.IsValid = true;
         }
 
@@ -255,21 +259,42 @@ namespace StadiumTools
             }
         }
 
+        /// <summary>
+        /// returns the total number of values in an array who's value is NOT equal to 0
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static int NonZeroCount(double[] values)
+        {
+            int nonZeroCount = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] != 0)
+                {
+                    nonZeroCount++;
+                }
+            }
+            return nonZeroCount;
+        }
+
         public static int CalcBowlEdgeCount(PlaySurface playSurface, Style bowlStyle, double[] cornerRadaii)
         {
             int bowlEdgeCount = 0;
             int boundaryCount = playSurface.Boundary.Length;
+            int roundedCornerCount = NonZeroValues(cornerRadaii); 
 
             switch ((int)bowlStyle)
             {
-                case ((int)Style.Radial) :
+                case ((int)Style.Radial):
                     {
-                        bowlEdgeCount = boundaryCount;
+                        bowlEdgeCount += boundaryCount;
+                        bowlEdgeCount += roundedCornerCount;
                         break;
                     }
                 case ((int)Style.Orthagonal):
                     {
                         bowlEdgeCount = boundaryCount;
+                        bowlEdgeCount += roundedCornerCount;
                         break;
                     }
                 case ((int)Style.NoCorners):
@@ -288,10 +313,21 @@ namespace StadiumTools
                         break;
                     }
             }
-
             return bowlEdgeCount;
         }
 
+        public static int NonZeroValues(double[] values)
+        {
+            int nonZero = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] != 0)
+                {
+                    nonZero++;
+                }
+            }
+            return nonZero;
+        }
 
     }
 }

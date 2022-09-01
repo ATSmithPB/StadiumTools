@@ -53,6 +53,34 @@ namespace StadiumTools
             result[3] = new Line(pts[3], pts[0]);
             return result;
         }
+
+        /// <summary>
+        /// returns the Pt3d midpoint of a line
+        /// </summary>
+        /// <returns>Pt3d</returns>
+        Pt3d ICurve.Midpoint()
+        {
+            return Pt3d.Midpoint(this.Start, this.End);
+        }
+
+        /// <summary>
+        /// returns a Pt3d along a line at a specified parameter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns>Pt3d</returns>
+        Pt3d ICurve.PointOn(double parameter)
+        {
+            return Pt3d.Tween2(this.Start, this.End, parameter);
+        }
+
+        /// <summary>
+        /// calculates the length of a line
+        /// </summary>
+        /// <returns>double</returns>
+        double ICurve.Length()
+        {
+            return Pt3d.Distance(this.Start, this.End);
+        }
     }
 
 

@@ -8,5 +8,10 @@ namespace StadiumTools
 {
     public interface ICurve
     {
+        Pt3d Midpoint();
+
+        Pt3d PointOn(double parameter);
+
+        double Length();
     }
 }

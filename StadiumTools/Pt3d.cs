@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using Rhino.Geometry;
 
 namespace StadiumTools
 {
@@ -221,6 +222,51 @@ namespace StadiumTools
                 result[i] = pts2d[i].ToPt3d(plane);
             }
             return result;
+        }
+
+        /// <summary>
+        /// calculates point between two points at a parameter
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static Pt3d Tween2(Pt3d a, Pt3d b, double t)
+        {
+            Vec3d AB = new Vec3d(b - a);
+            Vec3d AC = (t * AB.M) * AB;
+            Pt3d c = a + AC;
+
+            return c;
+        }
+
+        /// <summary>
+        /// calculates the midpoint between two Pt3d objects
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Pt3d Midpoint(Pt3d a, Pt3d b)
+        {
+            return new Pt3d((a.X + b.X) / 2, (a.Y + b.Y) / 2, (a.Z + b.Z) / 2);
+        }
+
+        /// <summary>
+        /// calculates the distance between two Pt3d points
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static double Distance(Pt3d a, Pt3d b)
+        {
+            Vec3d v = new Vec3d(a, b);
+            return v.M;
+        }
+
+        public static Pt3d Rotate(Pln3d pln, Pt3d pt, double angleRadians)
+        {
+            Pt2d localPt2d = new Pt2d(LocalCoordinates(pt, pln));
+            return new Pt3d(Pt2d.Rotate(localPt2d, angleRadians), pln);
         }
     }
 
