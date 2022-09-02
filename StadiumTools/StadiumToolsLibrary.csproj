@@ -48,7 +48,7 @@
     <Compile Include="Arc.cs" />
     <Compile Include="Bowl3d.cs" />
     <Compile Include="Domain.cs" />
-    <Compile Include="Ellipse2d.cs" />
+    <Compile Include="Ellipse.cs" />
     <Compile Include="ICurve.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="BowlPlan.cs" />

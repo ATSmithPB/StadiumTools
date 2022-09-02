@@ -124,7 +124,7 @@ namespace StadiumTools
         {
             if (currentTier.BuildFromPreviousTier)
             { 
-                //set current tier's StartPt to be last point of previous tier
+                //set current tier's Start to be last point of previous tier
                 Tier lastTier = section.Tiers[currentTier.SectionIndex - 1];
                 int lastPtCount = lastTier.Points2d.Length;
                 Pt2d lastPt = lastTier.Points2d[lastPtCount - 1];

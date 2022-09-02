@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace StadiumTools
 {
-    public interface ICurve
+    public struct Pline 
     {
+        //Properties
+        Pt3d[] Points { get; set; }
+        Pln3d[] Planes { get; set; }
         Pt3d Start { get; set; }
         Pt3d End { get; set; }
-        Pt3d Midpoint();
-        Pt3d PointOn(double parameter);
-        double Length();
+        
+        //Constructors
+
+
+
+        //Methods
     }
 }

@@ -263,6 +263,13 @@ namespace StadiumTools
             return v.M;
         }
 
+        /// <summary>
+        /// Rotates a Pt3d about the Z-axis of a specified Pln3d, by a specified angle in Radians
+        /// </summary>
+        /// <param name="pln"></param>
+        /// <param name="pt"></param>
+        /// <param name="angleRadians"></param>
+        /// <returns></returns>
         public static Pt3d Rotate(Pln3d pln, Pt3d pt, double angleRadians)
         {
             Pt2d localPt2d = new Pt2d(LocalCoordinates(pt, pln));

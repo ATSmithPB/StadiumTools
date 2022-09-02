@@ -88,6 +88,20 @@ namespace StadiumTools
             GetValidity(this);
         }
 
+        public Pln3d(Pt3d origin, Pt3d ptOnZAxis)
+        {
+            this.IsValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            Vec3d normalZ = Vec3d.Normalize(new Vec3d(origin, ptOnZAxis));
+            this.Zaxis = normalZ;
+            this.Xaxis = Vec3d.Normalize(Vec3d.Perp(normalZ));
+            this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(normalZ, this.Xaxis));
+            GetValidity(this);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -111,6 +125,16 @@ namespace StadiumTools
         {
             Pt3d pt3d = pln.OriginPt;
             return pt3d;
+        }
+
+        public static Pln3d[] PerpPlanes(Pt3d[] pts)
+        {
+            Pln3d[] pln3ds = new Pln3d[pts.Length];
+            for (int i = 0; i < pts.Length; i++)
+            {
+                pln3ds[i] = new Pln3d(pts[i], pts[i + 1]);
+            }
+            return pln3ds;
         }
 
     }

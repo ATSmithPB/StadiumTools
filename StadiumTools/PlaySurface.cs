@@ -215,7 +215,7 @@ namespace StadiumTools
         private static ICurve[] BoundaryCricket(Pln2d plane, double unit)
         {
             ICurve[] boundary = new ICurve[1];
-            boundary[0] = new Ellipse2d(plane, 150 * unit, 137 * unit);
+            boundary[0] = new Ellipse(plane, 150 * unit, 137 * unit);
             return boundary;
         }
 

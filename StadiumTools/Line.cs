@@ -58,7 +58,7 @@ namespace StadiumTools
         /// returns the Pt3d midpoint of a line
         /// </summary>
         /// <returns>Pt3d</returns>
-        Pt3d ICurve.Midpoint()
+        public Pt3d Midpoint()
         {
             return Pt3d.Midpoint(this.Start, this.End);
         }
@@ -68,7 +68,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Pt3d</returns>
-        Pt3d ICurve.PointOn(double parameter)
+        public Pt3d PointOn(double parameter)
         {
             return Pt3d.Tween2(this.Start, this.End, parameter);
         }
@@ -77,7 +77,7 @@ namespace StadiumTools
         /// calculates the length of a line
         /// </summary>
         /// <returns>double</returns>
-        double ICurve.Length()
+        public double Length()
         {
             return Pt3d.Distance(this.Start, this.End);
         }

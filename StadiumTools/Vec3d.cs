@@ -25,7 +25,7 @@ namespace StadiumTools
 
         //Constructors
         /// <summary>
-        /// Constructs a Vec3d object from 3 its three components (x,y,z)
+        /// Constructs a Vec3d object from 3 its three vC (x,y,z)
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -52,7 +52,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Constructs a Vec3d with the same XYZ components as a Pt3d
+        /// Constructs a Vec3d with the same XYZ vC as a Pt3d
         /// </summary>
         /// <param name="pt3d"></param>
         public Vec3d(Pt3d pt3d)
@@ -73,16 +73,16 @@ namespace StadiumTools
 
         //Delegates
         /// <summary>
-        /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
+        /// Gets Vector with Default XAxis vC (1.0, 0.0, 0.0)
         /// </summary>
         public static Vec3d XAxis => new Vec3d(1.0, 0.0, 0.0);
         /// <summary>
-        /// Gets Vector with Default XAxis components (0.0, 1.0, 0.0)
+        /// Gets Vector with Default XAxis vC (0.0, 1.0, 0.0)
         /// </summary>
         public static Vec3d YAxis => new Vec3d(0.0, 1.0, 0.0);
         
         /// <summary>
-        /// Gets Vector with Default XAxis components (0.0, 0.0, 1.0)
+        /// Gets Vector with Default XAxis vC (0.0, 0.0, 1.0)
         /// </summary>
         public static Vec3d ZAxis => new Vec3d(0.0, 0.0, 1.0);
 
@@ -116,7 +116,7 @@ namespace StadiumTools
 
         //Methods
         /// <summary>
-        /// Returns the magnitude (absolute length) of of a vector given its three components.
+        /// Returns the magnitude (absolute length) of of a vector given its three vC.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -156,7 +156,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Scale all components of a vector such that its magnitude is equal to 1
+        /// Scale all vC of a vector such that its magnitude is equal to 1
         /// </summary>
         public void Normalize()
         {
@@ -167,7 +167,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Uniformly scale all three components of a vector
+        /// Uniformly scale all three vC of a vector
         /// </summary>
         /// <param name="f"></param>
         public void Scale(double f)
@@ -216,7 +216,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// returns a new Vec2d with matching X and Y components as a Vec3d 
+        /// returns a new Vec2d with matching X and Y vC as a Vec3d 
         /// </summary>
         /// <param name="v"></param>
         /// <returns>Vec2d</returns>
@@ -247,6 +247,71 @@ namespace StadiumTools
         public static double Reflex(Vec3d a, Vec3d b)
         {
             return (2 * PI) - Angle(a, b);
+        }
+
+        public static Vec3d PerpTo(Vec3d v)
+        {
+          double[] vC = new double[3];  
+          int i, j, k; 
+          double a, b;
+          k = 2;
+          if (Abs(v.Y) > Abs(v.X)) 
+          {
+            if (Abs(v.Z) > Abs(v.Y)) 
+            {
+              i = 2;
+              j = 1;
+              k = 0;
+              a = v.Z;
+              b = -v.Y;
+            }
+            else if (Abs(v.Z) >= Abs(v.X))
+            {
+              i = 1;
+              j = 2;
+              k = 0;
+              a = v.Y;
+              b = -v.Z;
+            }
+            else 
+            {
+              i = 1;
+              j = 0;
+              k = 2;
+              a = v.Y;
+              b = -v.X;
+            }
+          }
+          else if (Abs(v.Z) > Abs(v.X)) 
+          {
+            i = 2;
+            j = 0;
+            k = 1;
+            a = v.Z;
+            b = -v.X;
+          }
+          else if (Abs(v.Z) > Abs(v.Y)) 
+          {
+            i = 0;
+            j = 2;
+            k = 1;
+            a = v.X;
+            b = -v.Z;
+          }
+          else 
+          {
+            i = 0;
+            j = 1;
+            k = 2;
+            a = v.X;
+            b = -v.Y;
+          }
+          
+          vC[i] = b;
+          vC[j] = a;
+          vC[k] = 0.0;
+          
+          return new Vec3d(vC[0], vC[0], vC[0]);
         }
     }
 }

@@ -23,22 +23,34 @@ namespace StadiumTools
         /// Domain of Arc. Start Angle and End Angle in Radians
         /// </summary>
         public Domain Domain { get; set; }
+        /// <summary>
+        /// Arc Start Point
+        /// </summary>
+        public Pt3d Start { get; set; }
+        /// <summary>
+        /// Arc End Point
+        /// </summary>
+        public Pt3d End { get; set; }
 
         //Constructors
-        public Arc(Pln2d plane, double radius, double angle)
+        public Arc(Pln2d plane, double radius, double angleRadians)
         {
             Plane = new Pln3d(plane);
             Radius = radius;
-            Domain = new Domain(0.0, angle);
-            IsValid = ValidateDomain(angle);
+            Domain = new Domain(0.0, angleRadians);
+            Start = new Pt3d(new Pt2d(radius, 0.0), this.Plane);
+            End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
+            IsValid = ValidateDomain(angleRadians);
         }
 
-        public Arc(Pln3d plane, double radius, double angle)
+        public Arc(Pln3d plane, double radius, double angleRadians)
         {
             Plane = plane;
             Radius = radius;
-            Domain = new Domain(0.0, angle);
-            IsValid = ValidateDomain(angle);
+            Domain = new Domain(0.0, angleRadians);
+            Start = new Pt3d(new Pt2d(radius, 0.0), this.Plane);
+            End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
+            IsValid = ValidateDomain(angleRadians);
         }
 
         public Arc(Pln3d plane, double radius, Domain domain)
@@ -46,6 +58,9 @@ namespace StadiumTools
             Plane = plane;
             Radius = radius;
             Domain = domain;
+            Pt2d refPt = new Pt2d(radius, 0);
+            Start = new Pt3d(Pt2d.Rotate(refPt, domain.T0), plane); //simplify me
+            End = new Pt3d(Pt2d.Rotate(refPt, domain.T1), plane); //simplify me
             IsValid = ValidateDomain(this.Domain.Length);
         }
 
@@ -54,6 +69,9 @@ namespace StadiumTools
             Plane = plane;
             Radius = radius;
             Domain = new Domain(domainStart, domainEnd);
+            Pt2d refPt = new Pt2d(radius, 0);//simplify me
+            Start = new Pt3d(Pt2d.Rotate(refPt, domainStart), plane); //simplify me
+            End = new Pt3d(Pt2d.Rotate(refPt, domainEnd), plane); //simplify me
             IsValid = ValidateDomain(this.Domain.Length);
         }
 
@@ -62,6 +80,9 @@ namespace StadiumTools
             Plane = plane.ToPln3d(Pln2d.XYPlane);
             Radius = radius;
             Domain = new Domain(domainStart, domainEnd);
+            Pt2d refPt = new Pt2d(radius, 0);//simplify me
+            Start = new Pt3d(Pt2d.Rotate(refPt, domainStart), new Pln3d(plane)); //simplify me
+            End = new Pt3d(Pt2d.Rotate(refPt, domainEnd), new Pln3d(plane)); //simplify me
             IsValid = ValidateDomain(this.Domain.Length);
         }
 
@@ -71,6 +92,8 @@ namespace StadiumTools
             Radius = Pt2d.Distance(center, start);
             double angleRadians = Pt2d.Angle(center, start, end);
             Domain = new Domain(0.0, angleRadians);
+            Start = new Pt3d(start, this.Plane);
+            End = new Pt3d(end, this.Plane);
             IsValid = ValidateDomain(this.Domain.Length);
         }
 
@@ -100,11 +123,9 @@ namespace StadiumTools
         /// returns the Pt3d midpoint of an arc
         /// </summary>
         /// <returns>Pt3d</returns>
-        Pt3d ICurve.Midpoint()
+        public Pt3d Midpoint()
         {
-            Domain halfDomain = new Domain(this.Domain.T0, this.Domain.T1 / 2);
-            //return new Arc(this.Plane, this.Radius, halfDomain);
-            return Pt3d.Origin;
+            return Pt3d.Rotate(this.Plane, this.Start, this.Domain.T1 / 2);
         }
 
         /// <summary>
@@ -112,17 +133,17 @@ namespace StadiumTools
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Pt3d</returns>
-        Pt3d ICurve.PointOn(double parameter)
+        public Pt3d PointOn(double parameter)
         {
-            //return Pt3d.Tween2(this.Start, this.End, parameter);
-            return Pt3d.Origin;
+            double tauP = parameter * (Math.PI * 2);
+            return Pt3d.Rotate(this.Plane, this.Start, tauP);
         }
 
         /// <summary>
         /// calculates the length of an arc
         /// </summary>
         /// <returns>double</returns>
-        double ICurve.Length()
+        public double Length()
         {
             return Math.Abs(Domain.Length * this.Radius);
         }
