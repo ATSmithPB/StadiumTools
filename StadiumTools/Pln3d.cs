@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static System.Math;
 
 namespace StadiumTools
@@ -97,7 +98,7 @@ namespace StadiumTools
             this.OriginZ = origin.Z;
             Vec3d normalZ = Vec3d.Normalize(new Vec3d(origin, ptOnZAxis));
             this.Zaxis = normalZ;
-            this.Xaxis = Vec3d.Normalize(Vec3d.Perp(normalZ));
+            this.Xaxis = Vec3d.Normalize(Vec3d.PerpTo(normalZ));
             this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(normalZ, this.Xaxis));
             GetValidity(this);
         }
@@ -136,6 +137,25 @@ namespace StadiumTools
             }
             return pln3ds;
         }
+
+        //public static bool AreCoPlanar(Pln3d a, Pln3d b, double tolerance, double angleTolerance)
+        //{
+        //    int parallel = a.Zaxis.IsParallelTo(b.Zaxis, destination2);
+        //    switch (parallel)
+        //    {
+        //        case -1:
+        //        case 1:
+        //            if (Math.Abs(a.DistanceTo(unset2.Origin)) > destination1)
+        //            {
+        //                data = 0;
+        //                break;
+        //            }
+        //            break;
+        //    }
+        //    DA.SetData(0, (object)data);
+        //}
+
+
 
     }
 }

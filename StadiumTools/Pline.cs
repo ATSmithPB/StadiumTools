@@ -15,9 +15,23 @@ namespace StadiumTools
         Pt3d End { get; set; }
         
         //Constructors
-
-
+        public Pline(Pt3d[] pts)
+        {
+            Points = pts;
+            Planes = Pln3d.PerpPlanes(pts);
+            Start = pts[0];
+            End = pts[pts.Length - 1];
+        }
 
         //Methods
+        
+        public static Pline PlineFromArcLinear(Arc arc, bool planeOnCenter, double segmentLength)
+        {
+            Pt3d[] pts = new Pt3d[3];
+
+
+            return new Pline(pts);
+        }
+
     }
 }

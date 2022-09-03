@@ -47,12 +47,14 @@
   <ItemGroup>
     <Compile Include="Arc.cs" />
     <Compile Include="Bowl3d.cs" />
+    <Compile Include="Circle.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="Ellipse.cs" />
     <Compile Include="ICurve.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="BowlPlan.cs" />
     <Compile Include="PlaySurface.cs" />
+    <Compile Include="Pline.cs" />
     <Compile Include="Pln2d.cs" />
     <Compile Include="Pln3d.cs" />
     <Compile Include="Pt2d.cs" />

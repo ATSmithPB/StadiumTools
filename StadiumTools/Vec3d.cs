@@ -313,5 +313,38 @@ namespace StadiumTools
           
           return new Vec3d(vC[0], vC[0], vC[0]);
         }
+
+        /// <summary>
+        /// returns the Vec3d cross product vector of two 2d vectors
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>Vec3d</returns>
+        public static Vec3d CrossProduct(Vec2d a ,Vec2d b)
+        {
+            return new Vec3d(0.0, 0.0, a.X * b.Y - b.X * a.Y);
+        } 
+         
+        /// <summary>
+        /// returns the Vec3d cross product vector of two 3d vectors
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>Vec3d</returns>
+        public static Vec3d CrossProduct(Vec3d a, Vec3d b)
+        {
+            return new Vec3d((a.Y * b.Z) - (b.Y * a.Z), 
+                             (a.Z * b.X) - (b.Z * a.X), 
+                             (a.X * b.Y) - (b.X * a.Y));
+        }
+        
+        public static bool IsParallel(Vec3d u, Vec3d v, double tolerance)
+        {
+            double cX = u.Y * v.Z + u.Z * v.Y;
+            double cY = u.Z * v.X + u.X * v.Z;
+            double cZ = u.X * v.Y + u.Y * v.X;
+            double cN = cX * cX + cY * cY + cZ * cZ;
+            return cN < tolerance; 
+        }
     }
 }
