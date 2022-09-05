@@ -338,6 +338,13 @@ namespace StadiumTools
                              (a.X * b.Y) - (b.X * a.Y));
         }
         
+        /// <summary>
+        /// Returns true if two Vec3d vectors are parallel within a given absolute tolerance. Polar opposite vectors are considered parallel
+        /// </summary>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
         public static bool IsParallel(Vec3d u, Vec3d v, double tolerance)
         {
             double cX = u.Y * v.Z + u.Z * v.Y;
@@ -345,6 +352,20 @@ namespace StadiumTools
             double cZ = u.X * v.Y + u.Y * v.X;
             double cN = cX * cX + cY * cY + cZ * cZ;
             return cN < tolerance; 
+        }
+
+        public static bool IsParallel(Vec3d u, Vec3d v, double tolerance, out bool inverted)
+        {
+            inverted = false;
+            double cX = u.Y * v.Z + u.Z * v.Y;
+            double cY = u.Z * v.X + u.X * v.Z;
+            double cZ = u.X * v.Y + u.Y * v.X;
+            double cN = cX * cX + cY * cY + cZ * cZ;
+            if (u.Z * v.Z < 0)
+            {
+                inverted = true;
+            }
+            return cN < tolerance;
         }
     }
 }

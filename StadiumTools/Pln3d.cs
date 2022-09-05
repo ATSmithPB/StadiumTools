@@ -103,6 +103,23 @@ namespace StadiumTools
             GetValidity(this);
         }
 
+        /// <summary>
+        /// Construct a plane aligned to defauly XYZ with a specified origin
+        /// </summary>
+        /// <param name="origin"></param>
+        public Pln3d(Pt3d origin)
+        {
+            this.IsValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            this.Xaxis = Vec3d.XAxis;
+            this.Yaxis = Vec3d.YAxis;
+            this.Zaxis = Vec3d.ZAxis;
+            GetValidity(this);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -138,22 +155,26 @@ namespace StadiumTools
             return pln3ds;
         }
 
-        //public static bool AreCoPlanar(Pln3d a, Pln3d b, double tolerance, double angleTolerance)
-        //{
-        //    int parallel = a.Zaxis.IsParallelTo(b.Zaxis, destination2);
-        //    switch (parallel)
-        //    {
-        //        case -1:
-        //        case 1:
-        //            if (Math.Abs(a.DistanceTo(unset2.Origin)) > destination1)
-        //            {
-        //                data = 0;
-        //                break;
-        //            }
-        //            break;
-        //    }
-        //    DA.SetData(0, (object)data);
-        //}
+        /// <summary>
+        /// returns true if two Pln3d planes are coplanar within a given absolute tolerance
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="angleTolerance"></param>
+        /// <returns></returns>
+        public static bool IsCoPlanar(Pln3d a, Pln3d b, double tolerance)
+        {
+            bool result = false;
+            if (Vec3d.IsParallel(a.Zaxis, b.Zaxis, tolerance))
+            {
+                if(Math.Abs(Pt3d.LocalCoordinates(a.OriginPt, b).Z) < tolerance)
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
 
 
 

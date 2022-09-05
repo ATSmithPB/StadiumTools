@@ -67,6 +67,11 @@ namespace StadiumTools
             return Subtract(a, b);
         }
 
+        public static Pt3d operator - (Pt3d p, Vec3d v)
+        {
+            return Subtract(p, v);
+        }
+
         /// <summary>
         /// Returns the sum of a Pt3d and Vec3d
         /// </summary>
@@ -182,9 +187,26 @@ namespace StadiumTools
             return new Pt3d(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
         }
 
+        /// <summary>
+        /// subracts the components of Pt3d b from the components of Pt3d a and returns a new Pt3d with the resulting components
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>Pt3d</returns>
         public static Pt3d Subtract(Pt3d a, Pt3d b)
         {
             return new Pt3d(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        }
+
+        /// <summary>
+        /// subracts the components of Vec3d v from the components of Pt3d a and returns a new Pt3d with the resulting components
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="v"></param>
+        /// <returns>Pt3d</returns>
+        public static Pt3d Subtract(Pt3d p, Vec3d v)
+        {
+            return new Pt3d(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
         }
 
         /// <summary>
