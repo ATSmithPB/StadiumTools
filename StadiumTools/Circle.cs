@@ -47,7 +47,6 @@ namespace StadiumTools
                 circles[1] = circleA;
             }
 
-
             double rad0 = circles[0].Radius;
             double rad1 = circles[1].Radius;
             Vec3d vecD = new Vec3d(circles[1].Center.OriginPt - circles[0].Center.OriginPt);
@@ -61,16 +60,14 @@ namespace StadiumTools
                 return intersectionPts;
             }
 
-            
-            
-
-            if (disD > tolerance)
+            else 
             {
                 Pt3d[] intersectPts = new Pt3d[2];
                 vecD.Normalize();
                 Vec3d Dperp = Vec3d.CrossProduct(vecD, circles[0].Center.Zaxis);
                 double d1 = (rad0 * rad0 - rad1 * rad1 + disD * disD) / (2 * disD);
                 double a1 = rad0 * rad0 - d1 * d1;
+
                 if (a1 < 0)
                 {
                     a1 = 0;
@@ -87,7 +84,6 @@ namespace StadiumTools
                     intersectPts[0] = circles[0].Center.OriginPt + d1 * vecD + a1 * Dperp;
                     intersectPts[1] = circles[0].Center.OriginPt + d1 * vecD - a1 * Dperp;
                 }
-
                 return intersectPts;
             }
         }
@@ -112,6 +108,11 @@ namespace StadiumTools
                 result = true;
             }
             return result;
+        }
+
+        public static double ChordAngle(double radius, double chordLength)
+        {
+            return 2 * Math.Asin(chordLength/ (2* radius));
         }
     }
 }

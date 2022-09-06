@@ -25,13 +25,24 @@ namespace StadiumTools
 
         //Methods
         
-        public static Pline PlineFromArcLinear(Arc arc, bool planeOnCenter, double segmentLength)
-        {
-            Pt3d[] pts = new Pt3d[3];
+        //public static Pline PlineFromArcLinear(Arc arc, bool planeOnCenter, double segmentLength, double tolerance)
+        //{
+        //    List<Pt3d> pts = new List<Pt3d>();
+        //    bool end = false;
+        //    pts.Add(arc.Start);
+        //    Circle circleMajor = new Circle(arc.Plane, arc.Radius);
+        //    Circle circleMinor = new Circle(new Pln3d(arc.Start), segmentLength);
+
+        //    while (!end)
+        //    {
+        //        Pt3d[] iPts = Circle.Intersect(circleMinor, circleMajor, tolerance);
+        //        if (iPts[0] )
+
+        //    }
 
 
-            return new Pline(pts);
-        }
+        //    return new Pline(pts);
+        //}
 
     }
 }
