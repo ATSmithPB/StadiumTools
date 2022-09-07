@@ -7,7 +7,7 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
-
+using System;
 
 namespace StadiumTools
 {
@@ -101,6 +101,26 @@ namespace StadiumTools
         {
             Pt3d pt = new Pt3d(point3d.X, point3d.Y, point3d.Z);
             return pt;
+        }
+
+        public static Point3d[] Points3dFromPt3ds(Pt3d[] pt3ds)
+        {
+            Point3d[] points3d = new Point3d[pt3ds.Length];
+            for (int i = 0; i < pt3ds.Length; i++)
+            {
+                points3d[i] = Point3dFromPt3d(pt3ds[i]);
+            }
+            return points3d;
+        }
+
+        public static Point3d[] Points3dFromPt3ds(List<Pt3d> pt3ds)
+        {
+            Point3d[] points3d = new Point3d[pt3ds.Count];
+            for (int i = 0; i < pt3ds.Count; i++)
+            {
+                points3d[i] = Point3dFromPt3d(pt3ds[i]);
+            }
+            return points3d;
         }
 
         /// <summary>
@@ -242,6 +262,11 @@ namespace StadiumTools
             return rcInt;
         }
 
+        public static Polyline PolylineFromPline(Pline pline)
+        {
+            return new Polyline(Points3dFromPt3ds(pline.Points));
+        }
+
         public static Polyline PolylineFromTier(Tier tier)
         {
             Polyline polyline = new Polyline();
@@ -330,7 +355,7 @@ namespace StadiumTools
                 case "Arc":
                     return CurveFromArc((StadiumTools.Arc)icrv);
                 case "Ellipse2d":
-                    return CurveFromEllipse2d((StadiumTools.Ellipse2d)icrv);
+                    return CurveFromEllipse((StadiumTools.Ellipse)icrv);
                 default:
                     throw new System.Exception($"ICurve type [{icrv.GetType().Name}] not available for conversion to Rhino.Geometry.Curve");
             }
@@ -341,7 +366,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="stEllipse"></param>
         /// <returns></returns>
-        public static Curve CurveFromEllipse2d(StadiumTools.Ellipse2d stEllipse)
+        public static Curve CurveFromEllipse(StadiumTools.Ellipse stEllipse)
         {
             Rhino.Geometry.Ellipse rcEllipse = EllipseFromEllipse2d(stEllipse);
             NurbsCurve nurbsEllipse = rcEllipse.ToNurbsCurve();
@@ -370,16 +395,21 @@ namespace StadiumTools
         /// </summary>
         /// <param name="dom"></param>
         /// <returns></returns>
-        public static Interval IntervalFromDomain(Domain dom)
+        public static Interval IntervalFromDomain(Domain domain)
         {
-            return new Rhino.Geometry.Interval(dom.T0, dom.T1);
+            return new Rhino.Geometry.Interval(domain.T0, domain.T1);
+        }
+
+        public static Domain DomainFromInterval(Interval interval)
+        {
+            return new StadiumTools.Domain(interval.Min, interval.Max);
         }
 
         public static Rhino.Geometry.Arc RCArcFromArc(StadiumTools.Arc stArc)
         {
             Interval angleIntervalRadians = IntervalFromDomain(stArc.Domain);
             Plane plane = PlaneFromPln3d(stArc.Plane);
-            Circle circle = new Circle(plane, stArc.Radius);
+            Rhino.Geometry.Circle circle = new Rhino.Geometry.Circle(plane, stArc.Radius);
             return new Rhino.Geometry.Arc(circle, angleIntervalRadians);
         }
 
@@ -394,9 +424,9 @@ namespace StadiumTools
             return new Rhino.Geometry.Line(x0, y0, z0, x1, y1, z1);
         }
 
-        public static Rhino.Geometry.Ellipse EllipseFromEllipse2d(Ellipse2d stEllipse)
+        public static Rhino.Geometry.Ellipse EllipseFromEllipse2d(Ellipse stEllipse)
         {
-            Pln3d pln3d = new Pln3d(stEllipse.Center);
+            Pln3d pln3d = stEllipse.Center;
             Plane plane = PlaneFromPln3d(pln3d);
             return new Rhino.Geometry.Ellipse(plane, stEllipse.RadiusX, stEllipse.RadiusY);
         }
