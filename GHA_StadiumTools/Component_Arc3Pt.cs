@@ -78,20 +78,20 @@ namespace GHA_StadiumTools
             double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
 
             //Item Container (Destination)
-            Rhino.Geometry.Point3d pointItem = Rhino.Geometry.Point3d.Origin;
+            var pointItem = Rhino.Geometry.Point3d.Origin;
 
             //Get & Set Polyline
             if (!DA.GetData<Rhino.Geometry.Point3d>(IN_Origin, ref pointItem)) { return; }
-            StadiumTools.Pt2d center = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            var center = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
             if (!DA.GetData<Rhino.Geometry.Point3d>(IN_Start, ref pointItem)) { return; }
-            StadiumTools.Pt2d start = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            var start = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
             if (!DA.GetData<Rhino.Geometry.Point3d>(IN_End, ref pointItem)) { return; }
-            StadiumTools.Pt2d end = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            var end = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
 
-            StadiumTools.Arc arc = new StadiumTools.Arc(center, start, end);
+            var arc = new StadiumTools.Arc(center, start, end);
             StadiumTools.ICurve Iarc = arc;
             Rhino.Geometry.Arc rhinoArc = StadiumTools.IO.RCArcFromArc(arc);
-            Rhino.Geometry.ArcCurve rhinoArcCrv = new Rhino.Geometry.ArcCurve(rhinoArc);
+            var rhinoArcCrv = new Rhino.Geometry.ArcCurve(rhinoArc);
             Rhino.Geometry.Curve rhinoCurve = rhinoArcCrv;
 
             double domainSt = arc.Domain.T1 - arc.Domain.T0;
@@ -109,7 +109,7 @@ namespace GHA_StadiumTools
         /// <returns></returns>
         private static Rhino.Geometry.Polyline PolyCurveToPolyline(Rhino.Geometry.PolyCurve polyCurveItem)
         {
-            Rhino.Geometry.Polyline result = new Rhino.Geometry.Polyline();
+            var result = new Rhino.Geometry.Polyline();
             result.Add(polyCurveItem.SegmentCurve(0).PointAtStart);
 
             for (int i = 0; i < polyCurveItem.SegmentCount; i++)
