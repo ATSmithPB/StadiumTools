@@ -145,8 +145,8 @@ namespace StadiumTools
         /// <returns>Pt3d</returns>
         public Pt3d PointOn(double parameter)
         {
-            double tauP = parameter * (Math.PI * 2);
-            return Pt3d.Rotate(this.Plane, this.Start, tauP);
+            double reParameter = parameter * this.Angle;
+            return Pt3d.Rotate(this.Plane, this.Start, reParameter);
         }
 
         /// <summary>
@@ -158,38 +158,53 @@ namespace StadiumTools
             return Math.Abs(Domain.Length * this.Radius);
         }
 
+        /// <summary>
+        /// returns division points on an arc based on a specified chord length and if a division point is coincidnet with the arc midpoint
+        /// </summary>
+        /// <param name="arc"></param>
+        /// <param name="divLength"></param>
+        /// <param name="pointAtMiddle"></param>
+        /// <returns>Pt3d[]</returns>
         public static Pt3d[] DivideLinearCentered(Arc arc, double divLength, bool pointAtMiddle) //clean me
         {
-            double theta = Circle.ChordAngle(arc.Radius, divLength);
-            double halfRemainder = (arc.Angle % theta) / 2;
-            int n = (int)Math.Round(arc.Angle / theta, MidpointRounding.AwayFromZero);
-            int even = (n % 2) * 10;
-            int pam = pointAtMiddle ? 1 : 0;
-            double[] parameters = new double[n + pam];
-            
-            if (even + pam == 1 ||even + pam == 10) // 1 == even + pam : 10 == odd + gap
-            { 
-                parameters[0] = halfRemainder;
-                for (int i = 1; i < n + 1; i++)
-                {
-                    parameters[i] = parameters[0] + (theta * i);
-                }
-            }
-            else
+            if (divLength >= Pt3d.Distance(arc.Start, arc.End) || divLength <= 0)
             {
-                double halfAngle = arc.Angle / 2; 
-                double halfAngleRemainder = halfAngle % theta;
-                parameters[0] = halfAngleRemainder;
-                for (int i = 1; i < n + 2; i++)
+                throw new Exception("Division length must be greater than zero and smaller than the distance from Arc.Start point to Arc.End point.");
+            }
+            double theta = Circle.ChordAngle(arc.Radius, divLength);
+            List<double> delta0 = new List<double>();
+            bool outOfBounds = false;
+            double first = theta /2;
+            double mid = arc.Angle / 2;
+
+            if (pointAtMiddle)
+            {
+                first = theta;
+                delta0.Add(mid);
+            }
+
+            int divs = 0;
+            while (!outOfBounds)
+            {
+                double pos = mid + first + (theta * divs);
+                if (arc.Domain.Contains(pos))
                 {
-                    parameters[i] = parameters[0] + (theta * i);
+                    delta0.Add(pos);
+                    delta0.Add(mid - first - (theta * divs));
+                    divs++;
+                }
+                else
+                {
+                    outOfBounds = true;
                 }
             }
 
-            Pt3d[] result = new Pt3d[parameters.Length];
+            delta0.Sort();
+
+            Pt3d[] result = new Pt3d[delta0.Count];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = arc.PointOn(parameters[i]);
+                result[i] = Pt3d.Rotate(arc.Plane, arc.Start, delta0[i]);
             }
             return result;
         }

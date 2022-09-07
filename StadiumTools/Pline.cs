@@ -9,10 +9,10 @@ namespace StadiumTools
     public struct Pline 
     {
         //Properties
-        Pt3d[] Points { get; set; }
-        Pln3d[] Planes { get; set; }
-        Pt3d Start { get; set; }
-        Pt3d End { get; set; }
+        public Pt3d[] Points { get; set; }
+        public Pln3d[] Planes { get; set; }
+        public Pt3d Start { get; set; }
+        public Pt3d End { get; set; }
         
         //Constructors
         public Pline(Pt3d[] pts)
@@ -23,26 +23,25 @@ namespace StadiumTools
             End = pts[pts.Length - 1];
         }
 
+        public Pline(List<Pt3d> pts)
+        {
+            Points = pts.ToArray();
+            Planes = Pln3d.PerpPlanes(pts);
+            Start = pts[0];
+            End = pts[pts.Count - 1];
+        }
+
         //Methods
-        
-        //public static Pline PlineFromArcLinear(Arc arc, bool planeOnCenter, double segmentLength, double tolerance)
-        //{
-        //    List<Pt3d> pts = new List<Pt3d>();
-        //    bool end = false;
-        //    pts.Add(arc.Start);
-        //    Circle circleMajor = new Circle(arc.Plane, arc.Radius);
-        //    Circle circleMinor = new Circle(new Pln3d(arc.Start), segmentLength);
 
-        //    while (!end)
-        //    {
-        //        Pt3d[] iPts = Circle.Intersect(circleMinor, circleMajor, tolerance);
-        //        if (iPts[0] )
-
-        //    }
-
-
-        //    return new Pline(pts);
-        //}
+        public static Pline FromArc(Arc arc, double divLength, bool pointAtMiddle)
+        {
+            List<Pt3d> pts = new List<Pt3d>();
+            pts.Add(arc.Start);
+            pts.AddRange(Arc.DivideLinearCentered(arc, divLength, pointAtMiddle));
+            pts.Add(arc.End);
+            Pline result = new Pline(pts);
+            return result;
+        }
 
     }
 }

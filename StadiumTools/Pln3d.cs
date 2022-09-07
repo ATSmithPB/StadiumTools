@@ -148,7 +148,17 @@ namespace StadiumTools
         public static Pln3d[] PerpPlanes(Pt3d[] pts)
         {
             Pln3d[] pln3ds = new Pln3d[pts.Length];
-            for (int i = 0; i < pts.Length; i++)
+            for (int i = 0; i < pts.Length - 1; i++)
+            {
+                pln3ds[i] = new Pln3d(pts[i], pts[i + 1]);
+            }
+            return pln3ds;
+        }
+
+        public static Pln3d[] PerpPlanes(List<Pt3d> pts)
+        {
+            Pln3d[] pln3ds = new Pln3d[pts.Count];
+            for (int i = 0; i < pts.Count - 1; i++)
             {
                 pln3ds[i] = new Pln3d(pts[i], pts[i + 1]);
             }

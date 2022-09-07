@@ -30,5 +30,16 @@ namespace StadiumTools
             Length = end - start;
         }
 
+        //Methods
+
+        public bool Contains(double parameter)
+        {
+            bool result = false;
+            if (parameter >= this.T0 && parameter <= this.T1)
+            {
+                result = true;
+            }
+            return result;
+        }
     }
 }
