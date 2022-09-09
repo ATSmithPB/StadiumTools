@@ -7,4 +7,4 @@ StadiumTools : contains source code for a StadiumTools Dynamic Link Library (Sta
 ...for use within .NET Framework 4.8+
 
 StadiumTools_IO : contains source code for a StadiumTools_IO Dynamic Link Library (StadiumTools_IO.dll) 
-...for converting between rhinoCommon and StadiumTools objects.
+...for converting between rhinoCommon and StadiumTools classes/structs/interfaces.
