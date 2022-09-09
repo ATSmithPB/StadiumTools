@@ -94,8 +94,8 @@ namespace StadiumTools
         /// <param name="defaultBayWidth"></param>
         /// <param name="defaultSightlineOffset"></param>
         /// <param name="cornerBayCount"></param>
-        public BowlPlan(PlaySurface playSurface, 
-                        Style bowlStyle, 
+        public BowlPlan(PlaySurface playSurface,
+                        Style bowlStyle,
                         double bowlOffset,
                         double bowlRadaii,
                         double cornerRadaii,
@@ -114,7 +114,7 @@ namespace StadiumTools
             this.CenterGridline = ArrayValue(centerGridline, boundaryCount);
             this.BayWidths = ArrayValue(bayWidths, boundaryCount);
             this.CornerBayCount = ArrayValue(cornerBayCount, boundaryCount);
-            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, this.CornerRadaii); 
+            this.BowlEdgeCount = CalcBowlEdgeCount(playSurface, bowlStyle, this.CornerRadaii);
             this.IsValid = true;
         }
 
@@ -259,29 +259,11 @@ namespace StadiumTools
             }
         }
 
-        /// <summary>
-        /// returns the total number of values in an array who's value is NOT equal to 0
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static int NonZeroCount(double[] values)
-        {
-            int nonZeroCount = 0;
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (values[i] != 0)
-                {
-                    nonZeroCount++;
-                }
-            }
-            return nonZeroCount;
-        }
-
         public static int CalcBowlEdgeCount(PlaySurface playSurface, Style bowlStyle, double[] cornerRadaii)
         {
             int bowlEdgeCount = 0;
             int boundaryCount = playSurface.Boundary.Length;
-            int roundedCornerCount = NonZeroValues(cornerRadaii); 
+            int roundedCornerCount = NonZeroValues(cornerRadaii);
 
             switch ((int)bowlStyle)
             {
@@ -316,6 +298,11 @@ namespace StadiumTools
             return bowlEdgeCount;
         }
 
+        /// <summary>
+        /// returns the count of items in a collection whose value is not == 0
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public static int NonZeroValues(double[] values)
         {
             int nonZero = 0;
@@ -329,5 +316,32 @@ namespace StadiumTools
             return nonZero;
         }
 
+        /// <summary>
+        /// returns collection of polylines that represent the curved/radial boundary of a rectangle 
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="sizeX"></param>
+        /// <param name="sizeY"></param>
+        /// <param name="radaii"></param>
+        /// <param name="divLen"></param>
+        /// <param name="pointAtCenter"></param>
+        /// <returns>Pline[]</returns>
+        public static Pline[] RadialRectangleSegmented(Pln3d plane, double sizeX, double sizeY, double[] radaii, double[] divLen, bool[] pointAtCenter)
+        {
+            if (radaii.Length != 4 || divLen.Length != 4 || pointAtCenter.Length != 4)
+            {
+                throw new ArgumentException($"radaii[{radaii.Length}], divLen[{divLen.Length}], and pointAtCenter[{pointAtCenter.Length}] must have a length of 4");
+            }
+            Pt3d[] pts = Pt3d.RectangleCentered(plane, sizeX, sizeY);
+            Arc arc0 = new Arc(pts[0], pts[1], radaii[0]);
+            Arc arc1 = new Arc(pts[1], pts[2], radaii[1]);
+            Arc arc2 = new Arc(pts[2], pts[3], radaii[2]);
+            Arc arc3 = new Arc(pts[3], pts[0], radaii[3]);
+            Pline pline0 = new Pline(Arc.DivideLinearCentered(arc0, divLen[0], pointAtCenter[0]));
+            Pline pline1 = new Pline(Arc.DivideLinearCentered(arc1, divLen[1], pointAtCenter[1]));
+            Pline pline2 = new Pline(Arc.DivideLinearCentered(arc2, divLen[2], pointAtCenter[2]));
+            Pline pline3 = new Pline(Arc.DivideLinearCentered(arc3, divLen[3], pointAtCenter[3]));
+            return new Pline[4] { pline0, pline1, pline2, pline3 };
+        }
     }
 }

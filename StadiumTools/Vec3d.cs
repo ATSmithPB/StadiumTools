@@ -367,5 +367,10 @@ namespace StadiumTools
             }
             return cN < tolerance;
         }
+
+        public static Vec3d Scale(Vec3d v, double factor)
+        {
+            return new Vec3d(v.X * factor, v.Y * factor, v.Z * factor);
+        }
     }
 }

@@ -95,6 +95,12 @@ namespace StadiumTools
             Angle = this.Domain.Length;
         }
 
+        /// <summary>
+        /// construct an Arc from Pt2d origin, start and end. (END POINT SETS ANGLE/DOMAIN ONLY)
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
         public Arc(Pt2d center, Pt2d start, Pt2d end)
         {
             Plane = new Pln3d(new Pln2d(center, start));
@@ -102,7 +108,32 @@ namespace StadiumTools
             double angleRadians = Pt2d.Angle(center, start, end);
             Domain = new Domain(0.0, angleRadians);
             Start = new Pt3d(start, this.Plane);
-            End = new Pt3d(end, this.Plane);
+            End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
+            IsValid = ValidateDomain(this.Domain.Length);
+            Angle = angleRadians;
+        }
+
+        /// <summary>
+        /// construct an arc from a startPt, endPt and radius. 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="radius"></param>
+        public Arc(Pt3d start, Pt3d end, double radius)
+        {
+            if (radius * 2 <= Pt3d.Distance(start, end))
+            {
+                throw new Exception("Radius too small. Radius*2 must be > the distance between start and end points");
+            }
+            Vec3d Xaxis = Vec3d.Normalize(new Vec3d(start, end));
+            Pt3d cen = Pt3d.OffsetMidpoint(start, end, radius, out Pt3d midpoint);
+            Vec3d Yaxis = Vec3d.Normalize(new Vec3d(cen, midpoint));
+            Plane = new Pln3d(cen, Xaxis, Yaxis);
+            Radius = radius;
+            double angleRadians = Pt3d.Angle(this.Plane, start, end);
+            Domain = new Domain(0.0, angleRadians);
+            Start = start;
+            End = end;
             IsValid = ValidateDomain(this.Domain.Length);
             Angle = angleRadians;
         }

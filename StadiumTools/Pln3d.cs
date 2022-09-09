@@ -69,9 +69,22 @@ namespace StadiumTools
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
             this.OriginZ = origin.Z;
-            this.Xaxis = x;
-            this.Yaxis = y;
-            this.Zaxis = z;
+            this.Xaxis = Vec3d.Normalize(x);
+            this.Yaxis = Vec3d.Normalize(y);
+            this.Zaxis = Vec3d.Normalize(z);
+            GetValidity(this);
+        }
+
+        public Pln3d(Pt3d origin, Vec3d x, Vec3d y)
+        {
+            this.IsValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            this.Xaxis = Vec3d.Normalize(x);
+            this.Yaxis = Vec3d.Normalize(y);
+            this.Zaxis = Vec3d.CrossProduct(this.Xaxis, this.Yaxis);
             GetValidity(this);
         }
 

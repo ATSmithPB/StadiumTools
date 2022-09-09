@@ -110,9 +110,39 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// returns the angle of a chord 
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="chordLength"></param>
+        /// <returns>double</returns>
         public static double ChordAngle(double radius, double chordLength)
         {
             return 2 * Math.Asin(chordLength/ (2* radius));
+        }
+
+        /// <summary>
+        /// returns the distance between a chord and it's circle's centerpoint
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="chordLength"></param>
+        /// <returns>double</returns>
+        public static double ChordMidCen(double radius, double chordLength)
+        {
+            double half0 = ChordAngle(radius, chordLength) / 2;
+            double halfChord = chordLength / 2;
+            return Math.Sqrt((radius * radius) - (halfChord * halfChord));
+        }
+
+        /// <summary>
+        /// returns the perpendicular distance between a chord's midpoint and the circle perimeter away from the circles center  
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="chordLength"></param>
+        /// <returns>double</returns>
+        public static double ChordMidCirc(double radius, double chordLength)
+        {
+            return radius - ChordMidCen(radius, chordLength);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
 using Rhino.Geometry;
+using Rhino.Render;
+using System.Collections;
 
 namespace StadiumTools
 {
@@ -132,7 +134,6 @@ namespace StadiumTools
             result[2].Y = halfY;
             result[3].X = -halfX;
             result[3].Y = halfY;
-            
             return result;
         }
 
@@ -147,7 +148,17 @@ namespace StadiumTools
             result[1] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * -halfY);
             result[2] = center.OriginPt + (center.Xaxis * halfX) + (center.Yaxis * halfY);
             result[3] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * halfY);
+            return result;
+        }
 
+        public static Pt2d[] RectangleCentered(Pln2d center, double sizeY0, double sizeX1, double sizeY1, double sizex0)
+        {
+            Pt2d[] result = new Pt2d[4];
+
+            result[0] = center.OriginPt + (center.Xaxis * -sizex0) + (center.Yaxis * -sizeY0);
+            result[1] = center.OriginPt + (center.Xaxis * sizeX1) + (center.Yaxis * -sizeY0);
+            result[2] = center.OriginPt + (center.Xaxis * sizeX1) + (center.Yaxis * sizeY1);
+            result[3] = center.OriginPt + (center.Xaxis * -sizex0) + (center.Yaxis * sizeY1);
             return result;
         }
 
@@ -167,7 +178,6 @@ namespace StadiumTools
             boundaryPts[5] = new Pt2d(halfXR, halfY);
             boundaryPts[6] = new Pt2d(-halfXR, halfY);
             boundaryPts[7] = new Pt2d(-halfX, halfYR);
-
             return boundaryPts;
         }
 
@@ -187,7 +197,6 @@ namespace StadiumTools
             boundaryPts[5] = center.OriginPt + (center.Xaxis * halfXR) + (center.Yaxis * halfY);
             boundaryPts[6] = center.OriginPt + (center.Xaxis * -halfXR) + (center.Yaxis * halfY);
             boundaryPts[7] = center.OriginPt + (center.Xaxis * -halfX) + (center.Yaxis * halfYR);
-
             return boundaryPts;
         }
 
@@ -292,5 +301,18 @@ namespace StadiumTools
             return new Pt2d(x, y);
         }
 
+        /// <summary>
+        /// offsets the midpoint between two 2d points by a specified distance
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static Pt2d OffsetMidpoint(Pt2d start, Pt2d end, double offset) // refactor me
+        {
+            Vec2d axisNormalized = Vec2d.Normalize(new Vec2d(start, end));
+            Vec2d perpScaled = Vec2d.Scale(Vec2d.CW90(axisNormalized), offset);
+            return Pt2d.Midpoint(start, end) + perpScaled; 
+        }
     }
 }

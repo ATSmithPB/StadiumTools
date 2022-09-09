@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using Rhino.Geometry;
+using System.Collections;
 
 namespace StadiumTools
 {
@@ -143,7 +144,12 @@ namespace StadiumTools
             return result;
         }
 
-        //Returns the point pt in local coordinates of the coordinate system parameter
+        /// <summary>
+        /// Returns the point pt in local coordinates of the coordinate system parameter
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <param name="coordSystem"></param>
+        /// <returns></returns>
         public static Pt3d LocalCoordinates(Pt3d pt, Pln3d coordSystem)
         {
             Vec3d posVec = (pt - coordSystem.OriginPt).ToVec3d();
@@ -154,7 +160,26 @@ namespace StadiumTools
             return new Pt3d(projX, projY, projZ);
         }
 
-        //Returns the point pt in local coordinates of the coordinate system parameter
+        public static Pt3d[] LocalCoordinates(Pt3d[] pts, Pln3d coordSystem)
+        {
+            Pt3d[] result = new Pt3d[pts.Length];
+            for (int i = 0; i < pts.Length; i++)
+            {
+                Vec3d posVec = (pts[i] - coordSystem.OriginPt).ToVec3d();
+                double projX = posVec * coordSystem.Xaxis;
+                double projY = posVec * coordSystem.Yaxis;
+                double projZ = posVec * coordSystem.Zaxis;
+                result[i] = new Pt3d(projX, projY, projZ);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the point pt in local coordinates of the coordinate system parameter
+        /// </summary>
+        /// <param name="pt2d"></param>
+        /// <param name="coordSystem"></param>
+        /// <returns></returns>
         public static Pt3d LocalCoordinates(Pt2d pt2d, Pln3d coordSystem)
         {
             Pt3d pt = new Pt3d(pt2d, 0.0);
@@ -247,6 +272,24 @@ namespace StadiumTools
         }
 
         /// <summary>
+        /// Returns a collection of 3d points that represent the corners of a rectangle aligned to a 3d plane with discrete side lengths
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="sizeX"></param>
+        /// <param name="sizeY"></param>
+        /// <returns></returns>
+        public static Pt3d[] RectangleCentered(Pln3d plane, double sizeY0, double sizeX1, double sizeY1, double sizeX0)
+        {
+            Pt3d[] result = new Pt3d[4];
+            Pt2d[] pts2d = Pt2d.RectangleCentered(new Pln2d(plane), sizeY0, sizeX1, sizeY1, sizeX0);
+            for (int i = 0; i < 4; i++)
+            {
+                result[i] = pts2d[i].ToPt3d(plane);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// calculates point between two points at a parameter
         /// </summary>
         /// <param name="a"></param>
@@ -296,6 +339,30 @@ namespace StadiumTools
         {
             Pt2d localPt2d = new Pt2d(LocalCoordinates(pt, pln));
             return new Pt3d(Pt2d.Rotate(localPt2d, angleRadians), pln);
+        }
+
+        public static Pt3d OffsetMidpoint(Pt3d start, Pt3d end, double offset)
+        {
+            Vec3d axisNormalized = Vec3d.Normalize(new Vec3d(start, end));
+            Vec3d perp = Vec3d.CrossProduct(axisNormalized, Vec3d.ZAxis);
+            Vec3d perpScaled = Vec3d.Scale(perp, offset);
+            return Pt3d.Midpoint(start, end) + perpScaled;
+        }
+
+        public static Pt3d OffsetMidpoint(Pt3d start, Pt3d end, double offset, out Pt3d midpoint)
+        {
+            Vec3d axisNormalized = Vec3d.Normalize(new Vec3d(start, end));
+            Vec3d perp = Vec3d.CrossProduct(axisNormalized, Vec3d.ZAxis);
+            Vec3d perpScaled = Vec3d.Scale(perp, offset);
+            midpoint = Pt3d.Midpoint(start, end);
+            return midpoint + perpScaled;
+        }
+
+        public static double Angle(Pln3d plane, Pt3d start, Pt3d end)
+        {
+            Pt2d start2d = new Pt2d(LocalCoordinates(start, plane));
+            Pt2d end2d = new Pt2d(LocalCoordinates(end, plane));
+            return Pt2d.Angle(Pt2d.Origin, start2d, end2d);
         }
     }
 

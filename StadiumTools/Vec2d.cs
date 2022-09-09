@@ -219,6 +219,5 @@ namespace StadiumTools
             return (2* PI) - Angle(a, b);
         }
 
-
     }
 }
