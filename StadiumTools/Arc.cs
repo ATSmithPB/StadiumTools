@@ -125,10 +125,10 @@ namespace StadiumTools
             {
                 throw new Exception("Radius too small. Radius*2 must be > the distance between start and end points");
             }
-            Vec3d Xaxis = Vec3d.Normalize(new Vec3d(start, end));
             Pt3d cen = Pt3d.OffsetMidpoint(start, end, radius, out Pt3d midpoint);
-            Vec3d Yaxis = Vec3d.Normalize(new Vec3d(cen, midpoint));
-            Plane = new Pln3d(cen, Xaxis, Yaxis);
+            Vec3d x = new Vec3d(cen, start);
+            Vec3d y = Vec3d.CrossProduct(x, Vec3d.ZAxis);
+            Plane = new Pln3d(cen, x, y);
             Radius = radius;
             double angleRadians = Pt3d.Angle(this.Plane, start, end);
             Domain = new Domain(0.0, angleRadians);
