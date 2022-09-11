@@ -68,7 +68,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Pt3d</returns>
-        public Pt3d PointOn(double parameter)
+        public Pt3d PointAt(double parameter)
         {
             double pTau = parameter * (Math.PI * 2);
             double x = this.RadiusX * Math.Cos(pTau);
@@ -87,5 +87,29 @@ namespace StadiumTools
             return Math.PI * (3 * (a + b) - Math.Sqrt((3 * a + b) * (a + 3 * b)));
         }
 
+        /// <summary>
+        /// returns true if successful. out offset ICurve. A negative value will offset towards ellipse center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetCurve"></param>
+        /// <returns></returns>
+        public bool Offset(double distance, out ICurve offsetCurve)
+        {
+            bool result = this.Offset(distance, out Ellipse offsetEllipse);
+            offsetCurve = offsetEllipse;
+            return result;
+        }
+
+        /// <summary>
+        /// returns true if successful. out offset Ellipse. A negative value will offset towards ellipse center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetEllipse"></param>
+        /// <returns></returns>
+        public bool Offset(double distance, out Ellipse offsetEllipse)
+        {
+            offsetEllipse = new Ellipse(this.Center, this.RadiusX + distance, this.RadiusY + distance);
+            return true;
+        }
     }
 }

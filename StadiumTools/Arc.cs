@@ -121,13 +121,13 @@ namespace StadiumTools
         /// <param name="radius"></param>
         public Arc(Pt3d start, Pt3d end, double radius)
         {
-            if (radius * 2 <= Pt3d.Distance(start, end))
+            if (Math.Abs(radius) * 2 <= Pt3d.Distance(start, end))
             {
                 throw new Exception("Radius too small. Radius*2 must be > the distance between start and end points");
             }
             Pt3d cen = Pt3d.OffsetMidpoint(start, end, radius, out Pt3d midpoint);
             Vec3d x = new Vec3d(cen, start);
-            Vec3d y = Vec3d.CrossProduct(x, Vec3d.ZAxis);
+            Vec3d y = Vec3d.CrossProduct(Vec3d.ZAxis, x);
             Plane = new Pln3d(cen, x, y);
             Radius = radius;
             double angleRadians = Pt3d.Angle(this.Plane, start, end);
@@ -174,7 +174,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Pt3d</returns>
-        public Pt3d PointOn(double parameter)
+        public Pt3d PointAt(double parameter)
         {
             double reParameter = parameter * this.Angle;
             return Pt3d.Rotate(this.Plane, this.Start, reParameter);
@@ -240,6 +240,42 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// returns true if successful. out offset ICurve. A negative value will offset towards arc center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetCurve"></param>
+        /// <returns>ICurve</returns>
+        public bool Offset(double distance, out ICurve offsetCurve)
+        {
+            bool result = this.Offset(distance, out Arc offsetArc);
+            offsetCurve = offsetArc;
+            return result;
+        }
+
+        /// <summary>
+        /// returns true if successful. out offset Arc. A negative value will offset towards arc center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetArc"></param>
+        /// <returns>Arc</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public bool Offset(double distance, out Arc offsetArc)
+        {
+            if (distance <= -this.Radius)
+            {
+                throw new ArgumentException($"offset distance [{distance}] must exceed -1 * radius [{-this.Radius}]");
+            }
+            offsetArc = new Arc(this.Plane, this.Radius + distance, this.Domain);
+            return true;
+        }
+
+        public static Arc Fillet(Arc arc0, Arc arc1, double radius)
+        {
+            arc0.Offset(-radius, out Arc offsetArc0);
+            arc1.Offset(-radius, out Arc offsetArc1);
+            Pt3d cen = Intersect(offsetArc0, offsetArc1);
+        }
     }
 
 }

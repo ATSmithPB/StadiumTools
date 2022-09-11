@@ -6,17 +6,30 @@ using System.Threading.Tasks;
 
 namespace StadiumTools
 {
-    public struct Circle
+    public struct Circle : ICurve
     {
         //Properties
         public Pln3d Center { get; set; }
         public double Radius { get; set; }
+        public Pt3d Start { get; set; }
+        public Pt3d End { get; set; }
 
         //Constructors
         public Circle(Pln3d center, double radius)
         {
             Center = center;
             Radius = radius;
+            Pt3d seamPt = center.OriginPt + (radius * center.Xaxis);
+            Start = seamPt;
+            End = seamPt;
+        }
+
+        public Circle(Arc arc)
+        {
+            Center = arc.Plane;
+            Radius = arc.Radius;
+            Start = arc.Start;
+            End = arc.Start;
         }
 
         //Methods
@@ -144,5 +157,65 @@ namespace StadiumTools
         {
             return radius - ChordMidCen(radius, chordLength);
         }
+
+        /// <summary>
+        /// returns the midpoint of a circle. Diametrically opposed point to the start
+        /// </summary>
+        /// <returns>Pt3d</returns>
+        public Pt3d Midpoint()
+        {
+            return this.Center.OriginPt + (-this.Radius * this.Center.Xaxis);
+        }
+
+        /// <summary>
+        /// returns a point at a specified parameter on a circle.
+        /// </summary>
+        /// <param name="angleRadians"></param>
+        /// <returns></returns>
+        public Pt3d PointAt(double angleRadians)
+        {
+            return Pt3d.Rotate(this.Center, this.Start, angleRadians);
+        }
+
+        /// <summary>
+        /// returns the circumference of a circle
+        /// </summary>
+        /// <returns>double</returns>
+        public double Length()
+        {
+            return 2 * Math.PI * this.Radius;
+        }
+
+        /// <summary>
+        /// returns true if successful. out offset ICurve. A negative value will offset towards circle center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetCirc"></param>
+        /// <returns>bool</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public bool Offset(double distance, out ICurve offsetCurve)
+        {
+            bool result = this.Offset(distance, out Circle offsetCircle);
+            offsetCurve = offsetCircle;
+            return result;
+        }
+
+        /// <summary>
+        /// returns true if successful. out offset Circle. A negative value will offset towards circle center. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetCircle"></param>
+        /// <returns>bool</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public bool Offset(double distance, out Circle offsetCircle)
+        {
+            if (distance <= -this.Radius)
+            {
+                throw new ArgumentException($"offset distance [{distance}] must exceed -1 * radius [{-this.Radius}]");
+            }
+            offsetCircle = new Circle(this.Center, this.Radius + distance);
+            return true;
+        }
     }
+
 }

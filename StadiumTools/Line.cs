@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -68,7 +70,7 @@ namespace StadiumTools
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Pt3d</returns>
-        public Pt3d PointOn(double parameter)
+        public Pt3d PointAt(double parameter)
         {
             return Pt3d.Tween2(this.Start, this.End, parameter);
         }
@@ -81,9 +83,33 @@ namespace StadiumTools
         {
             return Pt3d.Distance(this.Start, this.End);
         }
+
+        /// <summary>
+        /// returns true if Offset is success, Outs the offset of a Line
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetCurve"></param>
+        /// <returns>bool</returns>
+        public bool Offset(double distance, out ICurve offsetCurve)
+        {
+            bool result = this.Offset(distance, out Line offsetLine);
+            offsetCurve = offsetLine;
+            return result;
+        }
+
+        /// <summary>
+        /// returns true if Offset is success, Outs the offset of a Line
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="offsetLine"></param>
+        /// <returns>bool</returns>
+        public bool Offset(double distance, out Line offsetLine)
+        {
+            Vec3d axisNormalized = Vec3d.Normalize(new Vec3d(this.Start, this.End));
+            Vec3d perp = Vec3d.CrossProduct(axisNormalized, Vec3d.ZAxis);
+            Vec3d perpScaled = Vec3d.Scale(perp, distance);
+            offsetLine = new Line(this.Start + perpScaled, this.End + perpScaled);
+            return true;
+        }
     }
-
-
-
-
 }
