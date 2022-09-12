@@ -275,6 +275,14 @@ namespace StadiumTools
             arc0.Offset(-radius, out Arc offsetArc0);
             arc1.Offset(-radius, out Arc offsetArc1);
             Pt3d cen = Intersect(offsetArc0, offsetArc1);
+
+        }
+
+        public static Pt3d Intersect(Arc arc0, Arc arc1)
+        {
+            Circle circ0 = new Circle(arc0);
+            Circle circ1 = new Circle(arc1);
+            Circle.Intersect(circ0, circ1);
         }
     }
 

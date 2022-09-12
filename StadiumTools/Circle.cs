@@ -33,73 +33,104 @@ namespace StadiumTools
         }
 
         //Methods
-        /// <summary>
-        /// returns the two intersection points of two circles if intersecting
-        /// </summary>
-        /// <param name="circleA"></param>
-        /// <param name="circleB"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public static Pt3d[] Intersect(Circle circleA, Circle circleB, double tolerance)
+        
+        
+        int ON_Intersect(Circle C0, Circle C1, double abstol, out Pt3d P0, out Pt3d P1)
         {
-            if (!Pln3d.IsCoPlanar(circleA.Center, circleB.Center, tolerance))
+          P0 = P1 = new Pt3d();
+          int xcnt = -1;  
+          bool parallel = Vec3d.IsParallel(C0.Center.Zaxis, C1.Center.Zaxis, abstol);
+          bool coplanar = Pln3d.IsCoPlanar(C0.Center, C1.Center, abstol);
+            if (coplanar)
             {
-                throw new Exception("The two circles are not coplanar");
-            }
-            
-            if (!IsIntersecting(circleA, circleB, out double dist))
-            {
-                throw new Exception("The two circles do not intersect");
-            }
-            
-            Circle[] circles = new Circle[2] { circleA, circleB };
-            if (circleB.Radius >= circleA.Radius)
-            {
-                circles[0] = circleB;
-                circles[1] = circleA;
-            }
-
-            double rad0 = circles[0].Radius;
-            double rad1 = circles[1].Radius;
-            Vec3d vecD = new Vec3d(circles[1].Center.OriginPt - circles[0].Center.OriginPt);
-            double disD = vecD.M;
-            double x = disD - (rad0 + rad1);
-
-            if (x < tolerance && x > -tolerance)
-            {
-                Pt3d[] intersectionPts = new Pt3d[1];
-                intersectionPts[0] = Pt3d.Midpoint(circles[0].Center.OriginPt, circles[1].Center.OriginPt);
-                return intersectionPts;
-            }
-
-            else 
-            {
-                Pt3d[] intersectPts = new Pt3d[2];
-                vecD.Normalize();
-                Vec3d Dperp = Vec3d.CrossProduct(vecD, circles[0].Center.Zaxis);
-                double d1 = (rad0 * rad0 - rad1 * rad1 + disD * disD) / (2 * disD);
-                double a1 = rad0 * rad0 - d1 * d1;
-
-                if (a1 < 0)
+                Circle[] C = new Circle[2] { C0, C1 };
+                if (C1.Radius >= C0.Radius)
                 {
-                    a1 = 0;
+                    C[0] = C1;
+                    C[1] = C0;
                 }
-                
-                a1 = Math.Sqrt(a1);
-
-                if (a1 < .5 * tolerance)
+                double R0 = C[0].Radius;       // largest radius
+                double R1 = C[1].Radius;
+                Vec3d D = new Vec3d(C[1].Center.OriginPt - C[0].Center.OriginPt);
+                double d = D.M;
+                if (d > abstol)
                 {
-                    intersectPts[0] = circles[0].Center.OriginPt + d1 * vecD;
+                    D.Normalize();
+                    Vec3d Dperp = Vec3d.CrossProduct(D, C[0].Center.Zaxis);
+
+                    if (d > R0 + R1 + abstol)
+                    {
+                        xcnt = 0;                 // disks are disjoint
+                    }
+                    else if (d + R1 + abstol < R0)
+                    {
+                        xcnt = 0;                 // small disk is in interior of large disk
+                    }
+                    else
+                    {
+                        double d1 = (R0 * R0 - R1 * R1 + d * d) / (2 * d);
+                        double a1 = R0 * R0 - d1 * d1;
+                        if (a1 < 0)
+                        {
+                            a1 = 0;
+                        }
+
+                        a1 = Math.Sqrt(a1);
+                        if (a1 < .5 * abstol)
+                        {
+                            xcnt = 1;
+                            P0 = C[0].Center + d1 * D;
+                        }
+                        else
+                        {
+                            xcnt = 2;
+                            P0 = C[0].Center + d1 * D + a1 * Dperp;
+                            P1 = C[0].Center + d1 * D - a1 * Dperp;
+                        }
+                    }
+                }
+                else if (R0 - R1 < abstol)
+                {
+                    xcnt = 3;
                 }
                 else
                 {
-                    intersectPts[0] = circles[0].Center.OriginPt + d1 * vecD + a1 * Dperp;
-                    intersectPts[1] = circles[0].Center.OriginPt + d1 * vecD - a1 * Dperp;
+                    xcnt = 0;
                 }
-                return intersectPts;
             }
+            else if (!parallel)
+            {
+                ON_Line  PxP;
+                if (ON_Intersect(C0.plane, C1.plane, PxP))
+                {
+                    ON_3dPoint CxL[2][2]; 
+
+                    double t0, t1;
+                    int x0 = ON_Intersect( PxP, C0,  &t0, CxL[0][0], &t1, CxL[0][1] );
+                    int x1 = ON_Intersect( PxP, C1,  &t0, CxL[1][0], &t1, CxL[1][1] );
+                    xcnt = 0;
+                    for (int i = 0; i < x0; i++)
+                    {
+                        int j;
+                for (j = 0; j < x1; j++)
+                {
+                  if(ON_PointsAreCoincident(3,false,CxL[0][i], CxL[1][j]))
+                    break;
+                }
+                if (j < x1)
+                {
+                  (xcnt?P0:P1) = CxL[0][i];
+                  xcnt++;
+                }
+              }
+
+            }
+          }
+          return xcnt;
         }
+
+
+        
 
         public static bool IsIntersecting(Circle a, Circle b)
         {
