@@ -416,8 +416,51 @@ namespace StadiumTools
             }
             return result;
         }
-    }
 
-    
+        /// <summary>
+        /// returns the closer point (p0 or p1) of two points, to the given point 
+        /// </summary>
+        /// <param name="p0"></param>
+        /// <param name="p1"></param>
+        /// <returns>Pt3d</returns>
+        public Pt3d CloserPt(Pt3d p0, Pt3d p1)
+        {
+            Vec3d v0 = new Vec3d(p1 - this);
+            Vec3d v1 = new Vec3d(p1 - this);
+
+            if (v1.M > v0.M)
+            {
+                return p1;
+            }
+            else
+            {
+                return p0;
+            }
+        }
+
+        /// <summary>
+        /// returns the closer point (p0 or p1) of two points, to the given point 
+        /// </summary>
+        /// <param name="p0"></param>
+        /// <param name="p1"></param>
+        /// <returns>Pt3d</returns>
+        public Pt3d CloserPt(Pt3d p0, Pt3d p1, out Vec3d distanceVec)
+        {
+            Vec3d v0 = new Vec3d(p1 - this);
+            Vec3d v1 = new Vec3d(p1 - this);
+
+            if (v1.M < v0.M)
+            {
+                distanceVec = v1;
+                return p1;
+            }
+            else
+            {
+                distanceVec = v0;
+                return p0;
+            }
+        }
+
+    }
 }
 

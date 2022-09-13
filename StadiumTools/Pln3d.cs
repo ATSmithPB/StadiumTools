@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using static System.Math;
 
 namespace StadiumTools
@@ -64,41 +65,40 @@ namespace StadiumTools
         /// <param name="z"></param>
         public Pln3d(Pt3d origin, Vec3d x, Vec3d y, Vec3d z)
         {
-            this.IsValid = false;
-            this.OriginPt = origin;
-            this.OriginX = origin.X;
-            this.OriginY = origin.Y;
-            this.OriginZ = origin.Z;
-            this.Xaxis = Vec3d.Normalize(x);
-            this.Yaxis = Vec3d.Normalize(y);
-            this.Zaxis = Vec3d.Normalize(z);
+            IsValid = false;
+            OriginPt = origin;
+            OriginX = origin.X;
+            OriginY = origin.Y;
+            OriginZ = origin.Z;
+            Xaxis = Vec3d.Normalize(x);
+            Yaxis = Vec3d.Normalize(y);
+            Zaxis = Vec3d.Normalize(z);
             GetValidity(this);
         }
 
         public Pln3d(Pt3d origin, Vec3d x, Vec3d y)
         {
-            this.IsValid = false;
-            this.OriginPt = origin;
-            this.OriginX = origin.X;
-            this.OriginY = origin.Y;
-            this.OriginZ = origin.Z;
-            this.Xaxis = Vec3d.Normalize(x);
-            this.Yaxis = Vec3d.Normalize(y);
-            this.Zaxis = Vec3d.CrossProduct(this.Xaxis, this.Yaxis);
+            IsValid = false;
+            OriginPt = origin;
+            OriginX = origin.X;
+            OriginY = origin.Y;
+            OriginZ = origin.Z;
+            Xaxis = Vec3d.Normalize(x);
+            Yaxis = Vec3d.Normalize(y);
+            Zaxis = Vec3d.CrossProduct(this.Xaxis, this.Yaxis);
             GetValidity(this);
         }
 
         public Pln3d(Pln2d plane)
         {
-            this.IsValid = false;
-            Pt3d origin = new Pt3d(plane.OriginPt, 0.0);
-            this.OriginPt = origin;
-            this.OriginX = origin.X;
-            this.OriginY = origin.Y;
-            this.OriginZ = origin.Z;
-            this.Xaxis = new Vec3d(plane.Xaxis, 0.0);
-            this.Yaxis = new Vec3d(plane.Yaxis, 0.0);
-            this.Zaxis = Vec3d.ZAxis;
+            IsValid = false;
+            OriginPt = new Pt3d(plane.OriginPt, 0.0);
+            OriginX = this.OriginPt.X;
+            OriginY = this.OriginPt.Y;
+            OriginZ = this.OriginPt.Z;
+            Xaxis = new Vec3d(plane.Xaxis, 0.0);
+            Yaxis = new Vec3d(plane.Yaxis, 0.0);
+            Zaxis = Vec3d.ZAxis;
             GetValidity(this);
         }
 
@@ -109,10 +109,22 @@ namespace StadiumTools
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
             this.OriginZ = origin.Z;
-            Vec3d normalZ = Vec3d.Normalize(new Vec3d(origin, ptOnZAxis));
-            this.Zaxis = normalZ;
-            this.Xaxis = Vec3d.Normalize(Vec3d.PerpTo(normalZ));
-            this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(normalZ, this.Xaxis));
+            this.Zaxis = Vec3d.Normalize(new Vec3d(origin, ptOnZAxis));
+            this.Xaxis = Vec3d.Normalize(Vec3d.PerpTo(this.Zaxis));
+            this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(this.Zaxis, this.Xaxis));
+            GetValidity(this);
+        }
+
+        public Pln3d(Pt3d origin, Vec3d zAxis)
+        {
+            this.IsValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            this.Zaxis = zAxis;
+            this.Xaxis = Vec3d.Normalize(Vec3d.PerpTo(zAxis));
+            this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(zAxis, this.Xaxis));
             GetValidity(this);
         }
 
@@ -133,6 +145,25 @@ namespace StadiumTools
             GetValidity(this);
         }
 
+        /// <summary>
+        /// construct a Pln3d from three points 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="ptOnX"></param>
+        /// <param name="ptOnPlane"></param>
+        public Pln3d(Pt3d origin, Pt3d ptOnX, Pt3d ptOnPlane)
+        {
+            this.IsValid = false;
+            this.OriginPt = origin;
+            this.OriginX = origin.X;
+            this.OriginY = origin.Y;
+            this.OriginZ = origin.Z;
+            this.Xaxis = Vec3d.Normalize(new Vec3d(origin, ptOnX));
+            this.Zaxis = Vec3d.PerpTo(origin, ptOnX, ptOnPlane);
+            this.Yaxis = Vec3d.CrossProduct(this.Zaxis, this.Xaxis);
+            GetValidity(this);
+        }
+
         //Delegates
         /// <summary>
         /// Gets Vector with Default XAxis components (1.0, 0.0, 0.0)
@@ -147,9 +178,19 @@ namespace StadiumTools
         /// <returns>bool</returns>
         private static bool GetValidity(Pln3d p)
         {
-            bool isValid = true;
-
-            return isValid;
+            if (p.Xaxis.M != 1.0)
+            {
+                throw new ArgumentException("Plane Xaxis is not unitized");
+            }
+            if (p.Yaxis.M != 1.0)
+            {
+                throw new ArgumentException("Plane Yaxis is not unitized");
+            }
+            if (p.Zaxis.M != 1.0)
+            {
+                throw new ArgumentException("Plane Zaxis is not unitized");
+            }
+            return true;
         }
 
         public Pt3d ToPt3d(Pln3d pln)

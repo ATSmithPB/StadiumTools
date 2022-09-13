@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rhino.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,102 +37,120 @@ namespace StadiumTools
         /// <summary>
         /// returns the intersection event between two circls, and if successful the intersection points
         /// </summary>
-        /// <param name="C0"></param>
-        /// <param name="C1"></param>
-        /// <param name="abstol"></param>
-        /// <param name="P0"></param>
-        /// <param name="P1"></param>
-        /// <returns></returns>
+        /// <param name="circleA"></param>
+        /// <param name="circleB"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="iPt0"></param>
+        /// <param name="iPt1"></param>
+        /// <returns>int</returns>
         /// <exception cref="ArgumentException"></exception>
-        public static int Intersect(Circle C0, Circle C1, double abstol, out Pt3d P0, out Pt3d P1)
+        public static int Intersect(Circle circleA, Circle circleB, double tolerance, out Pt3d iPt0, out Pt3d iPt1) //reimplemented from OpenNurbs
         {
-            P0 = P1 = new Pt3d();
-            int xcnt = -1;
-            if (Pln3d.IsCoPlanar(C0.Center, C1.Center, abstol))
+            iPt0 = iPt1 = new Pt3d();
+            int result = -1;
+            if (Pln3d.IsCoPlanar(circleA.Center, circleB.Center, tolerance))
             {
-                Circle[] C = new Circle[2] { C0, C1 };
-                if (C1.Radius >= C0.Radius)
+                Circle[] Circles = new Circle[2] { circleA, circleB };
+                if (circleB.Radius >= circleA.Radius)
                 {
-                    C[0] = C1;
-                    C[1] = C0;
+                    Circles[0] = circleB;
+                    Circles[1] = circleA;
                 }
-                double R0 = C[0].Radius;       // largest radius
-                double R1 = C[1].Radius;
-                Vec3d D = new Vec3d(C[1].Center.OriginPt - C[0].Center.OriginPt);
-                double d = D.M;
-                if (d > abstol)
+                double rad0 = Circles[0].Radius;
+                double rad1 = Circles[1].Radius;
+                Vec3d distVec = new Vec3d(Circles[1].Center.OriginPt - Circles[0].Center.OriginPt);
+                double distance = distVec.M;
+                if (distance > tolerance)
                 {
-                    D.Normalize();
-                    Vec3d Dperp = Vec3d.CrossProduct(D, C[0].Center.Zaxis);
+                    distVec.Normalize();
+                    Vec3d distVecPerp = Vec3d.CrossProduct(distVec, Circles[0].Center.Zaxis);
 
-                    if (d > R0 + R1 + abstol)
+                    if (!IsIntersecting(distance, rad0, rad1, tolerance))
                     {
-                        xcnt = 0;// disks are disjoint
-                    }
-                    else if (d + R1 + abstol < R0)
-                    {
-                        xcnt = 0;// small disk is in interior of large disk
+                        result = 0;
                     }
                     else
                     {
-                        double d1 = (R0 * R0 - R1 * R1 + d * d) / (2 * d);
-                        double a1 = R0 * R0 - d1 * d1;
+                        double d1 = (rad0 * rad0 - rad1 * rad1 + distance * distance) / (2 * distance);
+                        double a1 = rad0 * rad0 - d1 * d1;
                         if (a1 < 0)
                         {
                             a1 = 0;
                         }
 
                         a1 = Math.Sqrt(a1);
-                        if (a1 < .5 * abstol)
+                        if (a1 < .5 * tolerance)
                         {
-                            xcnt = 1;
-                            P0 = C[0].Center.OriginPt + d1 * D;
+                            result = 1;
+                            iPt0 = Circles[0].Center.OriginPt + d1 * distVec;
                         }
                         else
                         {
-                            xcnt = 2;
-                            P0 = C[0].Center.OriginPt + d1 * D + a1 * Dperp;
-                            P1 = C[0].Center.OriginPt + d1 * D - a1 * Dperp;
+                            result = 2;
+                            iPt0 = Circles[0].Center.OriginPt + d1 * distVec + a1 * distVecPerp;
+                            iPt1 = Circles[0].Center.OriginPt + d1 * distVec - a1 * distVecPerp;
                         }
                     }
                 }
-                else if (R0 - R1 < abstol)
+                else if (rad0 - rad1 < tolerance)
                 {
-                    xcnt = 3;
+                    result = 3; //circles are coindicent
                 }
                 else
                 {
-                    xcnt = 0;
+                    result = 0;
                 }
             }
             else
             {
                 throw new ArgumentException("Circle's are not parallel");
             }
-            return xcnt;
-        }
-
-
-
-
-        public static bool IsIntersecting(Circle a, Circle b)
-        {
-            bool result = false;
-            double d = Pt3d.Distance(a.Center.OriginPt, b.Center.OriginPt);
-            if (a.Radius + b.Radius >= d || d >= Math.Abs(a.Radius - b.Radius))
-            {
-                result = true;
-            }
             return result;
         }
 
-        public static bool IsIntersecting(Circle a, Circle b, out double distance)
+        /// <summary>
+        /// returns true if two circles are intersecting
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool IsIntersecting(Circle a, Circle b, double tolerance)
         {
-            bool result = false;
+            double distance = Pt3d.Distance(a.Center.OriginPt, b.Center.OriginPt);
+            return IsIntersecting(distance, a.Radius, b.Radius, tolerance);
+        }
+
+        /// <summary>
+        /// returns true if two circles are intersecting, out distance bwtween circle centers
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="distance"></param>
+        /// <returns>bool</returns>
+        public static bool IsIntersecting(Circle a, Circle b, double tolerance, out double distance)
+        {
             distance = Pt3d.Distance(a.Center.OriginPt, b.Center.OriginPt);
-            if (a.Radius + b.Radius >= distance || distance >= Math.Abs(a.Radius - b.Radius))
+            return IsIntersecting(distance, a.Radius, b.Radius, tolerance);
+        }
+
+        /// <summary>
+        /// returns true if two circles are intersecting
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="radius0"></param>
+        /// <param name="radius1"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public static bool IsIntersecting(double distance, double radius0, double radius1, double tolerance)
+        {
+            bool result = true;
+            if (distance > radius0 + radius1 + tolerance)
             {
-                result = true;
+                result = false;
+            }
+            else if (distance + radius1 + tolerance < radius0)
+            {
+                result = false;
             }
             return result;
         }
@@ -172,7 +191,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// returns the midpoint of a circle. Diametrically opposed point to the start
+        /// returns the midpoint of a circle. Diametrically opposed pt to the start
         /// </summary>
         /// <returns>Pt3d</returns>
         public Pt3d Midpoint()
@@ -181,7 +200,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// returns a point at a specified parameter on a circle.
+        /// returns a pt at a specified parameter on a circle.
         /// </summary>
         /// <param name="angleRadians"></param>
         /// <returns></returns>
@@ -231,44 +250,44 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// returns parameters of point on circle that is closest to given point
+        /// returns parameters of pt on circle that is closest to given pt
         /// </summary>
         /// <param name="point"></param>
-        /// <param name="t"></param>
+        /// <param name="tParam"></param>
         /// <returns></returns>
-        public bool ClosestPointTo(Pt3d point, double t)
+        public bool ClosestPointTo(Pt3d point, double tParam)
         {
-            bool rc = true;
-            if (t != 0.0)
+            bool result = true;
+            if (tParam != 0.0)
             {
                 double u = 0.0;
                 double v = 0.0;
-                rc = this.Center.ClosestPointTo(point, u, v);
+                result = this.Center.ClosestPointTo(point, u, v);
                 if (u == 0.0 && v == 0.0)
                 {
-                    t = 0.0;
+                    tParam = 0.0;
                 }
                 else
                 {
-                    t = Math.Atan2(v, u);
-                    if (t < 0.0)
+                    tParam = Math.Atan2(v, u);
+                    if (tParam < 0.0)
                     {
-                        t += 2.0 * Math.PI;
+                        tParam += 2.0 * Math.PI;
                     }
                 }
             }
-            return rc;
+            return result;
         }
 
         /// <summary>
-        /// returns the closest point on the circle to a given point
+        /// returns the closest pt on the circle to a given pt
         /// </summary>
-        /// <param name="point"></param>
+        /// <param name="pt"></param>
         /// <returns></returns>
-        public Pt3d ClosestPointTo(Pt3d point)
+        public Pt3d ClosestPointTo(Pt3d pt)
         {
             Pt3d result = new Pt3d();
-            Vec3d vec = new Vec3d(this.Center.ClosestPointTo(point) - this.Center.OriginPt);
+            Vec3d vec = new Vec3d(this.Center.ClosestPointTo(pt) - this.Center.OriginPt);
             if (vec.Unitize())
             {
                 vec.Unitize();

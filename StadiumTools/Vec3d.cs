@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static System.Math;
 
 namespace StadiumTools
@@ -254,12 +255,23 @@ namespace StadiumTools
             return Acos(d);
         }
 
+        /// <summary>
+        /// returns the reflex angle of two 3d vectors in radians
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>double</returns>
         public static double Reflex(Vec3d a, Vec3d b)
         {
             return (2 * PI) - Angle(a, b);
         }
 
-        public static Vec3d PerpTo(Vec3d v)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vec3d PerpTo(Vec3d v) // reimplemented from OpenNurbs
         {
           double[] vC = new double[3];  
           int i, j, k; 
@@ -321,7 +333,7 @@ namespace StadiumTools
           vC[j] = a;
           vC[k] = 0.0;
           
-          return new Vec3d(vC[0], vC[0], vC[0]);
+          return new Vec3d(vC[i], vC[j], vC[k]);
         }
 
         /// <summary>
@@ -382,5 +394,68 @@ namespace StadiumTools
         {
             return new Vec3d(v.X * factor, v.Y * factor, v.Z * factor);
         }
+
+
+        /// <summary>
+        /// find a the unit normal to a triangle defined by 3 points
+        /// </summary>
+        /// <param name="P0"></param>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <returns>Vec3d</returns>
+        public static Vec3d PerpTo(Pt3d P0, Pt3d P1, Pt3d P2)
+        { 
+            Vec3d result = new Vec3d();
+            Vec3d V0 = new Vec3d(P2 - P1);
+            Vec3d V1 = new Vec3d(P0 - P2);
+            Vec3d V2 = new Vec3d(P1 - P0);
+
+            Vec3d N0 = Vec3d.CrossProduct(V1, V2);
+            if (!N0.Unitize())
+            {
+                throw new ArgumentException("Error: Invalid Inputs, check for coincedence with P0, P1, P2");
+            }
+            Vec3d N1 = Vec3d.CrossProduct(V2, V0);
+            if (!N1.Unitize())
+            {
+                throw new ArgumentException("Error: Invalid Inputs, check for coincedence with P0, P1, P2");
+            }
+            Vec3d N2 = Vec3d.CrossProduct(V0, V1);
+            if (!N2.Unitize())
+            {
+                throw new ArgumentException("Error: Invalid Inputs, check for coincedence with P0, P1, P2");
+            }
+
+            double s0 = 1.0/V0.M;
+            double s1 = 1.0/V1.M;
+            double s2 = 1.0/V2.M;
+
+            // choose normal with smallest total error
+            double e0 = (s0 * Abs(DotProduct(N0,V0))) + (s1 * Abs(DotProduct(N0,V1))) + (s2 * Abs(DotProduct(N0,V2)));
+            double e1 = (s0 * Abs(DotProduct(N1,V0))) + (s1 * Abs(DotProduct(N1,V1))) + (s2 * Abs(DotProduct(N1,V2)));
+            double e2 = (s0 * Abs(DotProduct(N2,V0))) + (s1 * Abs(DotProduct(N2,V1))) + (s2 * Abs(DotProduct(N2,V2)));
+            if ( e0 <= e1 ) 
+            {
+                if ( e0 <= e2 ) 
+                {
+                    result = N0;
+                }
+                else 
+                {
+                    result = N2;
+                }
+            }
+            else if (e1 <= e2) 
+            {
+                result = N1;
+            }
+            else 
+            {
+                result = N2;
+            }
+          return result;
+        }
+
+         
     }
 }

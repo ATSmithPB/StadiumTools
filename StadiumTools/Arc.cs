@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
 using static System.Math;
+using Rhino.Commands;
+using System.Runtime.CompilerServices;
 
 namespace StadiumTools
 {
@@ -52,11 +54,12 @@ namespace StadiumTools
         {
             Plane = plane;
             Radius = radius;
+            Angle = angleRadians;
             Domain = new Domain(0.0, angleRadians);
             Start = new Pt3d(new Pt2d(radius, 0.0), this.Plane);
             End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
             IsValid = ValidateDomain(angleRadians);
-            Angle = angleRadians;
+            
         }
 
         public Arc(Pln3d plane, double radius, Domain domain)
@@ -105,16 +108,26 @@ namespace StadiumTools
         {
             Plane = new Pln3d(new Pln2d(center, start));
             Radius = Pt2d.Distance(center, start);
-            double angleRadians = Pt2d.Angle(center, start, end);
-            Domain = new Domain(0.0, angleRadians);
+            Angle = Pt2d.Angle(center, start, end);
+            Domain = new Domain(0.0, this.Angle);
             Start = new Pt3d(start, this.Plane);
-            End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
+            End = Pt3d.Rotate(this.Plane, this.Start, this.Angle);
             IsValid = ValidateDomain(this.Domain.Length);
-            Angle = angleRadians;
+        }
+
+        public Arc(Pt3d center, Pt3d start, Pt3d end)
+        {
+            Plane = new Pln3d(center, start, end);
+            Radius = Pt3d.Distance(center, start);
+            Angle = Pt3d.Angle(this.Plane, start, end);
+            Domain = new Domain(0.0, this.Angle);
+            Start = start;
+            End = Pt3d.Rotate(this.Plane, this.Start, this.Angle);
+            IsValid = ValidateDomain(this.Domain.Length);
         }
 
         /// <summary>
-        /// construct an arc from a startPt, endPt and radius. 
+        /// construct an arc from a startPt, endPt and filletRadius. 
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
@@ -264,29 +277,76 @@ namespace StadiumTools
         {
             if (distance <= -this.Radius)
             {
-                throw new ArgumentException($"offset distance [{distance}] must exceed -1 * radius [{-this.Radius}]");
+                throw new ArgumentException($"offset distance [{distance}] must exceed -1 * filletRadius [{-this.Radius}]");
             }
             offsetArc = new Arc(this.Plane, this.Radius + distance, this.Domain);
             return true;
         }
 
+        public static Arc[] FilletTrim(Arc arc0, Arc arc1, double filletRadius, double tolerance)
+        {
+            if (filletRadius >= arc0.Radius || filletRadius >= arc0.Radius)
+            {
+                throw new ArgumentException("Error: Fillet Radius cannot exceed the radius of either Arc being filleted");
+            }
+            Arc fillet = Arc.Fillet(arc0, arc1, filletRadius, tolerance);
+
+            //Add arc0Trimmed and arc1Trimmed
+
+            return new Arc[3] { arc0, fillet, arc1 };
+        }
+
+        /// <summary>
+        /// returns the Arc that results from a fillet operation on two other arcs. Does not trim input arcs
+        /// </summary>
+        /// <param name="arc0"></param>
+        /// <param name="arc1"></param>
+        /// <param name="radius"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="Exception"></exception>
         public static Arc Fillet(Arc arc0, Arc arc1, double radius, double tolerance)
         {
-            int arcConnection = Arc.IsConnected(arc0, arc1, tolerance);
-            if (arcConnection == 0)
+            int connection = IsConnected(arc0, arc1, tolerance, out Pt3d cornerPt);
+            if (connection == 0)
             {
                 throw new ArgumentException("the two arcs are not connected");
             }
 
             arc0.Offset(-radius, out Arc offsetArc0);
             arc1.Offset(-radius, out Arc offsetArc1);
-            int xcnt = Intersect(offsetArc0, offsetArc1, tolerance, out Pt3d P0, out Pt3d P1);
-            
+            int xcnt = Intersect(offsetArc0, offsetArc1, tolerance, out Pt3d P0, out Pt3d P1); //one of these points is correct
 
+            Pt3d circleFilletCenPt = cornerPt.CloserPt(P0, P1);
+
+            Pln3d circleFilletCen = new Pln3d(circleFilletCenPt, arc0.Plane.Zaxis);
+            Circle circleFillet = new Circle(circleFilletCen, radius);
+            Circle circle0 = new Circle(arc0);
+            Circle circle1 = new Circle(arc1);
+
+            int result0 = Circle.Intersect(circleFillet, circle0, tolerance, out Pt3d iPt0, out Pt3d iPt1);
+            if (result0 != 1)
+            {
+                throw new Exception($"Error: Fillet Circle and Arc0 intersection event[{result0}] did not result in 1 point");
+            }
+            int result1 = Circle.Intersect(circleFillet, circle1, tolerance, out Pt3d iPt2, out Pt3d iPt3);
+            if (result1 != 1)
+            {
+                throw new Exception($"Error: Fillet Circle and Arc1 intersection event [{result1}] did not result in 1 point");
+            }
+
+            Arc result = new Arc(circleFilletCenPt, iPt0, iPt2); //Or P1
+
+            return result;
         }
 
+        //public static Arc Fillet(Arc arc0, Arc arc1, double filletRadius)
+        //{
+        //    //Wishlist: Fillet interecting, but not connected arcs
+        //}
 
-        public static int Intersect(Arc A0, Arc A1, double tolerance, out Pt3d P0,  out Pt3d P1)
+        public static int Intersect(Arc A0, Arc A1, double tolerance, out Pt3d P0,  out Pt3d P1) //Re-implemented from OpenNurbs
         {
             P0 = P1 = new Pt3d();
             Pt3d[] P = new Pt3d[] { P0, P1 };
@@ -435,7 +495,7 @@ namespace StadiumTools
         /// <param name="pt"></param>
         /// <param name="tParam"></param>
         /// <returns></returns>
-        public bool ClosestPointTo(Pt3d pt, double tParam)
+        public bool ClosestPointTo(Pt3d pt, double tParam) //reimplemented from OpenNurbs
         {
             double s = 0.0;
             double tau = 2.0 * Math.PI;
@@ -477,29 +537,36 @@ namespace StadiumTools
             return rc;
         }
 
-        public static int IsConnected(Arc arc0, Arc arc1, double tolerance)
+        public static int IsConnected(Arc arc0, Arc arc1, double tolerance, out Pt3d connectionPt)
         {
-
+            int result = 0;
             if (Pt3d.IsCoincident(arc0.Start, arc1.Start, tolerance))
             {
-                return 1;
+                connectionPt = arc0.Start;
+                result = 1;
             }
             else if (Pt3d.IsCoincident(arc0.Start, arc1.End, tolerance))
             {
-                return 2;
+                connectionPt = arc0.Start;
+                result = 2;
             }
             else if (Pt3d.IsCoincident(arc0.End, arc1.Start, tolerance))
             {
-                return 3;
+                connectionPt = arc0.End;
+                result = 3;
             }
             else if (Pt3d.IsCoincident(arc0.End, arc1.End, tolerance))
             {
-                return 4;
+                connectionPt = arc0.End;
+                result = 4;
             }
             else
             {
-                return 0;
+                connectionPt = Pt3d.Origin;
+                result = 0;
             }
+
+            return result;
         }
 
     }
