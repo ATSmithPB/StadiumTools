@@ -132,12 +132,22 @@ namespace StadiumTools
         /// Unitizes an existing 3d vector by reference
         /// </summary>
         /// <param name="v"></param>
-        private static void Normalize(ref Vec3d v)
+        public static void Normalize(ref Vec3d v)
         {
             v.X = v.X / v.M;
             v.Y = v.Y / v.M;
             v.Z = v.Z / v.M;
             v.M = 1;
+        }
+
+        /// <summary>
+        /// returns true if a vector is successfully Normalized
+        /// </summary>
+        /// <returns></returns>
+        public bool Unitize()
+        {
+            this.Normalize();
+            return true; 
         }
 
         /// <summary>

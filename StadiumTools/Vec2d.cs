@@ -119,15 +119,29 @@ namespace StadiumTools
             return m;
         }
 
+        public void Normalize()
+        {
+            Normalize(this);
+        }
         /// <summary>
         /// Scales a vector such that its length = 1.0 (by reference)
         /// </summary>
         /// <param name="v"></param>
-        private static void Normalize(ref Vec2d v)
+        public static void Normalize(ref Vec2d v)
         {
             v.X = v.X / v.M;
             v.Y = v.Y / v.M;
             v.M = 1;
+        }
+
+        /// <summary>
+        /// returns true if a vector is successfully Normalized
+        /// </summary>
+        /// <returns></returns>
+        public bool Unitize()
+        {
+            this.Normalize();
+            return true;
         }
 
         /// <summary>

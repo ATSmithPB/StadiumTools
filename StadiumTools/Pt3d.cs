@@ -2,6 +2,7 @@
 using System;
 using Rhino.Geometry;
 using System.Collections;
+using Rhino.Commands;
 
 namespace StadiumTools
 {
@@ -55,14 +56,13 @@ namespace StadiumTools
         /// Creates Point with Default Origin components (0.0, 0.0, 0.0)
         /// </summary>
         public static Pt3d Origin => new Pt3d(0.0, 0.0, 0.0);
-        
+
         //Operator Overrides
-        /// <summary>
-        /// Subtracts one point from another
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
+        public static Pt3d operator +(Pt3d a, Pt3d b)
+        {
+            return Add(a, b);
+        }
+
         public static Pt3d operator - (Pt3d a, Pt3d b)
         {
             return Subtract(a, b);
@@ -71,6 +71,11 @@ namespace StadiumTools
         public static Pt3d operator - (Pt3d p, Vec3d v)
         {
             return Subtract(p, v);
+        }
+
+        public static Pt3d operator *(double f, Pt3d a)
+        {
+            return Multiply(a, f);
         }
 
         /// <summary>
@@ -100,6 +105,11 @@ namespace StadiumTools
         {
             Vec3d vec3d = new Vec3d(this.X, this.Y, this.Z);
             return vec3d;
+        }
+
+        public double DistanceTo(Pt3d to)
+        {
+            return Distance(this, to);
         }
 
         /// <summary>
@@ -212,6 +222,11 @@ namespace StadiumTools
             return new Pt3d(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
         }
 
+        public static Pt3d Add(Pt3d a, Pt3d b)
+        {
+            return new Pt3d(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        }
+
         /// <summary>
         /// subracts the components of Pt3d b from the components of Pt3d a and returns a new Pt3d with the resulting components
         /// </summary>
@@ -232,6 +247,11 @@ namespace StadiumTools
         public static Pt3d Subtract(Pt3d p, Vec3d v)
         {
             return new Pt3d(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
+        }
+
+        public static Pt3d Multiply(Pt3d p, double f)
+        {
+            return new Pt3d(p.X * f, p.Y * f, p.Z * f);
         }
 
         /// <summary>
@@ -341,6 +361,13 @@ namespace StadiumTools
             return new Pt3d(Pt2d.Rotate(localPt2d, angleRadians), pln);
         }
 
+        /// <summary>
+        /// offset the midpoint between two points perpendicular to the axis of the given points (cross product)
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         public static Pt3d OffsetMidpoint(Pt3d start, Pt3d end, double offset)
         {
             Vec3d axisNormalized = Vec3d.Normalize(new Vec3d(start, end));
@@ -349,6 +376,14 @@ namespace StadiumTools
             return Pt3d.Midpoint(start, end) + perpScaled;
         }
 
+        /// <summary>
+        /// offset the midpoint between two points perpendicular to the axis of the given points (cross product)
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="offset"></param>
+        /// <param name="midpoint"></param>
+        /// <returns>Pt3d</returns>
         public static Pt3d OffsetMidpoint(Pt3d start, Pt3d end, double offset, out Pt3d midpoint)
         {
             Vec3d axisNormalized = Vec3d.Normalize(new Vec3d(start, end));
@@ -358,11 +393,28 @@ namespace StadiumTools
             return midpoint + perpScaled;
         }
 
+        /// <summary>
+        /// returns the angle in radians between two points relative to a plane and about its origin
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public static double Angle(Pln3d plane, Pt3d start, Pt3d end)
         {
             Pt2d start2d = new Pt2d(LocalCoordinates(start, plane));
             Pt2d end2d = new Pt2d(LocalCoordinates(end, plane));
             return Pt2d.Angle(Pt2d.Origin, start2d, end2d);
+        }
+
+        public static bool IsCoincident(Pt3d a, Pt3d b, double tolerance)
+        {
+            bool result = false;
+            if (Pt3d.Distance(a, b) < tolerance)
+            {
+                result = true;
+            }
+            return result;
         }
     }
 

@@ -33,15 +33,21 @@ namespace StadiumTools
         }
 
         //Methods
-        
-        
-        int ON_Intersect(Circle C0, Circle C1, double abstol, out Pt3d P0, out Pt3d P1)
+        /// <summary>
+        /// returns the intersection event between two circls, and if successful the intersection points
+        /// </summary>
+        /// <param name="C0"></param>
+        /// <param name="C1"></param>
+        /// <param name="abstol"></param>
+        /// <param name="P0"></param>
+        /// <param name="P1"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static int Intersect(Circle C0, Circle C1, double abstol, out Pt3d P0, out Pt3d P1)
         {
-          P0 = P1 = new Pt3d();
-          int xcnt = -1;  
-          bool parallel = Vec3d.IsParallel(C0.Center.Zaxis, C1.Center.Zaxis, abstol);
-          bool coplanar = Pln3d.IsCoPlanar(C0.Center, C1.Center, abstol);
-            if (coplanar)
+            P0 = P1 = new Pt3d();
+            int xcnt = -1;
+            if (Pln3d.IsCoPlanar(C0.Center, C1.Center, abstol))
             {
                 Circle[] C = new Circle[2] { C0, C1 };
                 if (C1.Radius >= C0.Radius)
@@ -60,11 +66,11 @@ namespace StadiumTools
 
                     if (d > R0 + R1 + abstol)
                     {
-                        xcnt = 0;                 // disks are disjoint
+                        xcnt = 0;// disks are disjoint
                     }
                     else if (d + R1 + abstol < R0)
                     {
-                        xcnt = 0;                 // small disk is in interior of large disk
+                        xcnt = 0;// small disk is in interior of large disk
                     }
                     else
                     {
@@ -79,13 +85,13 @@ namespace StadiumTools
                         if (a1 < .5 * abstol)
                         {
                             xcnt = 1;
-                            P0 = C[0].Center + d1 * D;
+                            P0 = C[0].Center.OriginPt + d1 * D;
                         }
                         else
                         {
                             xcnt = 2;
-                            P0 = C[0].Center + d1 * D + a1 * Dperp;
-                            P1 = C[0].Center + d1 * D - a1 * Dperp;
+                            P0 = C[0].Center.OriginPt + d1 * D + a1 * Dperp;
+                            P1 = C[0].Center.OriginPt + d1 * D - a1 * Dperp;
                         }
                     }
                 }
@@ -98,39 +104,15 @@ namespace StadiumTools
                     xcnt = 0;
                 }
             }
-            else if (!parallel)
+            else
             {
-                ON_Line  PxP;
-                if (ON_Intersect(C0.plane, C1.plane, PxP))
-                {
-                    ON_3dPoint CxL[2][2]; 
-
-                    double t0, t1;
-                    int x0 = ON_Intersect( PxP, C0,  &t0, CxL[0][0], &t1, CxL[0][1] );
-                    int x1 = ON_Intersect( PxP, C1,  &t0, CxL[1][0], &t1, CxL[1][1] );
-                    xcnt = 0;
-                    for (int i = 0; i < x0; i++)
-                    {
-                        int j;
-                for (j = 0; j < x1; j++)
-                {
-                  if(ON_PointsAreCoincident(3,false,CxL[0][i], CxL[1][j]))
-                    break;
-                }
-                if (j < x1)
-                {
-                  (xcnt?P0:P1) = CxL[0][i];
-                  xcnt++;
-                }
-              }
-
+                throw new ArgumentException("Circle's are not parallel");
             }
-          }
-          return xcnt;
+            return xcnt;
         }
 
 
-        
+
 
         public static bool IsIntersecting(Circle a, Circle b)
         {
@@ -162,7 +144,7 @@ namespace StadiumTools
         /// <returns>double</returns>
         public static double ChordAngle(double radius, double chordLength)
         {
-            return 2 * Math.Asin(chordLength/ (2* radius));
+            return 2 * Math.Asin(chordLength / (2 * radius));
         }
 
         /// <summary>
@@ -247,6 +229,57 @@ namespace StadiumTools
             offsetCircle = new Circle(this.Center, this.Radius + distance);
             return true;
         }
-    }
 
+        /// <summary>
+        /// returns parameters of point on circle that is closest to given point
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public bool ClosestPointTo(Pt3d point, double t)
+        {
+            bool rc = true;
+            if (t != 0.0)
+            {
+                double u = 0.0;
+                double v = 0.0;
+                rc = this.Center.ClosestPointTo(point, u, v);
+                if (u == 0.0 && v == 0.0)
+                {
+                    t = 0.0;
+                }
+                else
+                {
+                    t = Math.Atan2(v, u);
+                    if (t < 0.0)
+                    {
+                        t += 2.0 * Math.PI;
+                    }
+                }
+            }
+            return rc;
+        }
+
+        /// <summary>
+        /// returns the closest point on the circle to a given point
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public Pt3d ClosestPointTo(Pt3d point)
+        {
+            Pt3d result = new Pt3d();
+            Vec3d vec = new Vec3d(this.Center.ClosestPointTo(point) - this.Center.OriginPt);
+            if (vec.Unitize())
+            {
+                vec.Unitize();
+                result = this.Center.OriginPt + this.Radius * vec;
+            }
+            else 
+            {
+                result = PointAt(0.0);
+            }
+            return result;
+        }
+
+    }
 }
