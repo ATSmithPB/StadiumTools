@@ -283,6 +283,7 @@ namespace StadiumTools
             return true;
         }
 
+
         public static Arc[] FilletTrim(Arc arc0, Arc arc1, double filletRadius, double tolerance)
         {
             if (filletRadius >= arc0.Radius || filletRadius >= arc0.Radius)
@@ -303,7 +304,7 @@ namespace StadiumTools
         /// <param name="arc1"></param>
         /// <param name="radius"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>Arc</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Exception"></exception>
         public static Arc Fillet(Arc arc0, Arc arc1, double radius, double tolerance)
@@ -316,27 +317,30 @@ namespace StadiumTools
 
             arc0.Offset(-radius, out Arc offsetArc0);
             arc1.Offset(-radius, out Arc offsetArc1);
-            int xcnt = Intersect(offsetArc0, offsetArc1, tolerance, out Pt3d P0, out Pt3d P1); //one of these points is correct
+            int xcnt = Intersect(offsetArc0, offsetArc1, tolerance, out Pt3d[] cxcPts); //one of these points is correct
+            if (xcnt != 2)
+            {
+                throw new ArgumentException($"Error: Arc0|Arc1 intersection event[{xcnt}] did not result in 2 points");
+            }
 
-            Pt3d circleFilletCenPt = cornerPt.CloserPt(P0, P1);
-
+            Pt3d circleFilletCenPt = cornerPt.CloserPt(cxcPts[0], cxcPts[1]);
             Pln3d circleFilletCen = new Pln3d(circleFilletCenPt, arc0.Plane.Zaxis);
             Circle circleFillet = new Circle(circleFilletCen, radius);
             Circle circle0 = new Circle(arc0);
             Circle circle1 = new Circle(arc1);
 
-            int result0 = Circle.Intersect(circleFillet, circle0, tolerance, out Pt3d iPt0, out Pt3d iPt1);
+            int result0 = Circle.Intersect(circleFillet, circle0, tolerance, out Pt3d[] iPts0);
             if (result0 != 1)
             {
                 throw new Exception($"Error: Fillet Circle and Arc0 intersection event[{result0}] did not result in 1 point");
             }
-            int result1 = Circle.Intersect(circleFillet, circle1, tolerance, out Pt3d iPt2, out Pt3d iPt3);
+            int result1 = Circle.Intersect(circleFillet, circle1, tolerance, out Pt3d[] iPts1);
             if (result1 != 1)
             {
                 throw new Exception($"Error: Fillet Circle and Arc1 intersection event [{result1}] did not result in 1 point");
             }
 
-            Arc result = new Arc(circleFilletCenPt, iPt0, iPt2); //Or P1
+            Arc result = new Arc(circleFilletCenPt, iPts0[0], iPts1[0]); //Or P1
 
             return result;
         }
@@ -346,135 +350,40 @@ namespace StadiumTools
         //    //Wishlist: Fillet interecting, but not connected arcs
         //}
 
-        public static int Intersect(Arc A0, Arc A1, double tolerance, out Pt3d P0,  out Pt3d P1) //Re-implemented from OpenNurbs
+        public static int Intersect(Arc arc0, Arc arc1, double tolerance, out Pt3d[] intersectionPts)
         {
-            P0 = P1 = new Pt3d();
-            Pt3d[] P = new Pt3d[] { P0, P1 };
-            int xcnt = 0;
-
-            Pt3d[] CCX = new Pt3d[2];
-            int cxcnt = Circle.Intersect(new Circle(A0), new Circle(A1), tolerance, out CCX[0], out CCX[1]);
-            if ( cxcnt < 3)
+            int axaFlag = 0;
+            int cxcFlag = Circle.Intersect(new Circle(arc0), new Circle(arc1), tolerance, out Pt3d[] cxcPts);
+            
+            if (cxcFlag != 1 && cxcFlag != 2)
             {
-                for (int i = 0; i < cxcnt; i++)
+                throw new ArgumentException($"Error: Invalid Circle|Circle intersection flag [{cxcFlag}]. Must be 1 or 2");
+            }
+            else
+            {
+                List<Pt3d> iPts = new List<Pt3d>();
+                for (int i = 0; i < cxcFlag; i++)
                 {
-                    double t = 0.0;
-                    if (A0.ClosestPointTo(CCX[i], t))
+                    double tParam0 = 0.0;
+                    double tParam1 = 0.0;
+                    if (arc0.ClosestPointTo(cxcPts[i], ref tParam0))
                     {
-                        if (CCX[i].DistanceTo(A0.PointAt(t)) < tolerance)
+                        if (cxcPts[i].DistanceTo(arc0.PointAt(tParam0)) < tolerance)
                         {
-                            if (A1.ClosestPointTo(CCX[i], t))
+                            if (arc1.ClosestPointTo(cxcPts[i], ref tParam1))
                             {
-                                if (CCX[i].DistanceTo(A1.PointAt(t)) < tolerance)
+                                if (cxcPts[i].DistanceTo(arc1.PointAt(tParam1)) < tolerance)
                                 {
-                                    P[xcnt++] = CCX[i];
+                                    iPts[axaFlag] = cxcPts[i];
+                                    axaFlag++;
                                 }
                             }
                         }
                     }
                 }
+                intersectionPts = iPts.ToArray();
+                return axaFlag;
             }
-            else if (cxcnt == 3)
-            {
-                Arc[] Size = new Arc[] { A0, A1 };     //Size[0]<=Size[1]
-                if (A0.Domain.Length > A1.Domain.Length)
-                {
-                    Size[0] = A1;
-                    Size[1] = A0;
-                }
-                // Match ends of smaller to larger arc
-                double[] LittleEndMatch = new double[2];  // relative to Big ArcBig,  0-start, 1-end , .5 (interior),  -1 ( exterior)
-
-                Domain BigInterior = Size[1].Domain;    // interior domain of big arc
-                if (!BigInterior.Expand(-tolerance / Size[1].Radius))         // circles are not degenerate
-                BigInterior = Domain.Singleton(Size[1].Domain.Mid);
-    
-                for (int ei = 0; ei < 2; ei++)
-                {
-                    double t = 0.0; 
-                    bool eiBool = Convert.ToBoolean(ei);
-                    Pt3d LittleEnd = eiBool ? Size[0].End : Size[0].Start;
-                    if (Size[1].ClosestPointTo(LittleEnd, t))
-                    {
-                        switch (BigInterior.Clamp(t))
-                        {
-                            case(-1):
-                                {
-                                    if (Size[1].Start.DistanceTo(LittleEnd) < tolerance)
-                                    {
-                                        LittleEndMatch[ei] = 0;// start
-                                    }
-                                    else
-                                    {
-                                        LittleEndMatch[ei] = -1;// exterior
-                                    }
-                                    break;
-                                }
-                            case(0):
-                                {
-                                    LittleEndMatch[ei] = .5;// interior
-                                    break;
-                                }
-                            case(1):
-                                {
-                                    if (Size[1].End.DistanceTo(LittleEnd) < tolerance)
-                                    {
-                                        LittleEndMatch[ei] = 1;// end
-                                    }
-                                    else
-                                    {
-                                        LittleEndMatch[ei] = -1;// exterior
-                                    }
-                                    break;
-                                }
-                        }
-                    }
-                }
-                if (LittleEndMatch[0] == .5 || LittleEndMatch[1] == .5)
-                {
-                    xcnt = 3;// an interior match means an overlap
-                }
-                else if (LittleEndMatch[0] == -1 && LittleEndMatch[1] == -1)
-                {
-                    xcnt = 0;// both points exterior means  intersection is empty
-                }
-                else if (LittleEndMatch[0] == -1)
-                {
-                    P[xcnt++] = Size[0].End;// if start is exterior end must be an intersection point
-                }
-                else if (LittleEndMatch[1] == -1)
-                {
-                    P[xcnt++] = Size[0].Start;
-                }
-                else
-                {
-                    // Both endpoints match endpoints of Big
-                    // LittleEndMatch[ei] \in { 0, 1 }
-                    bool Orientation_agree = (A0.Plane.Zaxis * A1.Plane.Zaxis > 0);// true if  the orientations agree
-                    if (LittleEndMatch[0] != LittleEndMatch[1])
-                    {
-                        if (Orientation_agree == (LittleEndMatch[0] == 1.0))
-                        {
-                            P[xcnt++] = Size[0].Start;
-                            P[xcnt++] = Size[0].End;
-                        }
-                        else
-                        {
-                            xcnt = 3;
-                        }
-                    }
-                    else
-                    {
-                        // Degenerate cases
-                        if (Size[0].Start.DistanceTo(Size[0].End) < tolerance)
-                            P[xcnt++] = Size[0].Start;
-                        else
-                            xcnt = 3;
-                    }
-                }
-            }
-  
-          return xcnt;
         }
 
         /// <summary>
@@ -482,61 +391,42 @@ namespace StadiumTools
         /// </summary>
         /// <param name="pt"></param>
         /// <returns>Pt3d</returns>
+        /// <exception cref="ArgumentException"></exception>
         public Pt3d ClosestPointTo(Pt3d pt)
         {
-          double tParam = this.Domain.T0;
-          ClosestPointTo(pt, tParam);
+          double tParam = 0.0;
+          if (!ClosestPointTo(pt, ref tParam))
+          {
+                throw new ArgumentException("Arc.ClosestPointTo Failed!");
+          }
           return PointAt(tParam);
         }
-         
+
         /// <summary>
         /// returns parameters of point on arc that is closest to given point
         /// </summary>
         /// <param name="pt"></param>
         /// <param name="tParam"></param>
-        /// <returns></returns>
-        public bool ClosestPointTo(Pt3d pt, double tParam) //reimplemented from OpenNurbs
+        /// <returns>bool</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public bool ClosestPointTo(Pt3d pt, ref double tParam)
         {
-            double s = 0.0;
-            double tau = 2.0 * Math.PI;
             Circle circle = new Circle(this);
-            bool rc = circle.ClosestPointTo(pt, s);
-            if (rc)
+            if(!circle.ClosestPointTo(pt, out tParam))
             {
-                s -= this.Domain.T0;
-                while (s < 0.0)
-                {
-                    s += tau;
-                }
-                while (s >= tau)
-                {
-                    s -= tau;
-                }
-
-                double s1 = this.Domain.Length;
-                if (s < 0.0)
-                {
-                    s = 0.0;
-                }
-                if (s > s1)
-                {
-                    if (s > 0.5 * s1 + Math.PI)
-                    {
-                        s = 0.0;
-                    }
-                    else
-                    {
-                        s = s1;
-                    }
-                }
-                if (tParam != 0.0)
-                {
-                    tParam = this.Domain.T0 + s;
-                }
+                throw new ArgumentException("Circle.ClosestPointTo Failed!");
             }
-            return rc;
+            return true;
         }
 
+        /// <summary>
+        /// check if the endpoints of two arcs are connected  
+        /// </summary>
+        /// <param name="arc0"></param>
+        /// <param name="arc1"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="connectionPt"></param>
+        /// <returns>int</returns>
         public static int IsConnected(Arc arc0, Arc arc1, double tolerance, out Pt3d connectionPt)
         {
             int result = 0;

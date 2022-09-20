@@ -85,7 +85,7 @@ namespace StadiumTools
             OriginZ = origin.Z;
             Xaxis = Vec3d.Normalize(x);
             Yaxis = Vec3d.Normalize(y);
-            Zaxis = Vec3d.CrossProduct(this.Xaxis, this.Yaxis);
+            Zaxis = Vec3d.Normalize(Vec3d.CrossProduct(this.Xaxis, this.Yaxis));
             GetValidity(this);
         }
 
@@ -180,15 +180,15 @@ namespace StadiumTools
         {
             if (p.Xaxis.M != 1.0)
             {
-                throw new ArgumentException("Plane Xaxis is not unitized");
+                throw new ArgumentException($"Plane Xaxis length [{p.Xaxis.M}] is not unitized");
             }
             if (p.Yaxis.M != 1.0)
             {
-                throw new ArgumentException("Plane Yaxis is not unitized");
+                throw new ArgumentException($"Plane Yaxis length [{p.Yaxis.M}] is not unitized");
             }
             if (p.Zaxis.M != 1.0)
             {
-                throw new ArgumentException("Plane Zaxis is not unitized");
+                throw new ArgumentException($"Plane Zaxis length [{p.Zaxis.M}] is not unitized");
             }
             return true;
         }
@@ -265,10 +265,8 @@ namespace StadiumTools
         /// <returns>Pt3d</returns>
         public Pt3d ClosestPointTo(Pt3d pt)
         {
-            double u = 0.0;
-            double v = 0.0;
-            ClosestPointTo(pt, u, v);
-            return PointAt(u, v);
+            ClosestPointTo(pt, out double u, out double v);
+            return PointAt(u, v, 0.0);
         }
 
         /// <summary>
@@ -278,17 +276,11 @@ namespace StadiumTools
         /// <param name="u"></param>
         /// <param name="v"></param>
         /// <returns></returns>
-        public bool ClosestPointTo(Pt3d p, double u, double v)
+        public bool ClosestPointTo(Pt3d p, out double u, out double v)
         {
-          Vec3d vec = new Vec3d(p - this.OriginPt);
-            if (u != 0)
-            {
-                u = vec * this.Xaxis;
-            }
-            if (v != 0)
-            {
-                v = vec * this.Yaxis;
-            }
+            Vec3d vec = new Vec3d(p - this.OriginPt);
+            u = vec * this.Xaxis;
+            v = vec * this.Yaxis;
             return true;
         }
 
@@ -298,22 +290,9 @@ namespace StadiumTools
         /// <param name="u"></param>
         /// <param name="v"></param>
         /// <returns>Pt3d</returns>
-        public Pt3d PointAt(double u, double v)
-        {
-            return this.OriginPt + (u * this.Xaxis) + (v * this.Yaxis);   
-        }
-
-        /// <summary>
-        /// returns a point (in world coordinates) at the specified u,v,w parameters of this Plane. 
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <param name="w"></param>
-        /// <returns>Pt3d</returns>
         public Pt3d PointAt(double u, double v, double w)
         {
-            return this.OriginPt + (u * this.Xaxis) + (v * this.Yaxis) + (w * this.Zaxis);
+            return this.OriginPt + (u * this.Xaxis) + (v * this.Yaxis) + w * this.Zaxis;   
         }
-
     }
 }

@@ -186,7 +186,7 @@ namespace StadiumTools
             this.X *= f;
             this.Y *= f;
             this.Z *= f;
-            this.M *= f;
+            this.M *= Math.Abs(f);
         }
 
         /// <summary>

@@ -39,11 +39,11 @@ namespace StadiumTools
         /// </summary>
         public double[] BowlOffsets { get; set; }
         /// <summary>
-        /// an ordered collection of radaii for each edge of the bowl. 0 == Line 
+        /// an ordered collection of sideRadaii for each edge of the bowl. 0 == Line 
         /// </summary>
         public double[] BowlRadaii { get; set; }
         /// <summary>
-        /// an ordered collection of radaii for each filleted corner of the bowl
+        /// an ordered collection of sideRadaii for each filleted corner of the bowl
         /// </summary>
         public double[] CornerRadaii { get; set; }
         /// <summary>
@@ -330,7 +330,7 @@ namespace StadiumTools
         {
             if (radaii.Length != 4 || divLen.Length != 4 || pointAtCenter.Length != 4)
             {
-                throw new ArgumentException($"radaii[{radaii.Length}], divLen[{divLen.Length}], and pointAtCenter[{pointAtCenter.Length}] must have a length of 4");
+                throw new ArgumentException($"sideRadaii[{radaii.Length}], divLength[{divLen.Length}], and pointAtCenter[{pointAtCenter.Length}] must have a length of 4");
             }
             Pt3d[] pts = Pt3d.RectangleCentered(plane, sizeX, sizeY);
             Arc arc0 = new Arc(pts[0], pts[1], radaii[0]);
@@ -342,6 +342,48 @@ namespace StadiumTools
             Pline pline2 = new Pline(Arc.DivideLinearCentered(arc2, divLen[2], pointAtCenter[2]));
             Pline pline3 = new Pline(Arc.DivideLinearCentered(arc3, divLen[3], pointAtCenter[3]));
             return new Pline[4] { pline0, pline1, pline2, pline3 };
+        }
+
+        public static Pline[] RadialRectangleFilletedSegmented
+           (Pln3d plane,
+            double sizeX,
+            double sizeY,
+            double[] sideRadaii,
+            double[] cornerRadaii,
+            double[] divLength,
+            double cornerDivLen,
+            bool[] pointAtCenter,
+            bool cornerPointAtCenter,
+            double tolerance)
+        {
+            if (sideRadaii.Length != 4 || divLength.Length != 4 || pointAtCenter.Length != 4 || cornerRadaii.Length != 4)
+            {
+                throw new ArgumentException($"sideRadaii[{sideRadaii.Length}], divLength[{divLength.Length}], and pointAtCenter[{pointAtCenter.Length}] must have a length of 4");
+            }
+            Pt3d[] pts = Pt3d.RectangleCentered(plane, sizeX, sizeY);
+            Arc[] arcs = new Arc[8];
+            arcs[0] = new Arc(pts[0], pts[1], sideRadaii[0]);
+            arcs[1] = new Arc(pts[1], pts[2], sideRadaii[1]);
+            arcs[2] = new Arc(pts[2], pts[3], sideRadaii[2]);
+            arcs[3] = new Arc(pts[3], pts[0], sideRadaii[3]);
+            arcs[4] = Arc.Fillet(arcs[0], arcs[1], cornerRadaii[1], tolerance);
+            arcs[5] = Arc.Fillet(arcs[1], arcs[2], cornerRadaii[2], tolerance);
+            arcs[6] = Arc.Fillet(arcs[2], arcs[3], cornerRadaii[3], tolerance);
+            arcs[7] = Arc.Fillet(arcs[3], arcs[0], cornerRadaii[0], tolerance);
+            arcs[0] = new Arc(arcs[7].End, arcs[4].Start, sideRadaii[0]);
+            arcs[1] = new Arc(arcs[4].End, arcs[5].Start, sideRadaii[1]);
+            arcs[2] = new Arc(arcs[5].End, arcs[6].Start, sideRadaii[2]);
+            arcs[3] = new Arc(arcs[6].End, arcs[7].Start, sideRadaii[3]);
+            Pline pline0 = new Pline(Arc.DivideLinearCentered(arcs[0], divLength[0], pointAtCenter[0]));
+            Pline pline1 = new Pline(Arc.DivideLinearCentered(arcs[4], cornerDivLen, cornerPointAtCenter));
+            Pline pline2 = new Pline(Arc.DivideLinearCentered(arcs[1], divLength[1], pointAtCenter[1]));
+            Pline pline3 = new Pline(Arc.DivideLinearCentered(arcs[5], cornerDivLen, cornerPointAtCenter));
+            Pline pline4 = new Pline(Arc.DivideLinearCentered(arcs[2], divLength[2], pointAtCenter[2]));
+            Pline pline5 = new Pline(Arc.DivideLinearCentered(arcs[6], cornerDivLen, cornerPointAtCenter));
+            Pline pline6 = new Pline(Arc.DivideLinearCentered(arcs[3], divLength[3], pointAtCenter[3]));
+            Pline pline7 = new Pline(Arc.DivideLinearCentered(arcs[7], cornerDivLen, cornerPointAtCenter));
+
+            return new Pline[8] { pline0, pline1, pline2, pline3, pline4, pline5, pline6, pline7 };
         }
     }
 }
