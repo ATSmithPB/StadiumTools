@@ -77,6 +77,7 @@ namespace GHA_StadiumTools
         //Methods
         private static void ConstructPlineFromDA(IGH_DataAccess DA)
         {
+
             //Item Container (Destination)
             var planeItem = Rhino.Geometry.Plane.Unset;
             var intervalItem = Rhino.Geometry.Interval.Unset;
