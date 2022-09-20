@@ -267,6 +267,21 @@ namespace StadiumTools
             return new Polyline(Points3dFromPt3ds(pline.Points));
         }
 
+        public static PolylineCurve PolylineCurveFromPline(Pline pline)
+        {
+            return new PolylineCurve(PolylineFromPline(pline));
+        }
+
+        public static List<PolylineCurve> PolylineCurveListFromPlines(Pline[] plines)
+        {
+            List<PolylineCurve> curveList = new List<PolylineCurve>();
+            for (int i = 0; i < plines.Length; i++)
+            {
+                curveList[i] = PolylineCurveFromPline(plines[i]);
+            }
+            return curveList;
+        }
+
         public static Polyline PolylineFromTier(Tier tier)
         {
             Polyline polyline = new Polyline();
@@ -281,6 +296,11 @@ namespace StadiumTools
             return polyline;
         }
 
+        /// <summary>
+        /// returns a collection of points from the data of a tier
+        /// </summary>
+        /// <param name="tier"></param>
+        /// <returns></returns>
         public static Point3d[] PointsFromTier(Tier tier)
         {
             Point3d[] rhinoPts = new Point3d[tier.Points2dCount];
