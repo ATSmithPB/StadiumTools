@@ -26,12 +26,16 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            var originPoint = new Rhino.Geometry.Point3d(5, 5, 0);
+            var xPoint = new Rhino.Geometry.Point3d(0, 5, 0);
+            var planePoint = new Rhino.Geometry.Point3d(0, 0, 0);
+            var defaultPlane = new Rhino.Geometry.Plane(originPoint, xPoint, planePoint);
             pManager.AddPlaneParameter("PlaneA", "Pa", "Origin plane of reference arc", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
             pManager.AddIntervalParameter("DomainA", "Da", "Domain of arc angle in radians", GH_ParamAccess.item, new Rhino.Geometry.Interval(0, Math.PI / 2));
-            pManager.AddNumberParameter("RadiusA", "Ra", "The doubleItem of the arc", GH_ParamAccess.item, 1);
-            pManager.AddPlaneParameter("PlaneB", "Pb", "Origin plane of reference arc", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
+            pManager.AddNumberParameter("RadiusA", "Ra", "The doubleItem of the arc", GH_ParamAccess.item, 5);
+            pManager.AddPlaneParameter("PlaneB", "Pb", "Origin plane of reference arc", GH_ParamAccess.item, defaultPlane);
             pManager.AddIntervalParameter("DomainB", "Db", "Domain of arc angle in radians", GH_ParamAccess.item, new Rhino.Geometry.Interval(0, Math.PI / 2));
-            pManager.AddNumberParameter("RadiusB", "Rb", "The doubleItem of the arc", GH_ParamAccess.item, 1);
+            pManager.AddNumberParameter("RadiusB", "Rb", "The doubleItem of the arc", GH_ParamAccess.item, 5);
             pManager.AddNumberParameter("Fillet Radius", "fR", "Fillet radius between the two arcs", GH_ParamAccess.item, 1);
         }
 
@@ -43,7 +47,7 @@ namespace GHA_StadiumTools
         private static int IN_DomainB = 4;
         private static int IN_RadiusB = 5;
         private static int IN_Fillet_Radius = 6;
-        private static int OUT_Curve = 0;
+        private static int OUT_Curves = 0;
 
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curve", "C", "The Fillet Curve", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Curves", "C", "The resulting arc-like Curves", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace GHA_StadiumTools
             var intervalItem = Rhino.Geometry.Interval.Unset;
             double doubleItem = 0.0;
 
-            //Get & Set Polyline
+            //Arc0 from paramaters
             if (!DA.GetData<Rhino.Geometry.Plane>(IN_PlaneA, ref planeItem)) { return; }
             StadiumTools.Pln3d pln3dA = StadiumTools.IO.Pln3dFromPlane(planeItem);
             if (!DA.GetData<Rhino.Geometry.Interval>(IN_DomainA, ref intervalItem)) { return; }
@@ -96,18 +100,22 @@ namespace GHA_StadiumTools
             if (!DA.GetData<double>(IN_RadiusA, ref doubleItem)) { return; }
             var arc0 = new StadiumTools.Arc(pln3dA, doubleItem, domainA);
 
-            if (!DA.GetData<Rhino.Geometry.Plane>(IN_PlaneA, ref planeItem)) { return; }
+            //Arc1 from paramaters
+            if (!DA.GetData<Rhino.Geometry.Plane>(IN_PlaneB, ref planeItem)) { return; }
             StadiumTools.Pln3d pln3dB = StadiumTools.IO.Pln3dFromPlane(planeItem);
-            if (!DA.GetData<Rhino.Geometry.Interval>(IN_DomainA, ref intervalItem)) { return; }
+            if (!DA.GetData<Rhino.Geometry.Interval>(IN_DomainB, ref intervalItem)) { return; }
             StadiumTools.Domain domainB = StadiumTools.IO.DomainFromInterval(intervalItem);
-            if (!DA.GetData<double>(IN_RadiusA, ref doubleItem)) { return; }
+            if (!DA.GetData<double>(IN_RadiusB, ref doubleItem)) { return; }
             var arc1 = new StadiumTools.Arc(pln3dB, doubleItem, domainB);
 
+            //fillet arcs
             if (!DA.GetData<double>(IN_Fillet_Radius, ref doubleItem)) { return; }
-            StadiumTools.Arc filletArc = StadiumTools.Arc.Fillet(arc0, arc1, doubleItem, tolerance);
-            Rhino.Geometry.Curve filletCurve = StadiumTools.IO.CurveFromArc(filletArc);
+            StadiumTools.ICurve[] filletArcs = StadiumTools.Arc.FilletTrim(arc0, arc1, doubleItem, tolerance);
+            List<Rhino.Geometry.Curve> filletCurves = StadiumTools.IO.CurveListFromICurveArray(filletArcs);
+
             
-            DA.SetData(OUT_Curve, filletArc);
+
+            DA.SetDataList(OUT_Curves, filletCurves);
         }
     }
 }

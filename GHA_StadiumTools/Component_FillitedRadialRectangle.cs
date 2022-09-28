@@ -54,7 +54,7 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curves", "c", "Curves of Filleted Radial Rectangle", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Curves", "c", "Curves of Filleted Radial Rectangle", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace GHA_StadiumTools
             tolerance);
 
             List<PolylineCurve> polyLineCurves = StadiumTools.IO.PolylineCurveListFromPlines(plines);
-            DA.SetData(OUT_Curves, polyLineCurves);
+            DA.SetDataList(OUT_Curves, polyLineCurves);
         }
 
         /// <summary>

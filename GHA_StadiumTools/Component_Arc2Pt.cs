@@ -3,19 +3,21 @@ using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
 using GHA_StadiumTools.Properties;
+using Rhino.Geometry;
+using StadiumTools;
 
 namespace GHA_StadiumTools
 {
     /// <summary>
     /// Create a custom GH component called ST_ConstructSuperRiser using the GH_Component as base. 
     /// </summary>
-    public class ST_ConstructArc3Pt : GH_Component
+    public class ST_ConstructArc2Pt : GH_Component
     {
         /// <summary>
         /// A custom component for input parameters to generate a new spectator. 
         /// </summary>
-        public ST_ConstructArc3Pt()
-            : base(nameof(ST_ConstructArc3Pt), "A3p", "Construct an Arc from an origin point and two other points", "StadiumTools", "Debug")
+        public ST_ConstructArc2Pt()
+            : base(nameof(ST_ConstructArc2Pt), "A2p", "Construct an Arc from a start, end, and radius", "StadiumTools", "Debug")
         {
         }
 
@@ -24,18 +26,17 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Origin", "O", "Origin point of angle", GH_ParamAccess.item, new Rhino.Geometry.Point3d(0,0,0));
-            pManager.AddPointParameter("Start", "pA", "Point of angle start", GH_ParamAccess.item, new Rhino.Geometry.Point3d(1, 0, 0));
-            pManager.AddPointParameter("End", "pB", "Point of angle end", GH_ParamAccess.item, new Rhino.Geometry.Point3d(0, 1, 0));
+            pManager.AddPointParameter("Start", "S", "Start Point of Arc", GH_ParamAccess.item, Point3d.Origin);
+            pManager.AddPointParameter("End", "E", "End Point of Arc", GH_ParamAccess.item, new Rhino.Geometry.Point3d(5, 0, 0));
+            pManager.AddNumberParameter("Radius", "R", "Radius of Arc", GH_ParamAccess.item, 15);
         }
 
         //Set parameter indixes to names (for readability)
-        private static int IN_Origin = 0;
-        private static int IN_Start = 1;
-        private static int IN_End = 2;
+        private static int IN_Start = 0;
+        private static int IN_End = 1;
+        private static int IN_Radius = 2;
         private static int OUT_Arc = 0;
-        private static int OUT_DomainST = 1;
-        private static int OUT_DomainRC = 2;
+        private static int OUT_Arc_Center = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -43,8 +44,7 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddCurveParameter("Arc", "A", "An Arc", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Angle ST", "rcA", "Angle of ST_Arc ", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Angle RC", "stA", "Angle of RC_Arc", GH_ParamAccess.item);
+            pManager.AddPointParameter("Arc Center", "aC", "The center of the Arc", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            ST_ConstructArc3Pt.ConstructArcFromDA(DA);
+            ST_ConstructArc2Pt.ConstructArcFromDA(DA);
         }
 
         /// <summary>
@@ -70,36 +70,26 @@ namespace GHA_StadiumTools
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("f6f52aae-ed08-4239-8033-8f88b9d28f18");
+        public override Guid ComponentGuid => new Guid("457f53c6-025f-470f-bb07-3fd38a9beee9");
 
         //Methods
         private static void ConstructArcFromDA(IGH_DataAccess DA)
         {
-            double unit = StadiumTools.UnitHandler.FromString("Rhino", Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true));
-
             //Item Container (Destination)
             var pointItem = Rhino.Geometry.Point3d.Origin;
+            double doubleItem = 0.0;
 
-            //Get & Set Polyline
-            if (!DA.GetData<Rhino.Geometry.Point3d>(IN_Origin, ref pointItem)) { return; }
-            var center = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            //Get Set Values
             if (!DA.GetData<Rhino.Geometry.Point3d>(IN_Start, ref pointItem)) { return; }
-            var start = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            var start = StadiumTools.IO.Pt3dFromPoint3d(pointItem);
             if (!DA.GetData<Rhino.Geometry.Point3d>(IN_End, ref pointItem)) { return; }
-            var end = new StadiumTools.Pt2d(StadiumTools.IO.Pt2dFromPoint3d(pointItem));
+            var end = StadiumTools.IO.Pt3dFromPoint3d(pointItem);
+            if (!DA.GetData<double>(IN_Radius, ref doubleItem)) { return; }
+            
+            StadiumTools.ICurve Iarc = new StadiumTools.Arc(start, end, doubleItem);
+            Rhino.Geometry.Curve rcArc = StadiumTools.IO.CurveFromICurve(Iarc);
 
-            var arc = new StadiumTools.Arc(center, start, end);
-            StadiumTools.ICurve Iarc = arc;
-            Rhino.Geometry.Arc rhinoArc = StadiumTools.IO.RCArcFromArc(arc);
-            var rhinoArcCrv = new Rhino.Geometry.ArcCurve(rhinoArc);
-            Rhino.Geometry.Curve rhinoCurve = rhinoArcCrv;
-
-            double domainSt = arc.Domain.T1 - arc.Domain.T0;
-            double domainRc = rhinoArcCrv.AngleRadians;
-
-            DA.SetData(OUT_Arc, rhinoArcCrv);
-            DA.SetData(OUT_DomainST, domainSt);
-            DA.SetData(OUT_DomainRC, domainRc);
+            DA.SetData(OUT_Arc, rcArc);
         }
     }
 }
