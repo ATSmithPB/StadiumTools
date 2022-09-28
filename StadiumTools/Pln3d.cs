@@ -160,7 +160,7 @@ namespace StadiumTools
             this.OriginZ = origin.Z;
             this.Xaxis = Vec3d.Normalize(new Vec3d(origin, ptOnX));
             this.Zaxis = Vec3d.PerpTo(origin, ptOnX, ptOnPlane);
-            this.Yaxis = Vec3d.CrossProduct(this.Zaxis, this.Xaxis);
+            this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(this.Zaxis, this.Xaxis));
             GetValidity(this);
         }
 

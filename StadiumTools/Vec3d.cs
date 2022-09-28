@@ -410,12 +410,12 @@ namespace StadiumTools
             Vec3d V1 = new Vec3d(P0 - P2);
             Vec3d V2 = new Vec3d(P1 - P0);
 
-            Vec3d N0 = Vec3d.CrossProduct(V1, V2);
+            Vec3d N0 = CrossProduct(V1, V2);
             if (!N0.Unitize())
             {
                 throw new ArgumentException("Error: Invalid Inputs, check for coincedence with P0, P1, P2");
             }
-            Vec3d N1 = Vec3d.CrossProduct(V2, V0);
+            Vec3d N1 = CrossProduct(V2, V0);
             if (!N1.Unitize())
             {
                 throw new ArgumentException("Error: Invalid Inputs, check for coincedence with P0, P1, P2");
@@ -453,7 +453,7 @@ namespace StadiumTools
             {
                 result = N2;
             }
-          return result;
+          return Vec3d.Normalize(result);
         }
 
          

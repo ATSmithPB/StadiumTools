@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rhino.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -32,6 +33,84 @@ namespace StadiumTools
             Start = arc.Start;
             End = arc.Start;
         }
+
+        public Circle(Pt3d a, Pt3d b, double radius)
+        {
+            if (Pt3d.IsCoincident(a, b, UnitHandler.abstol))
+            {
+                throw new ArgumentException("Error: Input Points are coincident");
+            }
+
+            double distance = a.DistanceTo(b);
+            if (distance < radius)
+            {
+                throw new ArgumentException($"Error: Radius [{radius}] must be => [{distance}] (the distance between input points)");
+            }
+
+            double offset = ChordMidCen(radius, distance);
+            Pt3d centerPt = Pt3d.OffsetMidpoint(a, b, offset);
+            Center = new Pln3d(centerPt, a, b);
+            Radius = radius;
+            Start = a;
+            End = a;
+        }
+
+        /*
+        public Circle(Pt3d P, Pt3d Q, Pt3d R)
+        {
+          Pt3d C = new Pt3d();
+          Vec3d X = new Vec3d();
+          Vec3d Y = new Vec3d();
+          Vec3d Z = new Vec3d();
+          
+          while(true)
+          {
+            if (!Z.PerpendicularTo(P, Q, R))
+            {
+              break;
+            }
+            // get center as the intersection of 3 planes
+            Pln3d plane0 = new Pln3d(P, Z);
+            Pln3d plane1 = new Pln3d(0.5*(P+Q), P-Q);
+            Pln3d plane2 = new Pln3d(0.5*(R+Q), R-Q);
+
+            if (!ON_Intersect(plane0, plane1, plane2, C))
+            {
+              break;
+            }
+
+            X = P - C;
+            this.Radius = X.Length();
+            if (!(this.Radius > 0.0))
+            {
+              break;
+            }
+
+            if (!X.Unitize())
+            {
+              break;
+            }
+
+            Y = ON_CrossProduct(Z, X);
+            if ( !Y.Unitize() )
+              break;
+
+            plane.origin = C;
+            plane.xaxis = X;
+            plane.yaxis = Y;
+            plane.zaxis = Z;
+
+            plane.UpdateEquation();
+
+            return true;
+          }
+
+          plane = ON_Plane::World_xy;
+          radius = 0.0;
+          return false;
+        }
+
+        */
 
         //Methods
         /// <summary>

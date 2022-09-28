@@ -14,7 +14,7 @@ namespace StadiumTools
         public const double inch = 39.3701;
         public const double feet = 3.28084;
         public const double yard = 1.09361;
-
+        public const double abstol = double.MinValue;
 
         //Methods
         /// <summary>

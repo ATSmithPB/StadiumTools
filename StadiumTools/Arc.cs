@@ -41,61 +41,66 @@ namespace StadiumTools
         //Constructors
         public Arc(Pln2d plane, double radius, double angleRadians)
         {
+            IsValid = false;
             Plane = new Pln3d(plane);
             Radius = radius;
             Domain = new Domain(0.0, angleRadians);
             Start = new Pt3d(new Pt2d(radius, 0.0), this.Plane);
             End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
-            IsValid = ValidateDomain(angleRadians);
             Angle = angleRadians;
+            GetValidity(this);
         }
 
         public Arc(Pln3d plane, double radius, double angleRadians)
         {
+            IsValid = false;
             Plane = plane;
             Radius = radius;
             Angle = angleRadians;
             Domain = new Domain(0.0, angleRadians);
             Start = new Pt3d(new Pt2d(radius, 0.0), this.Plane);
             End = Pt3d.Rotate(this.Plane, this.Start, angleRadians);
-            IsValid = ValidateDomain(angleRadians);
-            
+            GetValidity(this);
+
         }
 
         public Arc(Pln3d plane, double radius, Domain domain)
         {
+            IsValid = false;
             Plane = plane;
             Radius = radius;
             Domain = domain;
             Pt2d refPt = new Pt2d(radius, 0);
             Start = new Pt3d(Pt2d.Rotate(refPt, domain.T0), plane); //simplify me
             End = new Pt3d(Pt2d.Rotate(refPt, domain.T1), plane); //simplify me
-            IsValid = ValidateDomain(this.Domain.Length);
             Angle = this.Domain.Length;
+            GetValidity(this);
         }
 
         public Arc(Pln3d plane, double radius, double domainStart, double domainEnd)
         {
+            IsValid = false;
             Plane = plane;
             Radius = radius;
             Domain = new Domain(domainStart, domainEnd);
             Pt2d refPt = new Pt2d(radius, 0);//simplify me
             Start = new Pt3d(Pt2d.Rotate(refPt, domainStart), plane); //simplify me
             End = new Pt3d(Pt2d.Rotate(refPt, domainEnd), plane); //simplify me
-            IsValid = ValidateDomain(this.Domain.Length);
             Angle = this.Domain.Length;
+            GetValidity(this);
         }
 
         public Arc(Pln2d plane, double radius, double domainStart, double domainEnd)
         {
+            IsValid = false;
             Plane = plane.ToPln3d(Pln2d.XYPlane);
             Radius = radius;
             Domain = new Domain(domainStart, domainEnd);
             Pt2d refPt = new Pt2d(radius, 0);//simplify me
             Start = new Pt3d(Pt2d.Rotate(refPt, domainStart), new Pln3d(plane)); //simplify me
             End = new Pt3d(Pt2d.Rotate(refPt, domainEnd), new Pln3d(plane)); //simplify me
-            IsValid = ValidateDomain(this.Domain.Length);
             Angle = this.Domain.Length;
+            GetValidity(this);
         }
 
         /// <summary>
@@ -106,24 +111,26 @@ namespace StadiumTools
         /// <param name="end"></param>
         public Arc(Pt2d center, Pt2d start, Pt2d end)
         {
+            IsValid = false;
             Plane = new Pln3d(new Pln2d(center, start));
             Radius = Pt2d.Distance(center, start);
             Angle = Pt2d.Angle(center, start, end);
             Domain = new Domain(0.0, this.Angle);
             Start = new Pt3d(start, this.Plane);
             End = Pt3d.Rotate(this.Plane, this.Start, this.Angle);
-            IsValid = ValidateDomain(this.Domain.Length);
+            GetValidity(this);
         }
 
         public Arc(Pt3d center, Pt3d start, Pt3d end)
         {
+            IsValid = false;
             Plane = new Pln3d(center, start, end);
             Radius = Pt3d.Distance(center, start);
             Angle = Pt3d.Angle(this.Plane, start, end);
             Domain = new Domain(0.0, this.Angle);
             Start = start;
             End = Pt3d.Rotate(this.Plane, this.Start, this.Angle);
-            IsValid = ValidateDomain(this.Domain.Length);
+            GetValidity(this);
         }
 
         /// <summary>
@@ -134,21 +141,27 @@ namespace StadiumTools
         /// <param name="radius"></param>
         public Arc(Pt3d start, Pt3d end, double radius)
         {
+            IsValid = false;
             if (Math.Abs(radius) * 2 <= Pt3d.Distance(start, end))
             {
-                throw new Exception("Radius too small. Radius*2 must be > the distance between start and end points");
+                throw new Exception("Error: Radius too small. Radius*2 must be > the distance between start and end points");
             }
-            Pt3d cen = Pt3d.OffsetMidpoint(start, end, radius, out Pt3d midpoint);
-            Vec3d x = new Vec3d(cen, start);
-            Vec3d y = Vec3d.CrossProduct(Vec3d.ZAxis, x);
-            Plane = new Pln3d(cen, x, y);
-            Radius = radius;
-            double angleRadians = Pt3d.Angle(this.Plane, start, end);
-            Domain = new Domain(0.0, angleRadians);
+            if (Pt3d.IsCoincident(start, end, UnitHandler.abstol))
+            {
+                throw new Exception("Error: Start and End are coincident");
+            }
             Start = start;
             End = end;
-            IsValid = ValidateDomain(this.Domain.Length);
+            Radius = radius;
+            double offset = Circle.ChordMidCen(radius, start.DistanceTo(end));
+            Pt3d centerPt = Pt3d.OffsetMidpoint(end, start, offset, out Pt3d midpoint);
+            Vec3d x = new Vec3d(centerPt, start);
+            Vec3d y = Vec3d.CrossProduct(Vec3d.ZAxis, x);
+            Plane = new Pln3d(centerPt, x, y);
+            double angleRadians = Pt3d.Angle(this.Plane, start, end);
+            Domain = new Domain(0.0, angleRadians);
             Angle = angleRadians;
+            GetValidity(this);
         }
 
         //Methods
@@ -156,21 +169,6 @@ namespace StadiumTools
         {
             //Shallow copy
             return (Arc)this.MemberwiseClone();
-        }
-
-        /// <summary>
-        /// Returns true if the input domain is between positive and negative 2 * Pi
-        /// </summary>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public static bool ValidateDomain(double domain)
-        {
-            bool result = false;
-            if (domain <= 2 * Math.PI && domain >= -2 * Math.PI)
-            {
-                result = true;
-            }
-            return result;
         }
 
         /// <summary>
@@ -243,8 +241,10 @@ namespace StadiumTools
                 }
             }
 
+            delta0.Add(arc.Angle);
+            delta0.Add(0.0);
             delta0.Sort();
-
+            
             Pt3d[] result = new Pt3d[delta0.Count];
             for (int i = 0; i < result.Length; i++)
             {
@@ -283,22 +283,31 @@ namespace StadiumTools
             return true;
         }
 
-
-        public static Arc[] FilletTrim(Arc arc0, Arc arc1, double filletRadius, double tolerance)
+        /// <summary>
+        /// Fillet two connected arcs
+        /// </summary>
+        /// <param name="arc0"></param>
+        /// <param name="arc1"></param>
+        /// <param name="filletRadius"></param>
+        /// <param name="tolerance"></param>
+        /// <returns>ICurve[]</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static ICurve[] FilletTrim(Arc arc0, Arc arc1, double filletRadius, double tolerance)
         {
             if (filletRadius >= arc0.Radius || filletRadius >= arc0.Radius)
             {
                 throw new ArgumentException("Error: Fillet Radius cannot exceed the radius of either Arc being filleted");
             }
-            Arc fillet = Arc.Fillet(arc0, arc1, filletRadius, tolerance);
+            ICurve[] result = new ICurve[3];
+            result[1] = Arc.Fillet(arc0, arc1, filletRadius, tolerance);
+            result[0] = new Arc(arc0.Start, result[1].Start, arc0.Radius);
+            result[2] = new Arc(result[1].End, arc1.End, arc1.Radius);
 
-            //Add arc0Trimmed and arc1Trimmed
-
-            return new Arc[3] { arc0, fillet, arc1 };
+            return result;
         }
 
         /// <summary>
-        /// returns the Arc that results from a fillet operation on two other arcs. Does not trim input arcs
+        /// returns resulting Arc from a fillet operation on two other arcs. Does not trim input arcs
         /// </summary>
         /// <param name="arc0"></param>
         /// <param name="arc1"></param>
@@ -317,10 +326,13 @@ namespace StadiumTools
 
             arc0.Offset(-radius, out Arc offsetArc0);
             arc1.Offset(-radius, out Arc offsetArc1);
-            int xcnt = Intersect(offsetArc0, offsetArc1, tolerance, out Pt3d[] cxcPts); //one of these points is correct
+            Circle offsetCircle0 = new Circle(offsetArc0);
+            Circle offsetCircle1 = new Circle(offsetArc1);
+            int xcnt = Circle.Intersect(offsetCircle0, offsetCircle1, tolerance, out Pt3d[] cxcPts);
+
             if (xcnt != 2)
             {
-                throw new ArgumentException($"Error: Arc0|Arc1 intersection event[{xcnt}] did not result in 2 points");
+                throw new ArgumentException($"Error: Arc0.Circle|Arc1.Circle intersection event[{xcnt}] did not result in 2 points");
             }
 
             Pt3d circleFilletCenPt = cornerPt.CloserPt(cxcPts[0], cxcPts[1]);
@@ -340,8 +352,7 @@ namespace StadiumTools
                 throw new Exception($"Error: Fillet Circle and Arc1 intersection event [{result1}] did not result in 1 point");
             }
 
-            Arc result = new Arc(circleFilletCenPt, iPts0[0], iPts1[0]); //Or P1
-
+            Arc result = new Arc(circleFilletCenPt, iPts0[0], iPts1[0]);
             return result;
         }
 
@@ -352,9 +363,9 @@ namespace StadiumTools
 
         public static int Intersect(Arc arc0, Arc arc1, double tolerance, out Pt3d[] intersectionPts)
         {
-            int axaFlag = 0;
             int cxcFlag = Circle.Intersect(new Circle(arc0), new Circle(arc1), tolerance, out Pt3d[] cxcPts);
-            
+            int axaFlag = 0;
+
             if (cxcFlag != 1 && cxcFlag != 2)
             {
                 throw new ArgumentException($"Error: Invalid Circle|Circle intersection flag [{cxcFlag}]. Must be 1 or 2");
@@ -457,6 +468,24 @@ namespace StadiumTools
             }
 
             return result;
+        }
+
+        private static bool GetValidity(Arc a)
+        {
+            if (a.Radius <= 0)
+            {
+                throw new ArgumentException($"Error: Radius must be non-negative and not equal to zero");
+            }
+            if (a.Domain.Length > (Math.PI * 2))
+            {
+                throw new ArgumentException($"Error: Domain exceeds Tau");
+            }
+            if (a.Domain.Length <= 0)
+            {
+                throw new ArgumentException($"Error: Domain must be non-negative and not equal to zero");
+            }
+            a.IsValid = true;
+            return true;
         }
 
     }
