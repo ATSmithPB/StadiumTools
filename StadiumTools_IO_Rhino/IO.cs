@@ -277,7 +277,7 @@ namespace StadiumTools
             List<PolylineCurve> curveList = new List<PolylineCurve>();
             for (int i = 0; i < plines.Length; i++)
             {
-                curveList[i] = PolylineCurveFromPline(plines[i]);
+                curveList.Add(PolylineCurveFromPline(plines[i]));
             }
             return curveList;
         }
