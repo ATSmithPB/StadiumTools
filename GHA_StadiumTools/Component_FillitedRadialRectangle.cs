@@ -5,6 +5,7 @@ using Rhino;
 using Grasshopper.Kernel;
 using GHA_StadiumTools.Properties;
 using Rhino.Geometry;
+using StadiumTools;
 
 namespace GHA_StadiumTools
 {
@@ -31,10 +32,9 @@ namespace GHA_StadiumTools
             pManager.AddNumberParameter("Width", "y", "Width of rectangle (Y)", GH_ParamAccess.item, 40);
             pManager.AddNumberParameter("Side Radaii", "sR", "Radaii of each side of the rectangle", GH_ParamAccess.list, new double[4] { 160, 160, 160, 160});
             pManager.AddNumberParameter("Fillet Radaii", "fR", "Radaii of each corner of the rectangle", GH_ParamAccess.list, new double[4] { 10, 10, 10, 10 });
-            pManager.AddNumberParameter("Division", "dL", "Radaii of each corner of the rectangle", GH_ParamAccess.list, new double[4] { 10, 10, 10, 10 });
-            pManager.AddNumberParameter("Corner Div.", "cdL", "Radaii of each corner of the rectangle", GH_ParamAccess.item, 3);
-            pManager.AddBooleanParameter("P.O.C", "POC", "Radaii of each corner of the rectangle", GH_ParamAccess.list, new bool[4] { false, true, false, true });
-            pManager.AddBooleanParameter("Corner P.O.C", "cPOC", "Radaii of each corner of the rectangle", GH_ParamAccess.item, false);
+            pManager.AddNumberParameter("Division", "dL", "The segment length of each side of the rectangle", GH_ParamAccess.list, new double[4] { 10, 10, 10, 10 });
+            pManager.AddIntegerParameter("Corner Bays", "cB", "The number of corner bays", GH_ParamAccess.item, 3);
+            pManager.AddBooleanParameter("P.O.C", "POC", "Point-on-Center. True if a discontinuity point is at the center of each side", GH_ParamAccess.list, new bool[4] { false, true, false, true });
         }
 
         //Set parameter indixes to names (for readability)
@@ -44,17 +44,18 @@ namespace GHA_StadiumTools
         private static int IN_Side_Radaii = 3;
         private static int IN_Fillet_Radaii = 4;
         private static int IN_Division = 5;
-        private static int IN_Corner_Div = 6;
+        private static int IN_Corner_Bays = 6;
         private static int IN_POC = 7;
-        private static int IN_Corner_POC = 8;
         private static int OUT_Curves = 0;
+        private static int OUT_Planes = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curves", "c", "Curves of Filleted Radial Rectangle", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Curves", "C", "Curves of Filleted Radial Rectangle", GH_ParamAccess.list);
+            pManager.AddPlaneParameter("Planes", "P", "Perpendicular planes to the curves", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -64,6 +65,7 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            ST_FilletedRadialRectangle.HandleErrors(DA, this);
             ST_FilletedRadialRectangle.FilletedRadialRectangleFromDA(DA);
         }
 
@@ -90,8 +92,7 @@ namespace GHA_StadiumTools
             var planeItem = new Rhino.Geometry.Plane();
             double length = 0.0;
             double width = 0.0;
-            double cornerDiv = 0.0;
-            bool cornerPOC = false;
+            int cornerDiv = 0;
 
             List<double> sideRadaii = new List<double>();
             List<double> filletRadaii = new List<double>();
@@ -103,14 +104,13 @@ namespace GHA_StadiumTools
             StadiumTools.Pln3d pln3d = StadiumTools.IO.Pln3dFromPlane(planeItem);
             if (!DA.GetData<double>(IN_Length, ref length)) { return; }
             if (!DA.GetData<double>(IN_Width, ref width)) { return; }
-            if (!DA.GetData<double>(IN_Corner_Div, ref cornerDiv)) { return; }
-            if (!DA.GetData<bool>(IN_Corner_POC, ref cornerPOC)) { return; }
+            if (!DA.GetData<int>(IN_Corner_Bays, ref cornerDiv)) { return; }
             if (!DA.GetDataList<double>(IN_Side_Radaii, sideRadaii)) { return; }
             if (!DA.GetDataList<double>(IN_Fillet_Radaii, filletRadaii)) { return; }
             if (!DA.GetDataList<double>(IN_Division, divLen)) { return; }
             if (!DA.GetDataList<bool>(IN_POC, pointAtCenter)) { return; }
 
-            StadiumTools.Pline[] plines = StadiumTools.BowlPlan.RadialRectangleFilletedSegmented
+            StadiumTools.Pline[] plines = StadiumTools.BowlPlan.RadialFilletedNonUniform
             (pln3d,
             length,
             width,
@@ -119,29 +119,19 @@ namespace GHA_StadiumTools
             divLen.ToArray(),
             cornerDiv,
             pointAtCenter.ToArray(),
-            cornerPOC,
-            tolerance);
+            tolerance,
+            out List<Pln3d> planes
+            );
 
+            List<Rhino.Geometry.Plane> rcPlanes = StadiumTools.IO.PlanesFromPln3ds(planes); 
             List<PolylineCurve> polyLineCurves = StadiumTools.IO.PolylineCurveListFromPlines(plines);
             DA.SetDataList(OUT_Curves, polyLineCurves);
+            DA.SetDataList(OUT_Planes, rcPlanes);
         }
 
-        /// <summary>
-        /// Returns a Polyline approximation of a PolyCurve object
-        /// </summary>
-        /// <param name="polyCurveItem"></param>
-        /// <returns></returns>
-        private static Rhino.Geometry.Polyline PolyCurveToPolyline(Rhino.Geometry.PolyCurve polyCurveItem)
+        private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
         {
-            var result = new Rhino.Geometry.Polyline();
-            result.Add(polyCurveItem.SegmentCurve(0).PointAtStart);
-
-            for (int i = 0; i < polyCurveItem.SegmentCount; i++)
-            {
-                result.Add(polyCurveItem.SegmentCurve(i).PointAtEnd);
-            }
-            return result;
+            //error handling here
         }
-
     }
 }
