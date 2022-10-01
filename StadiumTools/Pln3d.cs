@@ -89,6 +89,19 @@ namespace StadiumTools
             GetValidity(this);
         }
 
+        public Pln3d(Pt3d origin, Vec3d z, Pt3d ptOnY)
+        {
+            IsValid = false;
+            OriginPt = origin;
+            OriginX = origin.X;
+            OriginY = origin.Y;
+            OriginZ = origin.Z;
+            Zaxis = Vec3d.Normalize(z);
+            Yaxis = Vec3d.Normalize(new Vec3d(origin, ptOnY));
+            Xaxis = Vec3d.Normalize(Vec3d.CrossProduct(Yaxis, Zaxis));
+            GetValidity(this);
+        }
+
         public Pln3d(Pln2d plane)
         {
             IsValid = false;
@@ -122,7 +135,7 @@ namespace StadiumTools
             this.OriginX = origin.X;
             this.OriginY = origin.Y;
             this.OriginZ = origin.Z;
-            this.Zaxis = zAxis;
+            this.Zaxis = Vec3d.Normalize(zAxis);
             this.Xaxis = Vec3d.Normalize(Vec3d.PerpTo(zAxis));
             this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(zAxis, this.Xaxis));
             GetValidity(this);
@@ -225,16 +238,47 @@ namespace StadiumTools
         /// <returns></returns>
         public static Pln3d[] PerpPlanes(List<Pt3d> pts)
         {
-            if (pts.Count < 2)
+            Pt3d[] ptsArray = pts.ToArray();
+            return PerpPlanes(ptsArray);
+        }
+
+        public static Pln3d[] AvgPlanes(Pline pline, Pln3d cPlane)
+        {
+            return AvgPlanes(pline.Points, pline.Closed, cPlane);
+        }
+
+        public static Pln3d[] AvgPlanes(Pt3d[] pts, bool closed, Pln3d cPlane)
+        {
+            if (pts.Length < 2)
             {
-                throw new ArgumentException("pts.Count must be >1 to calculate perp plane");
+                throw new ArgumentException("pts.Length must be >1 to calculate avg plane");
             }
-            Pln3d[] pln3ds = new Pln3d[pts.Count];
-            for (int i = 0; i < pts.Count - 1; i++)
+            
+            Pln3d[] planes = new Pln3d[pts.Length - 1];
+            Vec3d prev = new Vec3d();
+            Vec3d curr = new Vec3d(pts[0], pts[1]);
+            if (closed)
             {
-                pln3ds[i] = new Pln3d(pts[i], pts[i + 1]);
+                prev = new Vec3d(pts[pts.Length - 2], pts[pts.Length - 1]);
             }
-            return pln3ds;
+            else
+            {
+                prev = curr;
+            }
+
+            for (int i = 0; i < pts.Length - 2; i++) // i < p.L - 3? 
+            {
+                Vec3d zAxis = Vec3d.Tween2(prev, curr).Flip();
+                Pt3d ptOnY = pts[i] + cPlane.Zaxis;
+                planes[i] = new Pln3d(pts[i], zAxis, ptOnY);
+                prev = curr;
+                curr = new Vec3d(pts[i + 1], pts[i + 2]);
+            }
+
+            Vec3d lastVec = Vec3d.Tween2(prev, curr);
+            planes[pts.Length - 2] = new Pln3d(pts[pts.Length - 2], lastVec);
+
+            return planes;
         }
 
         /// <summary>

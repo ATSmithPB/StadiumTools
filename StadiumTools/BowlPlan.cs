@@ -326,12 +326,23 @@ namespace StadiumTools
         /// <param name="divLen"></param>
         /// <param name="pointAtCenter"></param>
         /// <returns>Pline[]</returns>
-        public static Pline[] RadialRectangleSegmented(Pln3d plane, double sizeX, double sizeY, double[] radaii, double[] divLen, bool[] pointAtCenter)
+        public static Pline[] RadialNonUniform
+            (Pln3d plane, 
+            double sizeX, 
+            double sizeY, 
+            double[] radaii, 
+            double[] divLen, 
+            bool[] pointAtCenter)
         {
             if (radaii.Length != 4 || divLen.Length != 4 || pointAtCenter.Length != 4)
             {
                 throw new ArgumentException($"sideRadaii[{radaii.Length}], divLength[{divLen.Length}], and pointAtCenter[{pointAtCenter.Length}] must have a length of 4");
             }
+            if (radaii[0] <= sizeX || radaii[2] <= sizeX || radaii[1] <= sizeY || radaii[3] <= sizeY)
+            {
+                throw new ArgumentException($"Error: Side radius too small. Each side's diameter must exceed its length");
+            }
+
             Pt3d[] pts = Pt3d.RectangleCentered(plane, sizeX, sizeY);
             Arc arc0 = new Arc(pts[0], pts[1], radaii[0]);
             Arc arc1 = new Arc(pts[1], pts[2], radaii[1]);
@@ -344,17 +355,18 @@ namespace StadiumTools
             return new Pline[4] { pline0, pline1, pline2, pline3 };
         }
 
-        public static Pline[] RadialRectangleFilletedSegmented
+        //returns collection of polylines that represent a non-uniform radial rectangle with filleted corners
+        public static Pline[] RadialFilletedNonUniform
            (Pln3d plane,
             double sizeX,
             double sizeY,
             double[] sideRadaii,
             double[] cornerRadaii,
             double[] divLength,
-            double cornerDivLen,
+            int cornerBayCount,
             bool[] pointAtCenter,
-            bool cornerPointAtCenter,
-            double tolerance)
+            double tolerance,
+            out List<Pln3d> planes)
         {
             if (sideRadaii.Length != 4 || divLength.Length != 4 || pointAtCenter.Length != 4 || cornerRadaii.Length != 4)
             {
@@ -370,20 +382,32 @@ namespace StadiumTools
             arcs[5] = Arc.Fillet(arcs[1], arcs[2], cornerRadaii[2], tolerance);
             arcs[6] = Arc.Fillet(arcs[2], arcs[3], cornerRadaii[3], tolerance);
             arcs[7] = Arc.Fillet(arcs[3], arcs[0], cornerRadaii[0], tolerance);
+
             arcs[0] = new Arc(arcs[7].End, arcs[4].Start, sideRadaii[0]);
             arcs[1] = new Arc(arcs[4].End, arcs[5].Start, sideRadaii[1]);
             arcs[2] = new Arc(arcs[5].End, arcs[6].Start, sideRadaii[2]);
             arcs[3] = new Arc(arcs[6].End, arcs[7].Start, sideRadaii[3]);
-            Pline pline0 = new Pline(Arc.DivideLinearCentered(arcs[0], divLength[0], pointAtCenter[0]));
-            Pline pline1 = new Pline(Arc.DivideLinearCentered(arcs[4], cornerDivLen, cornerPointAtCenter));
-            Pline pline2 = new Pline(Arc.DivideLinearCentered(arcs[1], divLength[1], pointAtCenter[1]));
-            Pline pline3 = new Pline(Arc.DivideLinearCentered(arcs[5], cornerDivLen, cornerPointAtCenter));
-            Pline pline4 = new Pline(Arc.DivideLinearCentered(arcs[2], divLength[2], pointAtCenter[2]));
-            Pline pline5 = new Pline(Arc.DivideLinearCentered(arcs[6], cornerDivLen, cornerPointAtCenter));
-            Pline pline6 = new Pline(Arc.DivideLinearCentered(arcs[3], divLength[3], pointAtCenter[3]));
-            Pline pline7 = new Pline(Arc.DivideLinearCentered(arcs[7], cornerDivLen, cornerPointAtCenter));
+            
+            Pline[] plines = new Pline[8];
+            plines[0] = new Pline(Arc.DivideLinearCentered(arcs[0], divLength[0], pointAtCenter[0]));
+            plines[1] = Pline.FromArc(arcs[4], cornerBayCount);
+            plines[2] = new Pline(Arc.DivideLinearCentered(arcs[1], divLength[1], pointAtCenter[1]));
+            plines[3] = Pline.FromArc(arcs[5], cornerBayCount);
+            plines[4] = new Pline(Arc.DivideLinearCentered(arcs[2], divLength[2], pointAtCenter[2]));
+            plines[5] = Pline.FromArc(arcs[6], cornerBayCount);
+            plines[6] = new Pline(Arc.DivideLinearCentered(arcs[3], divLength[3], pointAtCenter[3]));
+            plines[7] = Pline.FromArc(arcs[7], cornerBayCount);
 
-            return new Pline[8] { pline0, pline1, pline2, pline3, pline4, pline5, pline6, pline7 };
+            if (!Pline.Join(plines, out Pline pline))
+            {
+                throw new Exception("Error: Plines failed to join");
+            }
+            planes = new List<Pln3d>();
+            planes.AddRange(Pln3d.AvgPlanes(pline, plane));
+            
+            return plines; 
         }
+
+        
     }
 }

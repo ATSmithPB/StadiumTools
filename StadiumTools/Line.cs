@@ -111,5 +111,6 @@ namespace StadiumTools
             offsetLine = new Line(this.Start + perpScaled, this.End + perpScaled);
             return true;
         }
+
     }
 }

@@ -314,5 +314,26 @@ namespace StadiumTools
             Vec2d perpScaled = Vec2d.Scale(Vec2d.CW90(axisNormalized), offset);
             return Pt2d.Midpoint(start, end) + perpScaled; 
         }
+
+        /// <summary>
+        /// returns orientation of ordered triplet. 0 = Collinear, 1 = CW 2 = CCW
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="q"></param>
+        /// <param name="r"></param>
+        /// <returns>int</returns>
+        public static int Orientation(Pt2d p, Pt2d q, Pt2d r)
+        {
+            double val = ((q.Y - p.Y) * (r.X - q.X)) - ((q.X - p.X) * (r.Y - q.Y));
+            if (val == 0) //collinear
+            {
+                return 0;
+            }
+            else
+            {
+                return (val > 0) ? 1 : 2; // CW or CCW
+            }
+        }
+
     }
 }

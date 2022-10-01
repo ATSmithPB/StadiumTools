@@ -211,7 +211,7 @@ namespace StadiumTools
         {
             if (divLength >= Pt3d.Distance(arc.Start, arc.End) || divLength <= 0)
             {
-                throw new Exception("Division length must be greater than zero and smaller than the distance from Arc.Start point to Arc.End point.");
+                throw new Exception($"Division length [{divLength}] must be greater than zero and smaller than [{Pt3d.Distance(arc.Start, arc.End)}] the distance from Arc.Start point to Arc.End point.");
             }
             double theta = Circle.ChordAngle(arc.Radius, divLength);
             List<double> delta0 = new List<double>();
@@ -486,6 +486,48 @@ namespace StadiumTools
             }
             a.IsValid = true;
             return true;
+        }
+
+        /// <summary>
+        /// divides an arc by a given number of segments and returns division points.
+        /// </summary>
+        /// <param name="arc"></param>
+        /// <param name="segmentCount"></param>
+        /// <param name="tParams"></param>
+        /// <returns>Pt3d[]</returns>
+        public static Pt3d[] Divide(Arc arc, int segmentCount, out double[] tParams)
+        {
+            tParams = Divide(arc, segmentCount);
+            Pt3d[] result = new Pt3d[tParams.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = arc.PointAt(tParams[i]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// divides an arc by a given number of segments and returns division parameters.
+        /// </summary>
+        /// <param name="arc"></param>
+        /// <param name="segmentCount"></param>
+        /// <returns>double[]</returns>
+        public static double[] Divide(Arc arc, int segmentCount)
+        {
+            if (segmentCount < 2)
+            {
+                throw new ArgumentException($"Error: segmentCount [{segmentCount}] must be >2. Cannot divide arc into less than two segments");
+            }
+            
+            double[] result = new double[segmentCount - 1];
+            double theta = arc.Angle / segmentCount;
+            
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = (theta + theta * i) / arc.Angle;
+            }
+            
+            return result;
         }
 
     }

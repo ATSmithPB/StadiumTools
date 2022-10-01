@@ -263,6 +263,10 @@ namespace StadiumTools
         /// <returns>Pt3d[]</returns>
         public static Pt3d[] RectangleCentered(Pln3d plane, double sizeX, double sizeY)
         {
+            if(sizeX <= 0 || sizeY <= 0)
+            {
+                throw new ArgumentException("Error: sizeX and sizeY must be non-negative and > 0");
+            }
             Pt3d[] result = new Pt3d[4];
             Pt2d[] pts2d = Pt2d.RectangleCentered(plane.OriginPt.ToPt2d(), sizeX, sizeY);
             for (int i = 0; i < 4; i++)

@@ -166,6 +166,11 @@ namespace StadiumTools
             return vN;
         }
 
+        public Vec3d Flip()
+        {
+            return new Vec3d(-this.X, -this.Y, -this.Z);
+        }
+
         /// <summary>
         /// Scale all vC of a vector such that its magnitude is equal to 1
         /// </summary>
@@ -267,73 +272,73 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// 
+        /// returns the perpendicular vector to a given vector
         /// </summary>
         /// <param name="v"></param>
-        /// <returns></returns>
-        public static Vec3d PerpTo(Vec3d v) // reimplemented from OpenNurbs
+        /// <returns>Vec3d</returns>
+        public static Vec3d PerpTo(Vec3d v)
         {
-          double[] vC = new double[3];  
-          int i, j, k; 
-          double a, b;
-          k = 2;
-          if (Abs(v.Y) > Abs(v.X)) 
-          {
-            if (Abs(v.Z) > Abs(v.Y)) 
+            double[] this_v = new double[3];
+            int i, j, k; 
+            double a, b;
+            k = 2;
+            if (Math.Abs(v.Y) > Math.Abs(v.X))
             {
-              i = 2;
-              j = 1;
-              k = 0;
-              a = v.Z;
-              b = -v.Y;
+                if (Math.Abs(v.Z) > Math.Abs(v.Y)) 
+                {
+                    i = 2;
+                    j = 1;
+                    k = 0;
+                    a = v.Z;
+                    b = -v.Y;
+                }
+                else if (Math.Abs(v.Z) >= Math.Abs(v.X))
+                {
+                    i = 1;
+                    j = 2;
+                    k = 0;
+                    a = v.Y;
+                    b = -v.Z;
+                }
+                else 
+                {
+                    i = 1;
+                    j = 0;
+                    k = 2;
+                    a = v.Y;
+                    b = -v.X;
+                }
             }
-            else if (Abs(v.Z) >= Abs(v.X))
+            else if (Math.Abs(v.Z) > Math.Abs(v.X)) 
             {
-              i = 1;
-              j = 2;
-              k = 0;
-              a = v.Y;
-              b = -v.Z;
+                i = 2;
+                j = 0;
+                k = 1;
+                a = v.Z;
+                b = -v.X;
+            }
+            else if (Math.Abs(v.Z) > Math.Abs(v.Y)) 
+            {
+                i = 0;
+                j = 2;
+                k = 1;
+                a = v.X;
+                b = -v.Z;
             }
             else 
             {
-              i = 1;
-              j = 0;
-              k = 2;
-              a = v.Y;
-              b = -v.X;
+                i = 0;
+                j = 1;
+                k = 2;
+                a = v.X;
+                b = -v.Y;
             }
-          }
-          else if (Abs(v.Z) > Abs(v.X)) 
-          {
-            i = 2;
-            j = 0;
-            k = 1;
-            a = v.Z;
-            b = -v.X;
-          }
-          else if (Abs(v.Z) > Abs(v.Y)) 
-          {
-            i = 0;
-            j = 2;
-            k = 1;
-            a = v.X;
-            b = -v.Z;
-          }
-          else 
-          {
-            i = 0;
-            j = 1;
-            k = 2;
-            a = v.X;
-            b = -v.Y;
-          }
+
+            this_v[i] = b;
+            this_v[j] = a;
+            this_v[k] = 0.0;
           
-          vC[i] = b;
-          vC[j] = a;
-          vC[k] = 0.0;
-          
-          return new Vec3d(vC[i], vC[j], vC[k]);
+            return new Vec3d(this_v[0], this_v[1], this_v[2]);
         }
 
         /// <summary>
@@ -342,9 +347,9 @@ namespace StadiumTools
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns>Vec3d</returns>
-        public static Vec3d CrossProduct(Vec2d a ,Vec2d b)
+        public static Vec3d CrossProduct(Vec2d a, Vec2d b)
         {
-            return new Vec3d(0.0, 0.0, a.X * b.Y - b.X * a.Y);
+            return new Vec3d(0.0, 0.0, (a.X * b.Y) - (b.X * a.Y));
         } 
          
         /// <summary>
@@ -456,6 +461,11 @@ namespace StadiumTools
           return Vec3d.Normalize(result);
         }
 
-         
+        public static Vec3d Tween2(Vec3d a, Vec3d b)
+        {
+            return new Vec3d((a.X + b.X)/2, (a.Y + b.Y) / 2, (a.Z + b.Z) / 2);
+        }
+
+        
     }
 }
