@@ -8,6 +8,7 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 using System;
+using Rhino.Commands;
 
 namespace StadiumTools
 {
@@ -64,6 +65,36 @@ namespace StadiumTools
             Pln2d pln = new Pln2d(pOrigin, xAxis, yAxis);
             pln.IsValid = true;
             return pln;
+        }
+
+        /// <summary>
+        /// Returns an array of Planes from an array of Pln3d objects
+        /// </summary>
+        /// <param name="pln3d"></param>
+        /// <returns>Plane[]</returns>
+        public static Plane[] PlanesFromPln3ds(Pln3d[] pln3d)
+        {
+            Rhino.Geometry.Plane[] result = new Rhino.Geometry.Plane[pln3d.Length];    
+            for (int i = 0; i < pln3d.Length; i++)
+            {
+                result[i] = PlaneFromPln3d(pln3d[i]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a List of Planes from a List of Pln3d objects
+        /// </summary>
+        /// <param name="pln3d"></param>
+        /// <returns>List<Plane></returns>
+        public static List<Plane> PlanesFromPln3ds(List<Pln3d> pln3d)
+        {
+            List<Rhino.Geometry.Plane> result = new List <Rhino.Geometry.Plane>();
+            for (int i = 0; i < pln3d.Count; i++)
+            {
+                result.Add(PlaneFromPln3d(pln3d[i]));
+            }
+            return result;
         }
 
         /// <summary>
