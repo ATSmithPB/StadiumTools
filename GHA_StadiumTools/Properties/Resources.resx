@@ -118,6 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ST_Bowl3DBreps" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_Bowl3DBreps.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_Bowl3DMesh" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_Bowl3DMesh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructBoundaryCustom" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructBoundaryCustom.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructBoundaryElliptical" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructBoundaryElliptical.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructBoundaryNoCorners" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructBoundaryNoCorners.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructBoundaryOrthagonal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructBoundaryOrthagonal.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ST_ConstructBoundaryRadial" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ST_ConstructBoundaryRadial.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ST_ConstructBowl3D" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ST_ConstructBowl3D.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

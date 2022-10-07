@@ -63,6 +63,76 @@ namespace GHA_StadiumTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ST_Bowl3DBreps {
+            get {
+                object obj = ResourceManager.GetObject("ST_Bowl3DBreps", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_Bowl3DMesh {
+            get {
+                object obj = ResourceManager.GetObject("ST_Bowl3DMesh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructBoundaryCustom {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructBoundaryCustom", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructBoundaryElliptical {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructBoundaryElliptical", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructBoundaryNoCorners {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructBoundaryNoCorners", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructBoundaryOrthagonal {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructBoundaryOrthagonal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ST_ConstructBoundaryRadial {
+            get {
+                object obj = ResourceManager.GetObject("ST_ConstructBoundaryRadial", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ST_ConstructBowl3D {
             get {
                 object obj = ResourceManager.GetObject("ST_ConstructBowl3D", resourceCulture);
