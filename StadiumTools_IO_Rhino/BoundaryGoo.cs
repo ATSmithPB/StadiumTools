@@ -14,27 +14,27 @@ namespace StadiumTools
     /// <summary>
     /// Tier Goo wrapper class, makes sure Tier can be used in Grasshopper.
     /// </summary>
-    public class PlaySurfaceGoo : GH_Goo<PlaySurface>
+    public class BoundaryGoo : GH_Goo<Boundary>
     {
         //Constructors
-        public PlaySurfaceGoo()
+        public BoundaryGoo()
         {
-            this.Value = new PlaySurface();
+            this.Value = new Boundary();
         }
-        public PlaySurfaceGoo(PlaySurface playSurface)
+        public BoundaryGoo(Boundary boundary)
         {
-            if (playSurface.IsValid == false)
-                playSurface = new PlaySurface();
-            this.Value = playSurface;
+            if (boundary.IsValid == false)
+                boundary = new Boundary();
+            this.Value = boundary;
         }
 
         public override IGH_Goo Duplicate()
         {
             return Duplicate();
         }
-        public PlaySurfaceGoo DuplicatePlaySurfaceGoo()
+        public BoundaryGoo DuplicateBoundaryGoo()
         {
-            return new PlaySurfaceGoo(Value.IsValid == false ? new PlaySurface() : (StadiumTools.PlaySurface)Value.Clone());
+            return new BoundaryGoo(Value.IsValid == false ? new Boundary() : (StadiumTools.Boundary)Value.Clone());
         }
 
         public override bool IsValid
@@ -49,17 +49,17 @@ namespace StadiumTools
         public override string ToString()
         {
             if (Value.IsValid == false)
-                return "Null Playsurface";
+                return "Null Boundary";
             else
-                return $"PlaySurface: T:{Value.SportType} B:{Value.Boundary.Length}, P:[{Value.Plane.OriginX},{Value.Plane.OriginY}]";
+                return $"Boundary: BS:{Value.BoundaryStyle} U:{Value.Unit}";
         }
         public override string TypeName
         {
-            get { return ("PlaySurface"); }
+            get { return ("Boundary"); }
         }
         public override string TypeDescription
         {
-            get { return ("Defines a single StadiumTools PlaySurface"); }
+            get { return ("Defines a single StadiumTools Boundary"); }
         }
     }
 

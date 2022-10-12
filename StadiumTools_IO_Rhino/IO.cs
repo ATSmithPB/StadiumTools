@@ -9,6 +9,7 @@ using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 using System;
 using Rhino.Commands;
+using Rhino.Render.ChangeQueue;
 
 namespace StadiumTools
 {
@@ -218,7 +219,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d
+        /// Casts a list of Vec2d objects to an array of RhinoCommon Vector2d   
         /// </summary>
         /// <param name="vecs"></param>
         /// <returns>Vector2d[]</returns>
@@ -273,6 +274,21 @@ namespace StadiumTools
             return rcDub;
         }
 
+        public static DataTree<T> DataTreeFromJaggedArray<T>(T[][] jaggedArray)
+        {
+            DataTree<T> rcPts = new DataTree<T>();
+            for (int i = 0; i < jaggedArray.Length; i++)
+            {
+                for (int j = 0; j < jaggedArray[i].Length; j++)
+                {
+                    GH_Path path = new GH_Path(i);
+                    T item = jaggedArray[i][j];
+                    rcPts.Add(item, path);
+                }
+            }
+            return rcPts;
+        }
+
         /// <summary> 
         /// Returns a Data Tree of doubles based on a list
         /// </summary>
@@ -291,6 +307,37 @@ namespace StadiumTools
                 }
             }
             return rcInt;
+        }
+
+
+        public static DataTree<Rhino.Geometry.Mesh> DataTreeFromJaggedArray(Rhino.Geometry.Mesh[][] meshes)
+        {
+            DataTree<Rhino.Geometry.Mesh> result = new DataTree<Rhino.Geometry.Mesh>();
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                for (int j = 0; j < meshes[i].Length; j++)
+                {
+                    GH_Path path = new GH_Path(i);
+                    Rhino.Geometry.Mesh item = meshes[i][j];
+                    result.Add(item, path);
+                }
+            }
+            return result;
+        }
+
+        public static DataTree<Rhino.Geometry.Mesh> DataTreeFromMultiArray(StadiumTools.Mesh[,] meshes)
+        {
+            DataTree<Rhino.Geometry.Mesh> result = new DataTree<Rhino.Geometry.Mesh>();
+            for (int i = 0; i < meshes.GetLength(0); i++)
+            {
+                for (int j = 0; j < meshes.GetLength(1); j++)
+                {
+                    GH_Path path = new GH_Path(i);
+                    Rhino.Geometry.Mesh item = RCMeshFromSTMesh(meshes[i, j]);
+                    result.Add(item, path);
+                }
+            }
+            return result;
         }
 
         public static Polyline PolylineFromPline(Pline pline)
@@ -327,6 +374,20 @@ namespace StadiumTools
             return polyline;
         }
 
+        public static Polyline AislePolylineFromTier(Tier tier)
+        {
+            Polyline polyline = new Polyline();
+            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Count];
+            for (int i = 0; i < rhinoPts.Length; i++)
+            {
+                Pt3d pt3d = tier.AislePoints2d[i].ToPt3d(tier.Plane);
+                rhinoPts[i] = Point3dFromPt3d(pt3d);
+            }
+
+            polyline.AddRange(rhinoPts);
+            return polyline;
+        }
+
         /// <summary>
         /// returns a collection of points from the data of a tier
         /// </summary>
@@ -339,6 +400,19 @@ namespace StadiumTools
             for (int i = 0; i < tier.Points2dCount; i++)
             {
                 Pt3d pt3d = tier.Points2d[i].ToPt3d(tier.Plane);
+                rhinoPts[i] = Point3dFromPt3d(pt3d);
+            }
+
+            return rhinoPts;
+        }
+
+        public static Point3d[] AislePointsFromTier(Tier tier)
+        {
+            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Count];
+
+            for (int i = 0; i < tier.AislePoints2d.Count; i++)
+            {
+                Pt3d pt3d = tier.AislePoints2d[i].ToPt3d(tier.Plane);
                 rhinoPts[i] = Point3dFromPt3d(pt3d);
             }
 
@@ -419,9 +493,19 @@ namespace StadiumTools
         /// <returns></returns>
         public static Curve CurveFromEllipse(StadiumTools.Ellipse stEllipse)
         {
-            Rhino.Geometry.Ellipse rcEllipse = EllipseFromEllipse2d(stEllipse);
+            Rhino.Geometry.Ellipse rcEllipse = EllipseFromEllipse(stEllipse);
             NurbsCurve nurbsEllipse = rcEllipse.ToNurbsCurve();
             Curve result = nurbsEllipse;
+            return result;
+        }
+
+        public static Rhino.Geometry.Curve[] CurvesFromArcs(StadiumTools.Arc[] arcs)
+        {
+            Rhino.Geometry.Curve[] result = new Rhino.Geometry.Curve[arcs.Length];
+            for (int i = 0; i < arcs.Length; i++)
+            {
+                result[i] = CurveFromArc(arcs[i]);
+            }
             return result;
         }
 
@@ -464,6 +548,21 @@ namespace StadiumTools
             return new Rhino.Geometry.Arc(circle, angleIntervalRadians);
         }
 
+        public static Rhino.Geometry.Line[] RCLinesFromLines(StadiumTools.Line[] lines)
+        {
+            Rhino.Geometry.Line[] result = new Rhino.Geometry.Line[lines.Length];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                result[i] = RCLineFromLine(lines[i]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Constructs a RhinoCommon Line from a StadiumTools Line
+        /// </summary>
+        /// <param name="stLine"></param>
+        /// <returns></returns>
         public static Rhino.Geometry.Line RCLineFromLine(StadiumTools.Line stLine)
         {
             double x0 = stLine.Start.X;
@@ -475,12 +574,45 @@ namespace StadiumTools
             return new Rhino.Geometry.Line(x0, y0, z0, x1, y1, z1);
         }
 
-        public static Rhino.Geometry.Ellipse EllipseFromEllipse2d(Ellipse stEllipse)
+        /// <summary>
+        /// Constructs a RhinoCommon Ellipse from a StadiumTools Ellipse
+        /// </summary>
+        /// <param name="stEllipse"></param>
+        /// <returns></returns>
+        public static Rhino.Geometry.Ellipse EllipseFromEllipse(Ellipse stEllipse)
         {
             Pln3d pln3d = stEllipse.Center;
             Plane plane = PlaneFromPln3d(pln3d);
             return new Rhino.Geometry.Ellipse(plane, stEllipse.RadiusX, stEllipse.RadiusY);
         }
+
+        /// <summary>
+        /// Constructs a RhinoCommon Mesh from a StadiumTools Mesh
+        /// </summary>
+        /// <param name="newSTBowlMesh"></param>
+        /// <returns></returns>
+        public static Rhino.Geometry.Mesh RCMeshFromSTMesh(StadiumTools.Mesh stMesh)
+        {
+            var result = new Rhino.Geometry.Mesh();
+            for (int i = 0; i < stMesh.Vertices.Count; i++)
+            {
+                result.Vertices.Add(Point3dFromPt3d(stMesh.Vertices[i]));
+            }
+
+            for (int i = 0; i < stMesh.Faces.Count; i++)
+            {
+                result.Faces.AddFace(MeshFaceFromFace(stMesh.Faces[i]));
+                result.FaceNormals.AddFaceNormal(Vector3dFromVec3d(stMesh.FaceNormals[i]));
+            }
+            return result;
+        }
+
+        public static Rhino.Geometry.MeshFace MeshFaceFromFace(Face face)
+        {
+            return new Rhino.Geometry.MeshFace(face.A, face.B, face.C, face.D);
+        }
+
+
     }
 }
         
