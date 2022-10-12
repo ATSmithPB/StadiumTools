@@ -13,14 +13,14 @@ ecf154c4-c77d-4f91-a76f-e955b11108f6 : ST_ConstructPlaySurface
 7baed942-3f4d-4ed9-a2b7-b08b0581ca61 : ST_DeconstructPlaySurface
 1b366a05-6d82-43a0-afbc-f8ac47227263 : ST_ConstructPlan
 2beee9f4-5e1f-4372-a51c-6670962523b6 : ST_ConstructMultiPlan
-248eabbc-6964-4195-91e9-a594a6c5309c
-cd0428a1-1a72-4e62-8177-06e5acb42502
-378a97f9-63f0-45a0-9357-df58a3c34c5e
-49b021df-e99e-4b35-850e-4c3a79744e06
-eaceb525-37c0-4ba7-b588-5270f48a8412
-4f45ae77-8764-45a6-9255-d38d44db28a1
-7f3f39dd-5330-44c6-8c43-0c3c2167e950
-282f2fd8-55db-4ea7-8a2f-7b06d0f044d0
+248eabbc-6964-4195-91e9-a594a6c5309c : ST_ConstructBowl3d
+cd0428a1-1a72-4e62-8177-06e5acb42502 : ST_ConstructBoundaryOrtho
+378a97f9-63f0-45a0-9357-df58a3c34c5e : ST_ConstructBoundaryRadial 
+49b021df-e99e-4b35-850e-4c3a79744e06 : ST_ConstructBoundaryElliptical 
+eaceb525-37c0-4ba7-b588-5270f48a8412 : ST_ConstructBoundaryNoCorners 
+4f45ae77-8764-45a6-9255-d38d44db28a1 : ST_ConstructBoundaryCustom 
+7f3f39dd-5330-44c6-8c43-0c3c2167e950 : ST_Bowl3DMesh
+282f2fd8-55db-4ea7-8a2f-7b06d0f044d0 : ST_Bowl3DBreps
 cc5f3784-9d89-45c3-aa8f-c1c345b5d77c
 71c66a98-055b-428b-b55f-bb72c7537cfa
 f2e1c626-fb81-41ed-9886-26be13e73b23

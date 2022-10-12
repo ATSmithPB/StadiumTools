@@ -110,7 +110,7 @@ namespace GHA_StadiumTools
             if (!DA.GetDataList<double>(IN_Division, divLen)) { return; }
             if (!DA.GetDataList<bool>(IN_POC, pointAtCenter)) { return; }
 
-            StadiumTools.Pline[] plines = StadiumTools.BowlPlan.RadialFilletedNonUniform
+            StadiumTools.Pline[] plines = StadiumTools.Boundary.RadialFilletedNonUniform
             (pln3d,
             length,
             width,

@@ -34,7 +34,6 @@ namespace GHA_StadiumTools
         private static int IN_BowlPlan = 0;
         private static int IN_Section = 1;
         private static int OUT_Bowl3D = 0;
-        private static int OUT_Mesh = 1;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -42,7 +41,6 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Bowl3D", "B3D", "A Bowl3D object", GH_ParamAccess.item);
-            pManager.AddMeshParameter("Mesh", "M", "A mesh representation of the resulting Bowl3D", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -93,7 +91,6 @@ namespace GHA_StadiumTools
 
             //Construct a new Bowl3d
             var newBowl3d = new StadiumTools.Bowl3d(sectionItem, bowlPlanItem);
-
             return newBowl3d;
         }
 

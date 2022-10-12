@@ -37,7 +37,9 @@ namespace GHA_StadiumTools
         private static int OUT_Profile = 2;
         private static int OUT_Plane = 3;
         private static int OUT_Section_Index = 4;
-        private static int OUT_Debug = 5;
+        private static int OUT_AislePoints = 5;
+        private static int OUT_AisleProfile = 6;
+        private static int OUT_Debug = 7;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -49,6 +51,8 @@ namespace GHA_StadiumTools
             pManager.AddCurveParameter("Profile", "Pr", "a Polyline representing the top surface of the tier", GH_ParamAccess.item);
             pManager.AddPlaneParameter("Plane", "Pl", "The reference plane of this tier (0,0 is the Point of Focus)", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Section Index", "Si", "The index of this tier within its host section", GH_ParamAccess.item);
+            pManager.AddPointParameter("AislePoints", "Apts", "The 3d points representing the top surface of the tier's aisle/vomatory", GH_ParamAccess.list);
+            pManager.AddCurveParameter("AisleProfile", "APr", "a Polyline representing the top surface of the tier's aisle/vomatory", GH_ParamAccess.item);
             pManager.AddTextParameter("Pt2d", "2d", "String representation of Pt2d objects of the tier (for debugging)", GH_ParamAccess.list);
         }
 
@@ -113,22 +117,19 @@ namespace GHA_StadiumTools
                 DA.SetDataList(OUT_Spectators, spectatorGooList);
             }
 
-            //Set Points
             Rhino.Geometry.Point3d[] points = StadiumTools.IO.PointsFromTier(tierItem);
             DA.SetDataList(OUT_Points, points);
-
-            //Set Profile Polyline
             Rhino.Geometry.Polyline pline = StadiumTools.IO.PolylineFromTier(tierItem);
             DA.SetData(OUT_Profile, pline);
 
-            //Set Plane (POF)
+            Rhino.Geometry.Point3d[] aislePoints = StadiumTools.IO.AislePointsFromTier(tierItem);
+            DA.SetDataList(OUT_AislePoints, aislePoints);
+            Rhino.Geometry.Polyline aislePline = StadiumTools.IO.AislePolylineFromTier(tierItem);
+            DA.SetData(OUT_AisleProfile, aislePline);
+
             Rhino.Geometry.Plane tierPlane = StadiumTools.IO.PlaneFromPln3d(tierItem.Plane);
             DA.SetData(OUT_Plane, tierPlane);
-
-            //Set Section Index
             DA.SetData(OUT_Section_Index, tierItem.SectionIndex);
-
-            //Set Debug
             DA.SetDataList(OUT_Debug, stringList);
         }
 

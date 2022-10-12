@@ -11,13 +11,13 @@ namespace GHA_StadiumTools
     /// <summary>
     /// Create a custom GH component called ST_ConstructSection2D using the GH_Component as base. 
     /// </summary>
-    public class ST_ConstructBowlPlan : GH_Component
+    public class ST_Bowl3dBreps : GH_Component
     {
         /// <summary>
         /// A custom component for input parameters to generate a new 2D section. 
         /// </summary>
-        public ST_ConstructBowlPlan()
-            : base(nameof(ST_ConstructBowlPlan), "cBP", "Construct a 2D BowlPlan from a PlaySurface and parameters", "StadiumTools", "2D Plan")
+        public ST_Bowl3dBreps()
+            : base(nameof(ST_Bowl3dBreps), "B3dB", "Calculate the brep geometry of a StadiumTools Bowl3d", "StadiumTools", "3D")
         {
         }
 
@@ -26,21 +26,19 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Playsurface", "PS", "The Playsurface of the Bowl Plan", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Boundary", "B", "A Boundary to construct the BowlPlan from", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Bowl3d", "B3Dd", "a valid StadiumTools Bowl3d object", GH_ParamAccess.item);
         }
 
         //Set parameter indixes to names (for readability)
-        private static int IN_PlaySurface = 0;
-        private static int IN_Boundary = 1;
-        private static int OUT_BowlPlan = 0;
+        private static int IN_Bowl3d = 0;
+        private static int OUT_Bowl3d_Breps = 0;
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("BowlPlan", "BP", "A BowlPlan object", GH_ParamAccess.item);
+            pManager.AddMeshParameter("Bowl3d Breps", "B3dB", "The Brep geometry of a StadiumTools Bowl3d object", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -51,13 +49,7 @@ namespace GHA_StadiumTools
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Construct a new section from Data Access
-            StadiumTools.BowlPlan newPlan = ST_ConstructBowlPlan.ConstructBowlPlanFromDA(DA, this);
-
-            //GH_Goo<T> wrapper
-            var newPlanGoo = new StadiumTools.BowlPlanGoo(newPlan);
-
-            //Output Goo
-            DA.SetData(OUT_BowlPlan, newPlanGoo);
+            ST_Bowl3dBreps.ConstructBowl3dBrepsFromDA(DA, this);
         }
 
         /// <summary>
@@ -66,29 +58,33 @@ namespace GHA_StadiumTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Resources.ST_ConstructPlan;
+        protected override System.Drawing.Bitmap Icon => Resources.ST_Bowl3DBreps;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
-        /// that use the old ID will partially fail during loading.
+        /// that use the old ID will partially fail during loading.   
         /// </summary>
-        public override Guid ComponentGuid => new Guid("1b366a05-6d82-43a0-afbc-f8ac47227263");
+        public override Guid ComponentGuid => new Guid("282f2fd8-55db-4ea7-8a2f-7b06d0f044d0");
 
         //Methods  
-        private static StadiumTools.BowlPlan ConstructBowlPlanFromDA(IGH_DataAccess DA, GH_Component thisComponent)
+        private static void ConstructBowl3dBrepsFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
-            //Item Containers  
-            var playSurfaceGooItem = new StadiumTools.PlaySurfaceGoo();
-            var boundaryGooItem = new StadiumTools.BoundaryGoo();
-            
-            DA.GetData<StadiumTools.PlaySurfaceGoo>(IN_PlaySurface, ref playSurfaceGooItem);
-            DA.GetData<StadiumTools.BoundaryGoo>(IN_Boundary, ref boundaryGooItem);
-            StadiumTools.PlaySurface ps = playSurfaceGooItem.Value;
-            StadiumTools.Boundary boundary = boundaryGooItem.Value;
-            return new StadiumTools.BowlPlan(ps, boundary, true);
+            //Item Containers
+            var bowl3dGooItem = new StadiumTools.Bowl3dGoo();
+
+            //Get Goos
+            DA.GetData<StadiumTools.Bowl3dGoo>(IN_Bowl3d, ref bowl3dGooItem);
+            var bowl3dItem = bowl3dGooItem.Value;
+
+            StadiumTools.Mesh[,] bowl3dMesh = bowl3dItem.ToMesh();
+            Grasshopper.DataTree<Rhino.Geometry.Mesh> bowl3dMeshRC = StadiumTools.IO.DataTreeFromMultiArray(bowl3dMesh);
+
+            DA.SetData(OUT_Bowl3d_Breps, bowl3dMeshRC);
         }
 
-        
+
+
+
     }
 }

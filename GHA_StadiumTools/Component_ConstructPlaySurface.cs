@@ -46,8 +46,8 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("PlaySurface", "PS", "A PlaySurface object", GH_ParamAccess.item);
-            pManager.AddCurveParameter("Boundary", "b", "A closed PolyCurve that represents the outermost PlaySurface boundary", GH_ParamAccess.item);
-            pManager.AddCurveParameter("Markings", "m", "A collection of curves that represent common PlaySurface markings", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Touchline", "Tl", "A closed PolyCurve that represents the touchline of the PlaySurface", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Markings", "M", "A collection of curves that represent common PlaySurface markings", GH_ParamAccess.list);
         }
 
         /// <summary>

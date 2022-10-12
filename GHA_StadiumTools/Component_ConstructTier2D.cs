@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
@@ -235,6 +236,9 @@ namespace GHA_StadiumTools
             tier.RiserHeights = new double[tier.RowCount - 1];
             tier.Points2dCount = StadiumTools.Tier.GetTierPtCount(tier);
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
+            tier.AisleStepHeight = 0.230 * tier.SpectatorParameters.Unit;
+            tier.AisleStepWidth = 0.260 * tier.SpectatorParameters.Unit;
+            tier.AislePoints2d = new List<StadiumTools.Pt2d>();
         }
     }
 }
