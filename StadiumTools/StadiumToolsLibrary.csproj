@@ -46,13 +46,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arc.cs" />
+    <Compile Include="Boundary.cs" />
     <Compile Include="Bowl3d.cs" />
     <Compile Include="Circle.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Data.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="Ellipse.cs" />
     <Compile Include="ICurve.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="BowlPlan.cs" />
+    <Compile Include="Mesh.cs" />
+    <Compile Include="Face.cs" />
     <Compile Include="PlaySurface.cs" />
     <Compile Include="Pline.cs" />
     <Compile Include="Pln2d.cs" />

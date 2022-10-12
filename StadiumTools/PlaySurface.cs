@@ -67,6 +67,15 @@ namespace StadiumTools
         /// the angle between the PlaySurface X-Axis (Long Axis) and North
         /// </summary>
         public double Orientation { get; set; }
+        /// <summary>
+        /// The length of the PlaySurface
+        /// </summary>
+        public double SizeX { get; set; }
+        /// <summary>
+        /// The width of the Playsurface
+        /// </summary>
+        public double SizeY { get; set; }
+        
 
         //Constructors
         /// <summary>
@@ -78,18 +87,20 @@ namespace StadiumTools
         /// <param name="lod"></param>
         public PlaySurface(Pln2d plane, Vec2d north, double unit, Type type, LOD lod)
         {
-            this.Unit = unit;
-            this.IsValid = true;
-            this.Plane = plane;
-            this.SportType = type;
-            this.Lod = lod;
-            this.North = north;
-            this.Orientation = Vec2d.Angle(north, plane.Xaxis);
+            Unit = unit;
+            IsValid = true;
+            Plane = plane;
+            SportType = type;
+            Lod = lod;
+            North = north;
+            Orientation = Vec2d.Angle(north, plane.Xaxis);
 
-            GetBoundaryMarkings(type, plane, unit, lod, out ICurve[] boundary, out ICurve[] markings);
+            GetBoundaryMarkings(type, plane, unit, lod, out ICurve[] boundary, out ICurve[] markings, out double sizeX, out double sizeY);
 
-            this.Boundary = boundary;
-            this.Markings = markings;
+            Boundary = boundary;
+            Markings = markings;
+            SizeX = sizeX;
+            SizeY = sizeY;
         }
 
         /// <summary>
@@ -101,69 +112,103 @@ namespace StadiumTools
         /// <param name="lod"></param>
         public PlaySurface(Pln2d plane, Vec2d north, double unit, LOD lod, ICurve[] boundary, ICurve[] markings)
         {
-            this.Unit = unit;
-            this.IsValid = true;
-            this.Plane = plane;
-            this.SportType = Type.Custom;
-            this.Lod = lod;
-            this.North = north;
-            this.Orientation = Vec2d.Angle(north, plane.Xaxis);
-            this.Boundary = boundary;
-            this.Markings = markings;
+            Unit = unit;
+            IsValid = true;
+            Plane = plane;
+            SportType = Type.Custom;
+            SizeX = 0.0;
+            SizeY = 0.0;
+            Lod = lod;
+            North = north;
+            Orientation = Vec2d.Angle(north, plane.Xaxis);
+            Boundary = boundary;
+            Markings = markings;
         }
 
         //Methods
-        private static void GetBoundaryMarkings(Type type, Pln2d plane, double unit, LOD lod, out ICurve[] boundary, out ICurve[] markings)
+        private static void GetBoundaryMarkings
+            (Type type, 
+            Pln2d plane, 
+            double unit, 
+            LOD lod, 
+            out ICurve[] boundary, 
+            out ICurve[] markings, 
+            out double sizeX, 
+            out double sizeY)
         {
             switch (type)
             {
                 case Type.Soccer:
                     boundary = BoundarySoccer(plane, unit);
                     markings = MarkingsSoccer(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.Football:
                     boundary = BoundaryFootball(plane, unit);
                     markings = MarkingsFootball(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.Baseball:
                     boundary = BoundaryBaseball(plane, unit);
                     markings = MarkingsBaseball(plane, unit, lod);
+                    sizeX = 123.61094 * unit;
+                    sizeY = 68.968368* unit;
                     break;
                 case Type.Cricket:
                     boundary = BoundaryCricket(plane, unit);
                     markings = MarkingsCricket(plane, unit, lod);
+                    sizeX = 150 * unit;
+                    sizeY = 137 * unit;
                     break;
                 case Type.Basketball:
                     boundary = BoundaryBasketball(plane, unit);
                     markings = MarkingsBasketball(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.Tennis:
                     boundary = BoundaryTennis(plane, unit);
                     markings = MarkingsTennis(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.IceHockey:
                     boundary = BoundaryIceHockey(plane, unit);
                     markings = MarkingsIceHockey(plane, unit, lod);
+                    sizeX = 60.959998 * unit;
+                    sizeY = 25.907999 * unit;
                     break;
                 case Type.FieldHockey:
                     boundary = BoundaryFieldHockey(plane, unit);
                     markings = MarkingsFieldHockey(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.Rugby:
                     boundary = BoundaryRugby(plane, unit);
                     markings = MarkingsRugby(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.Futsal:
                     boundary = BoundaryFutsal(plane, unit);
                     markings = MarkingsFutsal(plane, unit, lod);
+                    sizeX = boundary[0].Length();
+                    sizeY = boundary[1].Length();
                     break;
                 case Type.OlympicTrack:
                     boundary = BoundaryOlympicTrack(plane, unit);
                     markings = MarkingsOlympicTrack(plane, unit, lod);
+                    sizeX = 84.41 * unit;
+                    sizeY = 92.5 * unit;
                     break;
                 default:
                     boundary = BoundarySoccer(plane, unit);
                     markings = MarkingsSoccer(plane, unit, lod);
+                    sizeX = 0.0;
+                    sizeY = 0.0;
                     break;
             }
         }
@@ -238,6 +283,7 @@ namespace StadiumTools
         {
             double cornerRadius = 8.5344 * unit;
 
+            
             Pt2d[] boundaryPts = Pt2d.RectangleCenteredChamfered(plane, 60.959998 * unit, 25.907999 * unit, cornerRadius);
             Pt2d[] arcCenters = Pt2d.RectangleCentered(plane, 43.891198 * unit, 8.839199 * unit);
             Line[] lines = new Line[4];

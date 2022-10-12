@@ -466,6 +466,13 @@ namespace StadiumTools
             return new Vec3d((a.X + b.X)/2, (a.Y + b.Y) / 2, (a.Z + b.Z) / 2);
         }
 
-        
+        public static Vec3d Tween2(Vec3d a, Vec3d b, double parameter)
+        {
+            double x = (a.X * (1 - parameter)) + (b.X * parameter);
+            double y = (a.Y * (1 - parameter)) + (b.Y * parameter);
+            double z = (a.Z * (1 - parameter)) + (b.Z * parameter);
+            return new Vec3d(x, y, z);
+        }
+
     }
 }

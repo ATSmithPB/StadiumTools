@@ -322,8 +322,8 @@ namespace StadiumTools
         /// <returns></returns>
         public static Pt3d Tween2(Pt3d a, Pt3d b, double t)
         {
-            Vec3d AB = new Vec3d(b - a);
-            Vec3d AC = (t * AB.M) * AB;
+            Vec3d AB = new Vec3d(b - a); 
+            Vec3d AC = (t * AB.M) * Vec3d.Normalize(AB);
             Pt3d c = a + AC;
 
             return c;
@@ -465,6 +465,15 @@ namespace StadiumTools
             }
         }
 
+        public static Pt3d[] FromPt2d(Pt2d[] pts2d, Pln3d pln)
+        {
+            Pt3d[] result = new Pt3d[pts2d.Length];
+            for (int i = 0; i < pts2d.Length; i++)
+            {
+                result[i] = new Pt3d(pts2d[i], pln);
+            }
+            return result;
+        }
     }
 }
 

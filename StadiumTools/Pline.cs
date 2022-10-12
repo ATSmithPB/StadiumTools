@@ -1,5 +1,6 @@
 ﻿using Rhino.Collections;
 using Rhino.Commands;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,23 @@ namespace StadiumTools
         }
 
         /// <summary>
+        /// returns a polyline along a line. Method: 0 = remainder@end. 1 = gap@center. 2 = point@center
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="divLength"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static Pline FromLine(Line line, double divLength, int method)
+        {
+            List<Pt3d> pts = new List<Pt3d>();
+            pts.Add(line.Start);
+            pts.AddRange(Line.DivideLength(line, divLength, method));
+            pts.Add(line.End);
+            Pline result = new Pline(pts);
+            return result;
+        }
+
+        /// <summary>
         /// returns a collection representing the length of each polyline segment
         /// </summary>
         /// <returns>double[]</returns>
@@ -125,6 +143,7 @@ namespace StadiumTools
         public bool Offset(double distance, out ICurve offsetCurve)
         {
             //need to add this method ! ! !
+            throw new Exception("This method doesnt exist yet!");
             offsetCurve = null;
             return false;
         }
@@ -155,7 +174,8 @@ namespace StadiumTools
                 else
                 {
                     isSuccess = false;
-                    break;
+                    throw new ArgumentException($"Error: Join failed. pline[{i}] & pline[{i + 1}] are [{Pt3d.Distance(plines[i].End, plines[i + 1].Start)}] units apart");
+                    //break;
                 }
             }
 

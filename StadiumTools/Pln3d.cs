@@ -109,8 +109,8 @@ namespace StadiumTools
             OriginX = this.OriginPt.X;
             OriginY = this.OriginPt.Y;
             OriginZ = this.OriginPt.Z;
-            Xaxis = new Vec3d(plane.Xaxis, 0.0);
-            Yaxis = new Vec3d(plane.Yaxis, 0.0);
+            Xaxis = Vec3d.Normalize(new Vec3d(plane.Xaxis, 0.0));
+            Yaxis = Vec3d.Normalize(new Vec3d(plane.Yaxis, 0.0));
             Zaxis = Vec3d.ZAxis;
             GetValidity(this);
         }
@@ -172,7 +172,7 @@ namespace StadiumTools
             this.OriginY = origin.Y;
             this.OriginZ = origin.Z;
             this.Xaxis = Vec3d.Normalize(new Vec3d(origin, ptOnX));
-            this.Zaxis = Vec3d.PerpTo(origin, ptOnX, ptOnPlane);
+            this.Zaxis = Vec3d.Normalize(Vec3d.PerpTo(origin, ptOnX, ptOnPlane));
             this.Yaxis = Vec3d.Normalize(Vec3d.CrossProduct(this.Zaxis, this.Xaxis));
             GetValidity(this);
         }
@@ -275,8 +275,9 @@ namespace StadiumTools
                 curr = new Vec3d(pts[i + 1], pts[i + 2]);
             }
 
-            Vec3d lastVec = Vec3d.Tween2(prev, curr);
-            planes[pts.Length - 2] = new Pln3d(pts[pts.Length - 2], lastVec);
+            Vec3d lastZAxis = Vec3d.Tween2(prev, curr).Flip();
+            Pt3d lastPtOnY = pts[pts.Length - 2] + cPlane.Zaxis;
+            planes[pts.Length - 2] = new Pln3d(pts[pts.Length - 2], lastZAxis, lastPtOnY);
 
             return planes;
         }
@@ -337,6 +338,20 @@ namespace StadiumTools
         public Pt3d PointAt(double u, double v, double w)
         {
             return this.OriginPt + (u * this.Xaxis) + (v * this.Yaxis) + w * this.Zaxis;   
+        }
+
+        public static Pln3d[] Tween2(Pln3d a, Pln3d b, double[] parameters)
+        {
+            Pln3d[] result = new Pln3d[parameters.Length];
+            double distance = a.OriginPt.DistanceTo(b.OriginPt);
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                Pt3d origin = Pt3d.Tween2(a.OriginPt, b.OriginPt, parameters[i]);
+                Vec3d xAvg = Vec3d.Tween2(a.Xaxis, b.Xaxis, parameters[i]);
+                Vec3d yAvg = Vec3d.Tween2(a.Yaxis, b.Yaxis, parameters[i]);
+                result[i] = new Pln3d(origin, xAvg, yAvg); 
+            }
+            return result;
         }
     }
 }

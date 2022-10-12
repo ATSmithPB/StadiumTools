@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.ComponentModel.Design;
 
 namespace StadiumTools
 {
@@ -103,9 +105,21 @@ namespace StadiumTools
         /// </summary>
         public int Points2dCount { get; set; }
         /// <summary>
-        /// Pt2d objects that represents the top outline geometry of the tier profile
+        /// Pt2d objects that represents the top outline geometry of the tier's seating profile
         /// </summary>
         public Pt2d[] Points2d { get; set; }
+        /// <summary>
+        /// Pt2d objects that represents the top outline geometry of the tier's aisle/Vom profile
+        /// </summary>
+        public List<Pt2d> AislePoints2d { get; set; }
+        /// <summary>
+        /// The tread depth of aisle steps
+        /// </summary>
+        public double AisleStepWidth { get; set; }
+        /// <summary>
+        /// The maximum allowable riser height of the aisle steps
+        /// </summary>
+        public double AisleStepHeight { get; set; }
         /// <summary>
         /// Width of aisles (For Plan/3D)
         /// </summary>
@@ -140,13 +154,15 @@ namespace StadiumTools
 
             //Instance a default Fascia
             Fascia defaultFascia = Fascia.InitDefault(unit);
-
+            
             tier.Plane = Pln3d.XYPlane;
             tier.BuildFromPreviousTier = true;
             tier.StartX = 5.0 * tier.SpectatorParameters.Unit;
             tier.StartY = 1.0 * tier.SpectatorParameters.Unit;
             tier.RowCount = 25;
             tier.DefaultRowWidth = 0.8 * tier.SpectatorParameters.Unit;
+            tier.AisleStepWidth = 0.30 * tier.SpectatorParameters.Unit;
+            tier.AisleStepHeight = 0.175 * tier.SpectatorParameters.Unit;
             tier.AisleWidth = 0.8 * tier.SpectatorParameters.Unit;
 
             // Init all row widths to default value
@@ -155,12 +171,10 @@ namespace StadiumTools
             {
                 rowWidths[i] = tier.DefaultRowWidth;
             }
-
             if (tier.SuperRiser.Row > 0)
             {
                 tier.SuperHas = true;
             }
-
             if (tier.SuperHas)
             {
                 rowWidths[tier.SuperRiser.Row] = (tier.SuperRiser.Width * rowWidths[tier.SuperRiser.Row]);
@@ -173,6 +187,7 @@ namespace StadiumTools
             tier.FasciaHas = true;
             tier.Points2dCount = GetTierPtCount(tier);
             tier.Points2d = new Pt2d[tier.Points2dCount];
+            tier.AislePoints2d = new List<Pt2d>();
             tier.MaxRakeAngle = .593412; //radians
             tier.Spectators = new Spectator[tier.RowCount];
             tier.SpecSeperation = 0.4 * tier.SpectatorParameters.Unit;
@@ -208,6 +223,12 @@ namespace StadiumTools
             return tierPtCount;
         }
 
+        public static int GetAislePoints2dCount(Tier tier)
+        {
+            int result = 300;
+            return result;
+        }
+
         public static Tier[] CloneArray(Tier[] tiers)
         {
             //Deep copy
@@ -233,6 +254,7 @@ namespace StadiumTools
                 clone.RiserHeights = (double[])this.RiserHeights.Clone();
                 clone.Spectators = (Spectator[])this.Spectators.Clone();
                 clone.Points2d = (Pt2d[])this.Points2d.Clone();
+                clone.AislePoints2d = this.AislePoints2d.ToList();
             }
             return clone;
         }

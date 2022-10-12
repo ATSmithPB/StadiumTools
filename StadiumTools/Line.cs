@@ -112,5 +112,107 @@ namespace StadiumTools
             return true;
         }
 
+        public static Pt3d[] Divide(Line line, int segmentCount)
+        {
+            double segParam = (line.Length() / segmentCount) / line.Length();
+            Pt3d[] result = new Pt3d[segmentCount - 1];
+            for (int i = 0; i < segmentCount - 1; i++)
+            {
+                result[i] = line.PointAt(segParam + (i * segParam));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// returns division points of a line divided by a given length. Method: 1 = remainder@end. 2 = gap@center. 3 = point@center 
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="segmentLength"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static Pt3d[] DivideLength(Line line, double segmentLength, int method)
+        {
+            if (segmentLength <= 0)
+            {
+                throw new ArgumentException($"Error: segmentLength [{segmentLength}] must be non-negative and greater than 0");
+            }
+            
+            double length = line.Length();
+            
+            if (length < segmentLength)
+            {
+                throw new ArgumentException($"Error: segment length [{segmentLength}] must be less than the line's length [{length}]");
+            }
+            
+            double tSegment = segmentLength / length;
+            double dividend = length / segmentLength;
+            int count = (int)Math.Floor(dividend);
+            List<double> tPts = new List<double>();
+            switch (method)
+            {
+                case 0: //remainder at end
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            tPts.Add(tSegment + (tSegment * i));
+                        }
+                        break;
+                    }
+                case 1: //Gap at Center
+                    {
+                        bool inbounds = true;
+                        tPts.Add(0.5 + (tSegment / 2));
+                        tPts.Add(0.5 - (tSegment / 2));
+                        int i = 1;
+                        while (inbounds)
+                        {
+                            double posBound = (0.5 + (tSegment/2) + (tSegment * i));
+                            if (posBound < 1.0)
+                            {
+                                double negBound = (0.5 - ((tSegment / 2) + (tSegment * i)));
+                                tPts.Add(posBound);
+                                tPts.Add(negBound);
+                                i++;
+                            }
+                            else
+                            {
+                                inbounds = false;
+                            }
+                        }
+                        tPts.Sort();
+                        break;
+                    }
+                case 2: //Point at middle
+                    {
+                        bool inbounds = true;
+                        tPts.Add(0.5);
+                        int i = 1;
+                        while (inbounds)
+                        {
+                            double posBound = (0.5 + tSegment * i);
+                            if (posBound < 1.0)
+                            {
+                                double negBound = (0.5 - tSegment * i);
+                                tPts.Add(posBound);
+                                tPts.Add(negBound);
+                                i++;
+                            }
+                            else
+                            {
+                                inbounds = false;
+                            }
+                        }
+                        tPts.Sort();
+                        break;
+                    }
+            }
+            Pt3d[] result = new Pt3d[tPts.Count];
+            for (int i = 0; i < tPts.Count; i++)
+            {
+                result[i] = line.PointAt(tPts[i]);
+            }
+            return result;
+        }
     }
 }

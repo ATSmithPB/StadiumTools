@@ -133,46 +133,48 @@ namespace StadiumTools
             CalcRowPoints(currentTier);
             currentTier.inSection = true;
         }
-
         /// <summary>
         /// Calculates points for a tier iterativly, satisfying its minimum C-value (unless max rake angle is reached) 
         /// </summary>
         /// <param name="tier"></param>
         private static void CalcRowPoints(Tier tier)
         {
+            //                ptC---
+            //                 |
+            //                 |riserHeight
+            //       rowWidth  |
+            //   ptA----------ptB
+            //    
             //Points increment
             int p = 0;
-
             //Calc first tier  point (PtA)
-            Pt2d prevPt = new Pt2d(tier.StartPt.X + tier.StartX, tier.StartPt.Y + tier.StartY);
+            Pt2d ptA = new Pt2d(tier.StartPt.X + tier.StartX, tier.StartPt.Y + tier.StartY);
 
             //Add Fascia points if tier contains a Fascia parameter
             if (tier.FasciaHas && tier.Fascia.Points2d.Length > 0)
             {
-                int len = tier.Fascia.Points2d.Length - 1; //5   
-                for (int i = 0; i < len; i++)//runs 5 times
+                int len = tier.Fascia.Points2d.Length - 1;   
+                for (int i = 0; i < len; i++)
                 {
-                    tier.Points2d[p] = prevPt + tier.Fascia.Points2d[len - i]; //error
+                    tier.Points2d[p] = ptA + tier.Fascia.Points2d[len - i];
                     p++;
                 }
             }
 
             //Add first (non-Fascia) point  to tier
-            tier.Points2d[p] = prevPt;
+            tier.Points2d[p] = ptA;
             p++;
 
             //Calc riser points for each row iterativly | Pts(B) & Pts(C)
             for (int row = 0; row < (tier.RowCount - 1); row++)
             {
                 //Get rear riser bottom point (PtB) for current row
-                Pt2d currentPt = new Pt2d();
-                currentPt.X = prevPt.X + (tier.RowWidths[row]);
-                currentPt.Y = prevPt.Y;
-                tier.Points2d[p] = currentPt;
+                Pt2d ptB = new Pt2d(ptA.X + (tier.RowWidths[row]), ptA.Y);
+                tier.Points2d[p] = ptB;
                 p++;
 
                 //Instance a spectator for current row
-                AddRowSpectator(tier, currentPt, row);
+                AddRowSpectator(tier, ptB, row);
 
                 if (tier.SuperHas)
                 {
@@ -182,12 +184,12 @@ namespace StadiumTools
                         {
                             if (tier.SuperRiser.CurbHeight > 0.0)
                             {
-                                currentPt.Y += tier.SuperRiser.CurbHeight;
-                                tier.Points2d[p] = currentPt;
+                                ptB.Y += tier.SuperRiser.CurbHeight;
+                                tier.Points2d[p] = ptB;
                                 p++;
                             }
-                            currentPt.X += tier.SuperRiser.CurbWidth;
-                            tier.Points2d[p] = currentPt;
+                            ptB.X += tier.SuperRiser.CurbWidth;
+                            tier.Points2d[p] = ptB;
                             p++;
                         }
                     }
@@ -198,32 +200,37 @@ namespace StadiumTools
                 }
 
                 //Calc rear riser top point (PtC) for current row and add to list
-                double n = RiserHeightFromCVal(tier, currentPt, row, false);
-                currentPt.Y += n;
-                tier.Points2d[p] = currentPt;
+                double riserHeight = RiserHeightFromCVal(tier, ptB, row, false);
+                tier.RiserHeights[row] = riserHeight;
+                Pt2d ptC = new Pt2d(ptB.X, ptB.Y += riserHeight);
+                tier.Points2d[p] = ptB;
                 p++;
 
+                CalcRowStepPoints(tier, riserHeight, ptA, ptB);
+                
                 if (tier.SuperHas)
                 {
                     if (row == tier.SuperRiser.Row)
                     {
-                        currentPt.X += tier.SuperRiser.GuardrailWidth;
-                        tier.Points2d[p] = currentPt;
+                        ptC.X += tier.SuperRiser.GuardrailWidth;
+                        tier.Points2d[p] = ptC;
                         p++;
 
-                        currentPt.Y -= 0.5 * tier.SpectatorParameters.Unit;
-                        tier.Points2d[p] = currentPt;
+                        ptC.Y -= 0.5 * tier.SpectatorParameters.Unit;
+                        tier.Points2d[p] = ptC;
                         p++;
                     }
                 }
 
-                prevPt = currentPt;
+                ptA = ptC;
             }
 
             //Add final tier point (PtD) to tier
-            prevPt.X += (tier.RowWidths[tier.RowCount - 1]);
-            tier.Points2d[p] = prevPt;
-            AddRowSpectator(tier, prevPt, tier.RowCount - 1);
+            tier.AislePoints2d.Add(ptA);
+            ptA.X += (tier.RowWidths[tier.RowCount - 1]);
+            tier.Points2d[p] = ptA;
+            tier.AislePoints2d.Add(ptA);
+            AddRowSpectator(tier, ptA, tier.RowCount - 1);
         }
 
         /// <summary>
@@ -483,5 +490,30 @@ namespace StadiumTools
             return clone;
         }
 
+        public static void CalcRowStepPoints(Tier tier, double riserHeight, Pt2d ptA, Pt2d ptB)
+        {
+            tier.AislePoints2d.Add(ptA);
+            if (riserHeight <= tier.AisleStepHeight)
+            {
+                ptB.Y -= riserHeight;
+                tier.AislePoints2d.Add(ptB);
+            }
+            else
+            {
+                Pt2d stepPt = new Pt2d();
+                int nSteps = (int)Math.Floor(riserHeight / tier.AisleStepHeight);
+                stepPt.X = ptB.X - (tier.AisleStepWidth * nSteps);
+                stepPt.Y = ptA.Y;
+                tier.AislePoints2d.Add(stepPt);
+                for (int i = 0; i < nSteps; i++)
+                {
+                    stepPt.Y += riserHeight / (nSteps + 1);
+                    tier.AislePoints2d.Add(stepPt);
+
+                    stepPt.X += (tier.AisleStepWidth);
+                    tier.AislePoints2d.Add(stepPt);
+                }
+            }
+        }
     }
 }

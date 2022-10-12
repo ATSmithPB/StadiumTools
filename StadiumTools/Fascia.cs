@@ -101,5 +101,7 @@ namespace StadiumTools
             Pt2d[] defaultPts = new Pt2d[] { p0, p1, p2, p3, p4, p5 };
             return new Fascia(defaultPts, 2, unit);
         }
+
+        
     }
 }
