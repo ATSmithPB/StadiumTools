@@ -5,6 +5,7 @@ using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
 using GHA_StadiumTools.Properties;
+using Rhino.Geometry;
 
 namespace GHA_StadiumTools
 {
@@ -38,8 +39,8 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddMeshParameter("Bowl3d Meshes", "B3dM", "The mesh geometry of a StadiumTools Bowl3d object", GH_ParamAccess.tree);
-            pManager.AddTextParameter("Debug", "D", "Debug string", GH_ParamAccess.item);
+            pManager.AddMeshParameter("Bowl3d Meshes", "B3dM", "The mesh geometry of a StadiumTools Bowl3d object", GH_ParamAccess.list);
+            pManager.AddTextParameter("Debug", "D", "Debug string", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -79,13 +80,25 @@ namespace GHA_StadiumTools
             var bowl3dItem = bowl3dGooItem.Value;
 
 
-            StadiumTools.Mesh[,] bowl3dMesh = bowl3dItem.ToMesh(); 
-            Grasshopper.DataTree<Rhino.Geometry.Mesh> bowl3dMeshRC = StadiumTools.IO.DataTreeFromMultiArray(bowl3dMesh);
+            StadiumTools.Mesh[,] bowl3dMesh = bowl3dItem.ToMesh();
+            //Rhino.Geometry.Mesh bowl3dMeshRC = StadiumTools.IO.RCMeshFromSTMesh(bowl3dMesh[0, 0]);
+            //Grasshopper.DataTree<Rhino.Geometry.Mesh> bowl3dMeshRC = StadiumTools.IO.DataTreeFromMultiArray(bowl3dMesh);
+            List<Rhino.Geometry.Mesh> bowl3dMeshRC = StadiumTools.IO.ListFromMultiArray(bowl3dMesh);
+            
+            List<string> debugStringList = new List<string>();
+            int i = 0;
+            foreach (StadiumTools.Mesh m in bowl3dMesh)
+            {
+                string debugString = $"{i}: V:{m.Vertices.Count} F:{m.Faces.Count} N:{m.FaceNormals.Count}";
+                debugStringList.Add(debugString);
+                i++;
+            }
 
-            string debugString = $"bowl3d.bowlplan.sectioncount : [{bowl3dItem.BowlPlan.SectionCount}] tiercount : [{bowl3dItem.Section.Tiers.Length}]";
+            
 
-            DA.SetDataTree(OUT_Bowl3d_Mesh, bowl3dMeshRC);
-            DA.SetData(OUT_Debug, debugString);
+            //DA.SetDataTree(OUT_Bowl3d_Mesh, bowl3dMeshRC);
+            DA.SetDataList(OUT_Bowl3d_Mesh, bowl3dMeshRC);
+            DA.SetDataList(OUT_Debug, debugStringList);
         }
 
 
