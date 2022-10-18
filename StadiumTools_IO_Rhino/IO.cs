@@ -340,6 +340,19 @@ namespace StadiumTools
             return result;
         }
 
+        public static List<Rhino.Geometry.Mesh> ListFromMultiArray(StadiumTools.Mesh[,] meshes)
+        {
+            List<Rhino.Geometry.Mesh> result = new List<Rhino.Geometry.Mesh>();
+            for (int i = 0; i < meshes.GetLength(0); i++)
+            {
+                for (int j = 0; j < meshes.GetLength(1); j++)
+                {
+                    result.Add(RCMeshFromSTMesh(meshes[i, j]));
+                }
+            }
+            return result;
+        }
+
         public static Polyline PolylineFromPline(Pline pline)
         {
             return new Polyline(Points3dFromPt3ds(pline.Points));
