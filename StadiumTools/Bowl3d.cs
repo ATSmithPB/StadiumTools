@@ -38,7 +38,7 @@ namespace StadiumTools
         //Methods   
         public Mesh[,] ToMesh()
         {
-            Mesh[,] result = new Mesh[BowlPlan.SectionCount, Section.Tiers.Length];
+            Mesh[,] result = new Mesh[BowlPlan.SectionCount - 1, Section.Tiers.Length];
             for(int i = 0; i < BowlPlan.SectionCount - 1; i++)
             {
                 for (int j = 0; j < Section.Tiers.Length; j++)

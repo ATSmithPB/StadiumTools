@@ -66,6 +66,9 @@ namespace StadiumTools
             IsSolid = IsMeshSolid(this);
         }
 
+        //Delegates
+        public Mesh Cube => PrimitiveCube();
+
         //Methods
 
         public static bool IsMeshClosed(Mesh mesh)
@@ -95,31 +98,15 @@ namespace StadiumTools
 
             for (int i = 0; i < 3; i++)             
             {
-                if (i < 2)
+                int k = length * i;
+                for (int j = 0; j < length - 1; j++)
                 {
-                    int k = length * i;
-                    for (int j = 0; j < length; j++)
-                    {
-                        int a = k + j;
-                        int b = k + j + 1;
-                        int c = k + length + j + 1;
-                        int d = k + length + j;
-                        faces.Add(new Face(a, b, c, d));
-                        faceNormals.Add(Vec3d.PerpTo(vertices[a], vertices[b], vertices[c]));
-                    }
-                }
-                else
-                {
-                    int k = length * 2;
-                    for (int j = 0; j < length - 1; j++)
-                    {
-                        int a = k + j;
-                        int b = k + j + 1;
-                        int c = k + length + j + 1;
-                        int d = k + length + j;
-                        faces.Add(new Face(a, b, c, d));
-                        faceNormals.Add(Vec3d.PerpTo(vertices[a], vertices[b], vertices[c]));
-                    }
+                    int a = k + j;
+                    int b = k + j + 1;
+                    int c = k + length + j + 1;
+                    int d = k + length + j;
+                    faces.Add(new Face(a, b, c, d));
+                    faceNormals.Add(Vec3d.PerpTo(vertices[a], vertices[b], vertices[c]));
                 }
             }
             return new Mesh(vertices, faces, faceNormals);
@@ -151,6 +138,38 @@ namespace StadiumTools
 
 
             return new Mesh(vertices, faces, faceNormals);
+        }
+
+        public static Mesh PrimitiveCube()
+        {
+            List<Pt3d> vertices = new List<Pt3d>();
+            List<Face> faces = new List<Face>();
+            List<Vec3d> faceNormals = new List<Vec3d>();
+            vertices.Add(new Pt3d(0, 0, 0));
+            vertices.Add(new Pt3d(1, 0, 0));
+            vertices.Add(new Pt3d(1, 1, 0));
+            vertices.Add(new Pt3d(0, 1, 0));
+            vertices.Add(new Pt3d(0, 0, 1));
+            vertices.Add(new Pt3d(1, 0, 1));
+            vertices.Add(new Pt3d(1, 1, 1));
+            vertices.Add(new Pt3d(0, 1, 1));
+            faces.Add(new Face(3, 0, 4, 7));
+            faces.Add(new Face(0, 1, 5, 4));
+            faces.Add(new Face(3, 2, 1, 0));
+            faces.Add(new Face(1, 2, 6, 5));
+            faces.Add(new Face(7, 6, 2, 3));
+            faces.Add(new Face(6, 7, 4, 5));
+            faceNormals.Add(new Vec3d(-1, 0, 0));
+            faceNormals.Add(new Vec3d(0, -1, 0));
+            faceNormals.Add(new Vec3d(0, 0, -1));
+            faceNormals.Add(new Vec3d(1, 0, 0));
+            faceNormals.Add(new Vec3d(0, 1, 0));
+            faceNormals.Add(new Vec3d(0, 0, 1));
+
+            Mesh result = new Mesh(vertices, faces, faceNormals);
+            
+
+            return result;
         }
 
     }   
