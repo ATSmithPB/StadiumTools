@@ -52,6 +52,8 @@ namespace GHA_StadiumTools
         private static int OUT_Boundary = 0;
         private static int OUT_Curves = 1;
         private static int OUT_Planes = 2;
+        private static int OUT_Closest_Plane = 3;
+        private static int OUT_Closest_Distance = 4;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -61,6 +63,8 @@ namespace GHA_StadiumTools
             pManager.AddGenericParameter("Boundary", "B", "A Boundary object", GH_ParamAccess.item);
             pManager.AddCurveParameter("Curves", "BC", "Boundary Curves", GH_ParamAccess.list);
             pManager.AddPlaneParameter("Planes", "Pl", "Section Planes", GH_ParamAccess.list);
+            pManager.AddPlaneParameter("Closest Plane", "CPl", "Closest Section Plane on Boundary to the Touchline", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Closest Distance", "Cd", "Distance of Closest Section Plane on Boundary to the Touchline", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -74,8 +78,12 @@ namespace GHA_StadiumTools
             StadiumTools.Boundary newBoundary = ST_ConstructBoundaryRadial.ConstructBoundaryRadialFromDA(DA, this);
             List<Rhino.Geometry.PolylineCurve> curves = StadiumTools.IO.PolylineCurveListFromPlines(newBoundary.Edges);
             Rhino.Geometry.Plane[] planes = StadiumTools.IO.PlanesFromPln3ds(newBoundary.Planes);
+            Rhino.Geometry.Plane closestPlane = StadiumTools.IO.PlaneFromPln3d(newBoundary.ClosestPlane);
+
             DA.SetDataList(OUT_Curves, curves);
             DA.SetDataList(OUT_Planes, planes);
+            DA.SetData(OUT_Closest_Plane, closestPlane);
+            DA.SetData(OUT_Closest_Distance, newBoundary.ClosestPlaneDist);
 
             //Creat new GH_Goo<T> wrapper and output
             var newBoundaryGoo = new StadiumTools.BoundaryGoo(newBoundary);

@@ -13,7 +13,7 @@ namespace GHA_StadiumTools
     public class ST_ConstructPlaySurface : GH_Component
     {
         /// <summary>
-        /// A custom component for input parameters to generate a new spectator. 
+        /// A custom component for input parameters to generate a new playSurface. 
         /// </summary>
         public ST_ConstructPlaySurface()
             : base(nameof(ST_ConstructPlaySurface), "cPS", "Construct a PlaySurface from parameters", "StadiumTools", "2D Plan")
@@ -30,15 +30,19 @@ namespace GHA_StadiumTools
             pManager.AddPlaneParameter("Plane", "Pl", "Plane of Playsurface. Origin = Center Pitch. X-Axis = 'long' lxis for each pitch type", GH_ParamAccess.item, Rhino.Geometry.Plane.WorldXY);
             pManager.AddVectorParameter("North", "N", "A Vector pointing North (for climate calculations)", GH_ParamAccess.item, Rhino.Geometry.Vector3d.YAxis);
             pManager.AddIntegerParameter("LOD", "lod", "Level-Of-Detail for Markings output", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("U.O [WIP]", "UO", "0 = Document Unit. 1 = mm. 2 = cm. 3 = m. 4 = in. 5 = ft. 6 = yrd", GH_ParamAccess.item, 0);
         }
 
         //Set parameter indixes to names (for readability)
         private static int IN_Type = 0;
         private static int IN_Plane = 1;
         private static int IN_North = 2;
+        private static int IN_LOD = 3;
+        private static int IN_Units_Override = 4;
         private static int OUT_PlaySurface = 0;
-        private static int OUT_Boundary = 1;
-        private static int OUT_Markings = 2;
+        private static int OUT_Touchline = 1;
+        private static int OUT_TouchlinePL = 2;
+        private static int OUT_Markings = 3;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -47,7 +51,8 @@ namespace GHA_StadiumTools
         {
             pManager.AddGenericParameter("PlaySurface", "PS", "A PlaySurface object", GH_ParamAccess.item);
             pManager.AddCurveParameter("Touchline", "Tl", "A closed PolyCurve that represents the touchline of the PlaySurface", GH_ParamAccess.item);
-            pManager.AddCurveParameter("Markings", "M", "A collection of curves that represent common PlaySurface markings", GH_ParamAccess.list);
+            pManager.AddCurveParameter("TouchlinePL", "TlPL", "A closed PolyLine that approximates the touchline of the PlaySurface", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Markings", "M", "A collection of curves that represent common PlaySurface markings", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -57,24 +62,37 @@ namespace GHA_StadiumTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var playSurface = new StadiumTools.PlaySurface();
-            
-            ST_ConstructPlaySurface.HandleErrors(DA, this);
-            ST_ConstructPlaySurface.ConstructPlaySurfaceFromDA(DA, ref playSurface);
+            //Check if unit system is supported by StadiumTools
+            string unitSystemName = Rhino.RhinoDoc.ActiveDoc.GetUnitSystemName(true, false, true, true);
 
-            var newPlaySurfaceGoo = new StadiumTools.PlaySurfaceGoo(playSurface);
-            Rhino.Geometry.PolyCurve boundary = StadiumTools.IO.PolyCurveFromICurveArray(playSurface.Boundary);
-            boundary.MakeClosed(Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
-            int markingCount = playSurface.Markings.Length;
-            
-            if (playSurface.Markings.Length > 1)
+            //Handle Errors
+            ST_ConstructPlaySurface.HandleErrors(DA, this);
+
+            //Instance a new PlaySurface
+            var newPlaySurface = new StadiumTools.PlaySurface();
+            newPlaySurface.Unit = 1.0;
+
+            //Set parameters from Data Access
+            ST_ConstructPlaySurface.ConstructPlaySurfaceFromDA(DA, ref newPlaySurface, unitSystemName);
+
+            //GH_Goo<T> wrapper
+            var newPlaySurfaceGoo = new StadiumTools.PlaySurfaceGoo(newPlaySurface);
+
+
+            Rhino.Geometry.PolyCurve touchLine = StadiumTools.IO.PolyCurveFromICurveArray(newPlaySurface.TouchLine);
+            Rhino.Geometry.PolylineCurve touchLinePL = StadiumTools.IO.PolylineCurveFromPline(newPlaySurface.TouchLinePL);
+            touchLine.MakeClosed(Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+            int markingCount = newPlaySurface.Markings.Length;
+
+            //Output
+            DA.SetData(OUT_PlaySurface, newPlaySurfaceGoo);
+            DA.SetData(OUT_Touchline, touchLine);
+            DA.SetData(OUT_TouchlinePL, touchLinePL);
+            if (newPlaySurface.Markings.Length > 1)
             {
-                Rhino.Geometry.Curve[] markings = StadiumTools.IO.CurveArrayFromICurveArray(playSurface.Markings);
+                Rhino.Geometry.Curve[] markings = StadiumTools.IO.CurveArrayFromICurveArray(newPlaySurface.Markings);
                 DA.SetData(OUT_Markings, markings);
             }
-            
-            DA.SetData(OUT_PlaySurface, newPlaySurfaceGoo);
-            DA.SetData(OUT_Boundary, boundary);   
         }
 
         /// <summary>
@@ -116,12 +134,14 @@ namespace GHA_StadiumTools
             }
         }
 
-        private static void ConstructPlaySurfaceFromDA(IGH_DataAccess DA, ref StadiumTools.PlaySurface newPlaySurface)
+        private static void ConstructPlaySurfaceFromDA(IGH_DataAccess DA, ref StadiumTools.PlaySurface newPlaySurface, string unitSystemName)
         {
             //Containers (Destination)
             int intItem = 0;
             var planeItem = new Rhino.Geometry.Plane();
             var vectorItem = new Rhino.Geometry.Vector3d();
+
+            SetUnits(DA, ref newPlaySurface, unitSystemName);
 
             //Set PlaySurface Params
             if (!DA.GetData<int>(IN_Type, ref intItem)) { return; }
@@ -138,6 +158,37 @@ namespace GHA_StadiumTools
             newPlaySurface = new StadiumTools.PlaySurface(pln2d, north, unit, type, 0);
         }
 
-        
+        private static void SetUnits(IGH_DataAccess DA, ref StadiumTools.PlaySurface playSurface, string unitSystemName)
+        {
+            double metersPerUnit = StadiumTools.UnitHandler.FromString("Rhino", unitSystemName);
+
+            int intItem = 0;
+
+            if (!DA.GetData<int>(IN_Units_Override, ref intItem)) { return; }
+            switch (intItem)
+            {
+                case 0:
+                    playSurface.Unit = metersPerUnit;
+                    break;
+                case 1:
+                    playSurface.Unit = StadiumTools.UnitHandler.mm;
+                    break;
+                case 2:
+                    playSurface.Unit = StadiumTools.UnitHandler.cm;
+                    break;
+                case 3:
+                    playSurface.Unit = StadiumTools.UnitHandler.m;
+                    break;
+                case 4:
+                    playSurface.Unit = StadiumTools.UnitHandler.inch;
+                    break;
+                case 5:
+                    playSurface.Unit = StadiumTools.UnitHandler.feet;
+                    break;
+                case 6:
+                    playSurface.Unit = StadiumTools.UnitHandler.yard;
+                    break;
+            }
+        }
     }
 }

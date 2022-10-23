@@ -26,13 +26,11 @@ namespace GHA_StadiumTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Playsurface", "PS", "The Playsurface of the Bowl Plan", GH_ParamAccess.item);
             pManager.AddGenericParameter("Boundary", "B", "A Boundary to construct the BowlPlan from", GH_ParamAccess.item);
         }
 
         //Set parameter indixes to names (for readability)
-        private static int IN_PlaySurface = 0;
-        private static int IN_Boundary = 1;
+        private static int IN_Boundary = 0;
         private static int OUT_BowlPlan = 0;
 
         /// <summary>
@@ -79,14 +77,11 @@ namespace GHA_StadiumTools
         private static StadiumTools.BowlPlan ConstructBowlPlanFromDA(IGH_DataAccess DA, GH_Component thisComponent)
         {
             //Item Containers  
-            var playSurfaceGooItem = new StadiumTools.PlaySurfaceGoo();
             var boundaryGooItem = new StadiumTools.BoundaryGoo();
             
-            DA.GetData<StadiumTools.PlaySurfaceGoo>(IN_PlaySurface, ref playSurfaceGooItem);
             DA.GetData<StadiumTools.BoundaryGoo>(IN_Boundary, ref boundaryGooItem);
-            StadiumTools.PlaySurface ps = playSurfaceGooItem.Value;
             StadiumTools.Boundary boundary = boundaryGooItem.Value;
-            return new StadiumTools.BowlPlan(ps, boundary, true);
+            return new StadiumTools.BowlPlan(boundary, true);
         }
 
         

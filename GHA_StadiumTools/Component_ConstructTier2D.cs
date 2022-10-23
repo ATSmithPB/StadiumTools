@@ -32,7 +32,6 @@ namespace GHA_StadiumTools
             pManager.AddNumberParameter("Seperation", "Ss", "Distance between spectators seated on the same row (side-by-side)", GH_ParamAccess.item, defaultTier.SpecSeperation);
             pManager.AddNumberParameter("Start X", "sX", "Horizontal start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartX);
             pManager.AddNumberParameter("Start Y", "sY", "Vertical start distance of Tier Start", GH_ParamAccess.item, defaultTier.StartY);
-            pManager.AddBooleanParameter("Start", "St", "True if Tier Start is the end of the previous tier. False to use Section POF", GH_ParamAccess.item, defaultTier.BuildFromPreviousTier);
             pManager.AddIntegerParameter("Row Count", "rC", "Number of rows", GH_ParamAccess.item, defaultTier.RowCount);
             pManager.AddNumberParameter("Row Width", "rW", "Row width", GH_ParamAccess.item, defaultTier.DefaultRowWidth);
             pManager.AddNumberParameter("Aisle Width", "aW", "Minimum Width of Aisles in this Tier", GH_ParamAccess.item, defaultTier.AisleWidth);
@@ -42,9 +41,9 @@ namespace GHA_StadiumTools
             pManager.AddGenericParameter("Vomatory", "V", "An optional Vomatory object to inherit parameters from", GH_ParamAccess.item);
             pManager.AddGenericParameter("Fascia", "F", "An optional Fascia object to apply to the beginning of the tier", GH_ParamAccess.item);
             
+            pManager[9].Optional = true;
             pManager[10].Optional = true;
             pManager[11].Optional = true;
-            pManager[12].Optional = true;
         }
 
         //Set parameter indixes to names  (for readability)
@@ -52,15 +51,14 @@ namespace GHA_StadiumTools
         private static int IN_Seperation = 1;
         private static int IN_Start_X = 2;
         private static int IN_Start_Y = 3;
-        private static int IN_Start = 4;
-        private static int IN_Row_Count = 5;
-        private static int IN_Row_Width = 6;
-        private static int IN_Aisle_Width = 7;
-        private static int IN_Rounding = 8;
-        private static int IN_Maximum_Rake_Angle = 9;
-        private static int IN_SuperRiser = 10;
-        private static int IN_Vomatory = 11;
-        private static int IN_Fascia = 12;
+        private static int IN_Row_Count = 4;
+        private static int IN_Row_Width = 5;
+        private static int IN_Aisle_Width = 6;
+        private static int IN_Rounding = 7;
+        private static int IN_Maximum_Rake_Angle = 8;
+        private static int IN_SuperRiser = 9;
+        private static int IN_Vomatory = 10;
+        private static int IN_Fascia = 11;
         private static int OUT_Tier = 0;
 
         /// <summary>
@@ -112,27 +110,10 @@ namespace GHA_StadiumTools
         //Methods
         private static void HandleErrors(IGH_DataAccess DA, GH_Component thisComponent)
         {
-            bool start = false;
             int rowCount = 0;
             double doubleItem = 0.0;
             var superItem = new StadiumTools.SuperRiser();
 
-            if (!DA.GetData<bool>(IN_Start, ref start)) { return; }
-
-            if (DA.GetData<double>(IN_Start_X, ref doubleItem))
-            {
-                if (!start && doubleItem < 0.0)
-                {
-                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "If Tier Start = False, or Tier is index 0 in a Section. Start X must be non-negative and not equal to 0");
-                }
-            }
-            if (!start && DA.GetData<double>(IN_Start_Y, ref doubleItem))
-            {
-                if (doubleItem < 0.0)
-                {
-                    thisComponent.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "If Tier Start = False, or Tier is index 0 in a Section. Start Y must be non-negative and not equal to 0");
-                }
-            }
             if (DA.GetData<int>(IN_Row_Count, ref rowCount))
             {
                 if (rowCount < 3)
@@ -164,9 +145,7 @@ namespace GHA_StadiumTools
             var vomItem = new StadiumTools.Vomatory();
             var fasciaItem = new StadiumTools.Fascia();
             int intItem = 0;
-            bool boolItem = false;
             double doubleItem = 0.0;
-            double[] doubleArrayItem = new double[0];
 
             //Get & Set Tier parameters
             if(!DA.GetData(IN_Spectator, ref spectatorGooItem)) { return; }   
@@ -180,9 +159,6 @@ namespace GHA_StadiumTools
 
             if (!DA.GetData(IN_Start_Y, ref doubleItem)) { return; }
             tier.StartY = doubleItem;
-
-            if (!DA.GetData(IN_Start, ref boolItem)) { return; }
-            tier.BuildFromPreviousTier = boolItem;
 
             if (!DA.GetData(IN_Row_Count, ref intItem)) { return; }
             tier.RowCount = intItem;
@@ -238,7 +214,7 @@ namespace GHA_StadiumTools
             tier.Points2d = new StadiumTools.Pt2d[tier.Points2dCount];
             tier.AisleStepHeight = 0.230 * tier.SpectatorParameters.Unit;
             tier.AisleStepWidth = 0.260 * tier.SpectatorParameters.Unit;
-            tier.AislePoints2d = new List<StadiumTools.Pt2d>();
+            tier.AislePoints2d = new StadiumTools.Pt2d[0];
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
 using GHA_StadiumTools.Properties;
+using Rhino.DocObjects;
 
 namespace GHA_StadiumTools
 {
@@ -52,10 +53,8 @@ namespace GHA_StadiumTools
         {
             //Construct a new section from Data Access
             StadiumTools.Section newSection = ST_ConstructSection2D.ConstructSectionFromDA(DA, this);
-
             //GH_Goo<T> wrapper
             var newSectionGoo = new StadiumTools.SectionGoo(newSection);
-
             //Output Goo
             DA.SetData(OUT_Section, newSectionGoo);
         }
@@ -95,7 +94,7 @@ namespace GHA_StadiumTools
             //Get Plane3d
             DA.GetData<Rhino.Geometry.Plane>(IN_SectionPlane, ref planeItem);
             StadiumTools.Pln3d pln = StadiumTools.IO.Pln3dFromPlane(planeItem);
-
+            
             //Construct a new section
             var newSection = new StadiumTools.Section(tierArray, pln);
             return newSection;

@@ -5,6 +5,7 @@ using System.Drawing;
 using Rhino;
 using Grasshopper.Kernel;
 using GHA_StadiumTools.Properties;
+using StadiumTools;
 
 namespace GHA_StadiumTools
 {
@@ -34,6 +35,9 @@ namespace GHA_StadiumTools
         private static int IN_BowlPlan = 0;
         private static int IN_Section = 1;
         private static int OUT_Bowl3D = 0;
+        private static int OUT_Closest_Section = 1;
+        private static int OUT_Sections = 2;
+        private static int OUT_Debug = 3;
 
         /// <summary>
         /// Registers all the output parameters for this component.
@@ -41,6 +45,9 @@ namespace GHA_StadiumTools
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("Bowl3D", "B3D", "A Bowl3D object", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Closest Section", "CS", "The closest Section to the Touchline. Used to calculate riser heights for target C-Values", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Sections", "S", "All Sections of the Bowl3d", GH_ParamAccess.list);
+            pManager.AddTextParameter("Debug", "Db", "Debug text", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -52,12 +59,19 @@ namespace GHA_StadiumTools
         {
             //Construct a new section from Data Access
             StadiumTools.Bowl3d newBowl3d = ST_ConstructBowl3D.ConstructBowl3dFromDA(DA, this);
-
+            
             //GH_Goo<T> wrapper
             var newBowl3dGoo = new StadiumTools.Bowl3dGoo(newBowl3d);
+            var closestSectionGoo = new StadiumTools.SectionGoo(newBowl3d.ClosestSection);
+            string debug = ($"b3d.cs.pln = ({newBowl3d.ClosestSection.Plane.OriginPt.X}, {newBowl3d.ClosestSection.Plane.OriginPt.Y}, {newBowl3d.ClosestSection.Plane.OriginPt.Z}), b3d.b.cp = ({newBowl3d.BowlPlan.Boundary.ClosestPlane.OriginPt.X}, {newBowl3d.BowlPlan.Boundary.ClosestPlane.OriginPt.Y}, {newBowl3d.BowlPlan.Boundary.ClosestPlane.OriginPt.Z})");
+            var sectionGoos = SectionGoosFromSections(newBowl3d.Sections);
+            
 
             //Output Goo
             DA.SetData(OUT_Bowl3D, newBowl3dGoo);
+            DA.SetData(OUT_Closest_Section, closestSectionGoo);
+            DA.SetDataList(OUT_Sections, sectionGoos);
+            DA.SetData(OUT_Debug, debug);
         }
 
         /// <summary>
@@ -88,13 +102,21 @@ namespace GHA_StadiumTools
 
             var bowlPlanItem = bowlPlanGooItem.Value;
             var sectionItem = sectionGooItem.Value;
-
             //Construct a new Bowl3d
             var newBowl3d = new StadiumTools.Bowl3d(sectionItem, bowlPlanItem);
             return newBowl3d;
         }
 
-
+        private static SectionGoo[] SectionGoosFromSections(StadiumTools.Section[] sections)
+        {
+            SectionGoo[] result = new SectionGoo[sections.Length];
+            for (int i = 0; i < sections.Length; i++)
+            {
+                SectionGoo newSectionGoo = new SectionGoo(sections[i]);
+                result[i] = newSectionGoo;
+            }
+            return result;
+        }
 
 
     }
