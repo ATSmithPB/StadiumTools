@@ -38,7 +38,7 @@ namespace StadiumTools
         }
 
         /// <summary>
-        /// Returns a Pln3d object from a Rhino Plane
+        /// Returns a Pln3d object from a Rhino Plane  
         /// </summary>
         /// <param name="plane"></param>
         /// <returns>Pln3d</returns>
@@ -128,13 +128,18 @@ namespace StadiumTools
         /// Returns a Pt3d object from a Rhino Point3d
         /// </summary>
         /// <param name="point3d"></param>
-        /// <returns></returns>
+        /// <returns>Pt3d</returns>
         public static Pt3d Pt3dFromPoint3d(Point3d point3d)
         {
             Pt3d pt = new Pt3d(point3d.X, point3d.Y, point3d.Z);
             return pt;
         }
 
+        /// <summary>
+        /// returns an array of Rhino Points from an array of StadiumTools Pt3ds
+        /// </summary>
+        /// <param name="pt3ds"></param>
+        /// <returns></returns>
         public static Point3d[] Points3dFromPt3ds(Pt3d[] pt3ds)
         {
             Point3d[] points3d = new Point3d[pt3ds.Length];
@@ -387,10 +392,15 @@ namespace StadiumTools
             return polyline;
         }
 
+        /// <summary>
+        /// returns the top polyline of a tier's aisle   
+        /// </summary>
+        /// <param name="tier"></param>
+        /// <returns>Polyline</returns>
         public static Polyline AislePolylineFromTier(Tier tier)
         {
             Polyline polyline = new Polyline();
-            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Count];
+            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Length];
             for (int i = 0; i < rhinoPts.Length; i++)
             {
                 Pt3d pt3d = tier.AislePoints2d[i].ToPt3d(tier.Plane);
@@ -421,9 +431,9 @@ namespace StadiumTools
 
         public static Point3d[] AislePointsFromTier(Tier tier)
         {
-            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Count];
+            Point3d[] rhinoPts = new Point3d[tier.AislePoints2d.Length];
 
-            for (int i = 0; i < tier.AislePoints2d.Count; i++)
+            for (int i = 0; i < tier.AislePoints2d.Length; i++)
             {
                 Pt3d pt3d = tier.AislePoints2d[i].ToPt3d(tier.Plane);
                 rhinoPts[i] = Point3dFromPt3d(pt3d);
@@ -473,6 +483,11 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// returns a list of Rhino Curves from an Array of StadiumTools ICurves
+        /// </summary>
+        /// <param name="iCrvs"></param>
+        /// <returns></returns>
         public static List<Curve> CurveListFromICurveArray(ICurve[] iCrvs)
         {
             List<Curve> result = new List<Curve>();
@@ -483,6 +498,12 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// Construct a Rhino Curve from an ICurve
+        /// </summary>
+        /// <param name="icrv"></param>
+        /// <returns></returns>
+        /// <exception cref="System.Exception"></exception>
         public static Curve CurveFromICurve(ICurve icrv)
         {
             string typeName = icrv.GetType().Name;
@@ -492,7 +513,7 @@ namespace StadiumTools
                     return CurveFromLine((StadiumTools.Line)icrv);
                 case "Arc":
                     return CurveFromArc((StadiumTools.Arc)icrv);
-                case "Ellipse2d":
+                case "Ellipse":
                     return CurveFromEllipse((StadiumTools.Ellipse)icrv);
                 default:
                     throw new System.Exception($"ICurve type [{icrv.GetType().Name}] not available for conversion to Rhino.Geometry.Curve");
@@ -512,6 +533,11 @@ namespace StadiumTools
             return result;
         }
 
+        /// <summary>
+        /// constructs a Rhino Curve from a stadium tools Arc
+        /// </summary>
+        /// <param name="arcs"></param>
+        /// <returns>Curve</returns>
         public static Rhino.Geometry.Curve[] CurvesFromArcs(StadiumTools.Arc[] arcs)
         {
             Rhino.Geometry.Curve[] result = new Rhino.Geometry.Curve[arcs.Length];
@@ -553,6 +579,11 @@ namespace StadiumTools
             return new StadiumTools.Domain(interval.Min, interval.Max);
         }
 
+        /// <summary>
+        /// returns a Rhino Arc from a StadiumTools Arc
+        /// </summary>
+        /// <param name="stArc"></param>
+        /// <returns>Rhino.Geometry.Arc</returns>
         public static Rhino.Geometry.Arc RCArcFromArc(StadiumTools.Arc stArc)
         {
             Interval angleIntervalRadians = IntervalFromDomain(stArc.Domain);
@@ -561,6 +592,11 @@ namespace StadiumTools
             return new Rhino.Geometry.Arc(circle, angleIntervalRadians);
         }
 
+        /// <summary>
+        /// returns a array of Rhino Lines from an array of StadiumTools Lines
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns>Rhino.Geometry.Line[]</returns>
         public static Rhino.Geometry.Line[] RCLinesFromLines(StadiumTools.Line[] lines)
         {
             Rhino.Geometry.Line[] result = new Rhino.Geometry.Line[lines.Length];

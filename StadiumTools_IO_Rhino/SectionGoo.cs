@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using StadiumTools;
 using Rhino;
 using Rhino.Geometry;
@@ -23,8 +24,13 @@ namespace StadiumTools
         public SectionGoo(Section section)
         {
             if (section == null)
-                section = new Section();
-            this.Value = section;
+            {
+                section = new Section();    
+            }
+            else
+            {
+                this.Value = section;
+            }
         }
 
         public override IGH_Goo Duplicate()
@@ -48,9 +54,13 @@ namespace StadiumTools
         public override string ToString()
         {
             if (Value == null)
+            {
                 return "Null Section";
+            }
             else
-                return $"Section: T:{Value.Tiers.Length}";
+            {
+                return $"Section: U:{Value.Unit} T:{Value.Tiers.Length}";
+            }
         }
         public override string TypeName
         {

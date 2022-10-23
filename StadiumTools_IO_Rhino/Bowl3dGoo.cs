@@ -49,9 +49,9 @@ namespace StadiumTools
             if (Value == null)
                 return "Null Bowl3d";
             else
-                return $"Bowl3d: PS:{Value.BowlPlan.PlaySurfaceParameters.SportType}, BS:{Value.BowlPlan.Boundary.BoundaryStyle}, nT:{Value.Section.Tiers.Length}, nS:{Value.BowlPlan.SectionCount}";
+                return $"Bowl3d: PS:{Value.BowlPlan.Boundary.PlaySurfaceParameters.SportType}, BS:{Value.BowlPlan.Boundary.BoundaryStyle}, nT:{Value.Sections[0].Tiers.Length}, nS:{Value.BowlPlan.SectionCount}";
         }
-        public override string TypeName
+        public override string TypeName 
         {
             get { return ("Bowl3d"); }
         }

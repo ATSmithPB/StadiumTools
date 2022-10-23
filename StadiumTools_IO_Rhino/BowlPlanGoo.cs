@@ -49,7 +49,7 @@ namespace StadiumTools
             if (Value == null)
                 return "Null BowlPlan";
             else
-                return $"BowlPlan: PS:{Value.PlaySurfaceParameters.SportType}, BS:{Value.Boundary.BoundaryStyle}, nS:{Value.SectionCount}";
+                return $"BowlPlan: U:{Value.Unit} PS:{Value.Boundary.PlaySurfaceParameters.SportType}, BS:{Value.Boundary.BoundaryStyle}, nS:{Value.SectionCount}";
         }
         public override string TypeName
         {

@@ -51,7 +51,7 @@ namespace StadiumTools
             if (Value.IsValid == false)
                 return "Null Playsurface";
             else
-                return $"PlaySurface: T:{Value.SportType} B:{Value.Boundary.Length}, P:[{Value.Plane.OriginX},{Value.Plane.OriginY}]";
+                return $"PlaySurface: U:{Value.Unit} T:{Value.SportType} TL:{Value.TouchLine.Length}, P:[{Value.Plane.OriginX},{Value.Plane.OriginY}]";
         }
         public override string TypeName
         {
