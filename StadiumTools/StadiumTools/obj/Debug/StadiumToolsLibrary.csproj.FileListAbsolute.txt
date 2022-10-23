@@ -1,0 +1,9 @@
+C:\Users\ATSmi\source\repos\StadiumTools\obj\Debug\StadiumToolsLibrary.csproj.AssemblyReference.cache
+C:\Users\ATSmi\source\repos\StadiumTools\obj\Debug\StadiumToolsLibrary.csproj.CoreCompileInputs.cache
+C:\Users\ATSmi\source\repos\StadiumTools\obj\Debug\StadiumTools.dll
+C:\Users\ATSmi\source\repos\StadiumTools\obj\Debug\StadiumTools.pdb
+C:\Users\ATSmi\source\repos\StadiumTools\bin\Debug\StadiumTools.dll
+C:\Users\ATSmi\source\repos\StadiumTools\bin\Debug\StadiumTools.pdb
+C:\Users\ATSmi\source\repos\StadiumTools\bin\Debug\RhinoCommon.dll
+C:\Users\ATSmi\source\repos\StadiumTools\bin\Debug\RhinoCommon.xml
+C:\Users\ATSmi\source\repos\StadiumTools\obj\Debug\StadiumToolsLibrary.csproj.CopyComplete
